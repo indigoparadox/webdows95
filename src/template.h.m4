@@ -1,9 +1,11 @@
-
-`#'ifndef TEMPLATE_H
-`#'define TEMPLATE_H
+divert(-1)
+define(`guarda', `$1_H')
+divert(0)
+`#'ifndef guarda(TEMPLATE)
+`#'define guarda(TEMPLATE)
 
 `#'include <stdint.h>
 `#'include <stddef.h>
 
-`#'endif /* TEMPLATE_H */
+`#'endif /* guarda(TEMPLATE) */
 

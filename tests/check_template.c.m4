@@ -1,4 +1,6 @@
-
+divert(-1)
+define(`suitea', `$1_suite( void )')
+divert(0)
 `#'include <check.h>
 `#'include "../src/template.h"
 
@@ -14,7 +16,7 @@ static void setup_example() {
 static void teardown_example() {
 }
 
-Suite* template_suite( void ) {
+Suite* suitea(template) {
    Suite* s = NULL;
    TCase* tc_example = NULL;
 
