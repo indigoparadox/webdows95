@@ -25,3 +25,5 @@ if [ -n "$TEMPLATE_PROJECT_NAME" ]; then
    done
 fi
 
+rm $0
+
