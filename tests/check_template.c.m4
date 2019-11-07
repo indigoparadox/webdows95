@@ -1,8 +1,8 @@
 
-#include <check.h>
-#include "../src/template.h"
+`#'include <check.h>
+`#'include "../src/template.h"
 
-#include <stdio.h>
+`#'include <stdio.h>
 
 START_TEST( test_example ) {
 }
