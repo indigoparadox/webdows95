@@ -7,6 +7,14 @@ while (( "$#" )); do
          PROJECT_OPTS="$PROJECT_OPTS -D do_flask=enabled"
          ;;
 
+      "gpl3")
+         PROJECT_LICENSE="gpl3"
+         ;;
+
+      "lgpl3")
+         PROJECT_LICENSE="lgpl3"
+         ;;
+
       *)
          if [ -z "$PROJECT_NAME" ]; then
             PROJECT_NAME="$1"
@@ -61,6 +69,12 @@ case $PROJECT_LANG in
       exit 8
       ;;
 esac
+
+if [ "$PROJECT_LICENSE" = "gpl3" ]; then
+   wget "https://www.gnu.org/licenses/gpl-3.0.txt" -O LICENSE
+elif [ "$PROJECT_LICENSE" = "lgpl3" ]; then
+   wget "https://www.gnu.org/licenses/lgpl-3.0.txt" -O LICENSE
+fi
 
 # Loop through the files list and replace occurences of "template" with the
 # project name in the file names and contents.
