@@ -1,29 +1,79 @@
 #!/bin/bash
 
-echo "Project name?"
-read TEMPLATE_PROJECT_NAME
+PROJECT_OPTS=""
+while (( "$#" )); do
+   case "$1" in
+      "flask")
+         PROJECT_OPTS="$PROJECT_OPTS -D do_flask=enabled"
+         ;;
 
-TEMPLATE_PROJECT_UPPER=`echo "$TEMPLATE_PROJECT_NAME" | \
+      *)
+         if [ -z "$PROJECT_NAME" ]; then
+            PROJECT_NAME="$1"
+         elif [ -z "$PROJECT_LANG" ]; then
+            PROJECT_LANG="$1"
+         else
+            echo "Unsupported options: $1"
+            exit 16
+         fi
+         ;;
+   esac
+   shift
+done
+
+if [ -z "$PROJECT_NAME" ]; then
+   echo "Project name?"
+   read PROJECT_NAME
+   if [ -z "$PROJECT_NAME" ]; then
+      exit 2
+   fi
+fi
+
+if [ -z "$PROJECT_LANG" ]; then
+   echo "Language? (c/python)"
+   read PROJECT_LANG
+   if [ -z "$PROJECT_LANG" ]; then
+      exit 4
+   fi
+fi
+
+PROJECT_UPPER=`echo "$PROJECT_NAME" | \
    tr '[a-z]' '[A-Z]'`
 
-TEMPLATE_FILES="
-   src/Makefile
-   src/template.c
-   src/template.h
-   tests/check.c
-   tests/check_template.c"
+case $PROJECT_LANG in
+   "c")
+      TEMPLATE_FILES="
+         src/Makefile
+         src/template.c
+         src/template.h
+         tests/check.c
+         tests/check_template.c"
+      ;;
+   
+   "python")
+      TEMPLATE_FILES="
+         src/server.py
+         "
+      ;;
+
+   *)
+      echo "Invalid language specified."
+      exit 8
+      ;;
+esac
 
 # Loop through the files list and replace occurences of "template" with the
 # project name in the file names and contents.
-if [ -n "$TEMPLATE_PROJECT_NAME" ]; then
+if [ -n "$PROJECT_NAME" ]; then
    for TEMPL_ITER in $TEMPLATE_FILES; do
-      TEMPL_OUT="`sed "s/template/$TEMPLATE_PROJECT_NAME/g" <<< "$TEMPL_ITER"`"
+      TEMPL_OUT="`sed "s/template/$PROJECT_NAME/g" <<< "$TEMPL_ITER"`"
       m4 \
-         -D template="$TEMPLATE_PROJECT_NAME" \
-         -D TEMPLATE="$TEMPLATE_PROJECT_UPPER" \
+         -D template="$PROJECT_NAME" \
+         -D TEMPLATE="$PROJECT_UPPER" \
+         $PROJECT_OPTS \
          $TEMPL_ITER.m4 > $TEMPL_OUT
    done
 fi
 
-rm $0
+#rm $0
 
