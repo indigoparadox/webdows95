@@ -1,10 +1,22 @@
 #!/bin/bash
 
 PROJECT_OPTS=""
+DO_FLASK=0
+DO_BOOTSTRAP=0
+DO_JQUERY=0
+DO_NPM=0
 while (( "$#" )); do
    case "$1" in
       "flask")
-         PROJECT_OPTS="$PROJECT_OPTS -D do_flask=enabled"
+         DO_FLASK=1
+         ;;
+
+      "bootstrap")
+         DO_BOOTSTRAP=1
+         ;;
+
+      "jquery")
+         DO_JQUERY=1
          ;;
 
       "gpl3")
@@ -18,8 +30,6 @@ while (( "$#" )); do
       *)
          if [ -z "$PROJECT_NAME" ]; then
             PROJECT_NAME="$1"
-         elif [ -z "$PROJECT_LANG" ]; then
-            PROJECT_LANG="$1"
          else
             echo "Unsupported options: $1"
             exit 16
@@ -29,6 +39,26 @@ while (( "$#" )); do
    shift
 done
 
+if [ $DO_BOOTSTRAP = 1 ]; then
+   PROJECT_OPTS="$PROJECT_OPTS -D do_bootstrap=enabled"
+   DO_FLASK=1
+   DO_NPM=1
+fi
+
+if [ $DO_JQUERY = 1 ]; then
+   PROJECT_OPTS="$PROJECT_OPTS -D do_jquery=enabled"
+   DO_FLASK=1
+   DO_NPM=1
+fi
+
+if [ $DO_FLASK = 1 ]; then
+   PROJECT_OPTS="$PROJECT_OPTS -D do_flask=enabled"
+fi
+
+if [ $DO_NPM = 1 ]; then
+   PROJECT_OPTS="$PROJECT_OPTS -D do_npm=enabled"
+fi
+
 if [ -z "$PROJECT_NAME" ]; then
    echo "Project name?"
    read PROJECT_NAME
@@ -37,38 +67,28 @@ if [ -z "$PROJECT_NAME" ]; then
    fi
 fi
 
-if [ -z "$PROJECT_LANG" ]; then
-   echo "Language? (c/python)"
-   read PROJECT_LANG
-   if [ -z "$PROJECT_LANG" ]; then
-      exit 4
+if [ -z "$PROJECT_LICENSE" ]; then
+   echo "License? (gpl3/lgpl3)"
+   read PROJECT_LICENSE
+   if [ -z "$PROJECT_LICENSE" ]; then
+      exit 32
    fi
 fi
 
 PROJECT_UPPER=`echo "$PROJECT_NAME" | \
    tr '[a-z]' '[A-Z]'`
 
-case $PROJECT_LANG in
-   "c")
-      TEMPLATE_FILES="
-         src/Makefile
-         src/template.c
-         src/template.h
-         tests/check.c
-         tests/check_template.c"
-      ;;
-   
-   "python")
-      TEMPLATE_FILES="
-         src/server.py
-         "
-      ;;
+TEMPLATE_FILES="
+   src/server.py
+   "
 
-   *)
-      echo "Invalid language specified."
-      exit 8
-      ;;
-esac
+if [ $DO_FLASK = 1 ]; then
+   TEMPLATE_FILES="$TEMPLATE_FILES Dockerfile requirements.txt"
+fi
+
+if [ $DO_NPM = 1 ]; then
+   TEMPLATE_FILES="$TEMPLATE_FILES Gruntfile.js package.json"
+fi
 
 if [ "$PROJECT_LICENSE" = "gpl3" ]; then
    wget "https://www.gnu.org/licenses/gpl-3.0.txt" -O LICENSE

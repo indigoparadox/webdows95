@@ -1,3 +1,7 @@
-bin
-obj
-src/test_*
+env
+__pycache__
+*.swp
+*.pyc
+node_modules
+*.min.js
+*.min.css
