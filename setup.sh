@@ -1,6 +1,8 @@
 #!/bin/bash
 
+PROJECT_DIR="$(dirname $0)"
 PROJECT_OPTS=""
+LICENSE_PATH="$PROJECT_DIR/LICENSE"
 DO_FLASK=0
 DO_BOOTSTRAP=0
 DO_JQUERY=0
@@ -59,6 +61,8 @@ if [ $DO_NPM = 1 ]; then
    PROJECT_OPTS="$PROJECT_OPTS -D do_npm=enabled"
 fi
 
+echo "$PROJECT_DIR"
+
 if [ -z "$PROJECT_NAME" ]; then
    echo "Project name?"
    read PROJECT_NAME
@@ -91,21 +95,22 @@ if [ $DO_NPM = 1 ]; then
 fi
 
 if [ "$PROJECT_LICENSE" = "gpl3" ]; then
-   wget "https://www.gnu.org/licenses/gpl-3.0.txt" -O LICENSE
+   wget "https://www.gnu.org/licenses/gpl-3.0.txt" -O "$LICENSE_PATH"
 elif [ "$PROJECT_LICENSE" = "lgpl3" ]; then
-   wget "https://www.gnu.org/licenses/lgpl-3.0.txt" -O LICENSE
+   wget "https://www.gnu.org/licenses/lgpl-3.0.txt" -O "$LICENSE_PATH"
 fi
 
 # Loop through the files list and replace occurences of "template" with the
 # project name in the file names and contents.
 if [ -n "$PROJECT_NAME" ]; then
    for TEMPL_ITER in $TEMPLATE_FILES; do
-      TEMPL_OUT="`sed "s/template/$PROJECT_NAME/g" <<< "$TEMPL_ITER"`"
+      TEMPL_OUT="`sed "s/template/$PROJECT_NAME/g" \
+         <<< "$PROJECT_DIR/$TEMPL_ITER"`"
       m4 \
          -D template="$PROJECT_NAME" \
          -D TEMPLATE="$PROJECT_UPPER" \
          $PROJECT_OPTS \
-         $TEMPL_ITER.m4 > $TEMPL_OUT
+         "$PROJECT_DIR/$TEMPL_ITER.m4" > "$PROJECT_DIR/$TEMPL_OUT"
    done
 fi
 
