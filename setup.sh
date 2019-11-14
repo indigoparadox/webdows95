@@ -7,6 +7,7 @@ DO_FLASK=0
 DO_BOOTSTRAP=0
 DO_JQUERY=0
 DO_NPM=0
+DO_CLEAN=0
 while (( "$#" )); do
    case "$1" in
       "flask")
@@ -30,10 +31,7 @@ while (( "$#" )); do
          ;;
 
       "clean")
-         rm -rf "$PROJECT_DIR/.git"
-         find "$PROJECT_DIR" -name "*.m4" -exec rm {} \;
-         git init "$PROJECT_DIR"
-         exit 0
+         DO_CLEAN=1
          ;;
 
       *)
@@ -119,6 +117,15 @@ if [ -n "$PROJECT_NAME" ]; then
          $PROJECT_OPTS \
          "$PROJECT_DIR/$TEMPL_ITER.m4" > "$PROJECT_DIR/$TEMPL_OUT"
    done
+fi
+
+if [ $DO_CLEAN = 1 ]; then
+   rm -rf "$PROJECT_DIR/.git"
+   find "$PROJECT_DIR" -name "*.m4" -exec rm {} \;
+   git init "$PROJECT_DIR"
+   git add $TEMPLATE_FILES
+   git commit -a -m "Initial revision based on template."
+   rm "$0"
 fi
 
 #rm $0
