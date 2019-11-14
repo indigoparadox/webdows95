@@ -123,7 +123,7 @@ if [ $DO_CLEAN = 1 ]; then
    rm -rf "$PROJECT_DIR/.git"
    find "$PROJECT_DIR" -name "*.m4" -exec rm {} \;
    git init "$PROJECT_DIR"
-   git add $TEMPLATE_FILES .gitignore LICENSE src/static src/template
+   git add $TEMPLATE_FILES .gitignore LICENSE src/static src/templates
    git commit -a -m "Initial revision based on template."
    rm "$0"
 fi
