@@ -29,6 +29,13 @@ while (( "$#" )); do
          PROJECT_LICENSE="lgpl3"
          ;;
 
+      "clean")
+         rm -rf "$PROJECT_DIR/.git"
+         find "$PROJECT_DIR" -name "*.m4" -exec rm {} \;
+         git init "$PROJECT_DIR"
+         exit 0
+         ;;
+
       *)
          if [ -z "$PROJECT_NAME" ]; then
             PROJECT_NAME="$1"
