@@ -22,7 +22,8 @@ def create_app():
 
     ''' App factory function. Call this from the runner/WSGI. '''
 
-    app = Flask( __name__, instance_relative_config=False )
+    app = Flask( __name__, instance_relative_config=False,
+        static_folder='../static', template_folder='../templates' )
 
     # Load our hybrid YAML config.
     with app.open_instance_resource( 'config.yml', 'r' ) as config_f:

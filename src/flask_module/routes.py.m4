@@ -8,5 +8,5 @@ ifelse(do_sqlalchemy, `enabled', `    db_session.remove()', `dnl')
 define(`roota', `$1_root')
 @app.route( '/' )
 def roota(ghtmptmp)():
-    return render_template( 'menu.html' )
+    return render_template( 'root.html' )
 
