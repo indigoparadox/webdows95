@@ -1,18 +1,11 @@
 
 import logging
 ifelse(do_sqlalchemy, `enabled', `from .database import db_session', `dnl')
-divert(-1)
-changequote(`[', `]')
-
-define([sqlteardown], [
-@current_app.teardown_appcontext
-def shutdown_session( exception=None ):
-    db_session.remove()
-])
-
-changequote([`], ['])
+ifelse(do_sqlalchemy, `enabled', `', `dnl')
+ifelse(do_sqlalchemy, `enabled', `@current_app.teardown_appcontext', `dnl')
+ifelse(do_sqlalchemy, `enabled', `def shutdown_session( exception=None ):', `dnl')
+ifelse(do_sqlalchemy, `enabled', `    db_session.remove()', `dnl')
 define(`roota', `$1_root')
-divert(0)
 @app.route( '/' )
 def roota(ghtmptmp)():
     return render_template( 'menu.html' )

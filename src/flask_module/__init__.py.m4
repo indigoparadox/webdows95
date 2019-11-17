@@ -1,29 +1,22 @@
 
 import logging
-divert(-1)
-changequote(`[', `]')
-
-define([sqlimport], [
-])
-
-define([uwsgiimport], [uwsgi_present = False
+ifelse(do_sqlalchemy, `enabled', `from flask_sqlalchemy import SQLAlchemy', `dnl')
+from flask import Flask, render_template, request
+uwsgi_present = False
 try:
     import uwsgi
     uwsgi_present = True
 except ImportError:
+
     logger = logging.getLogger( 'init.uwsgi' )
     uwsgi_present = False
     logger.warning( 'uwsgi not present; connection locking unavailable.' )
-
-# Setup the database stuff.
-db = SQLAlchemy()])
-
-changequote([`], ['])
-divert(0)
-ifelse(do_sqlalchemy, `enabled', `from flask_sqlalchemy import SQLAlchemy', `dnl')
-ifelse(do_flask, `enabled', `from flask import Flask, render_template, request', `dnl')
-from .config import Config
-ifelse(do_flask, `enabled', `uwsgiimport', `dnl')
+changequote(`[', `]')dnl
+ifelse(do_sqlalchemy, [enabled], [], [dnl])
+ifelse(do_sqlalchemy, [enabled], [# Setup the database stuff.], [dnl])
+ifelse(do_sqlalchemy, [enabled], [db = SQLAlchemy()], [dnl])
+ifelse(do_sqlalchemy, [enabled], [uwsgiimport], [dnl])
+changequote([`], ['])dnl
 
 def create_app():
 
