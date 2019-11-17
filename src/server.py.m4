@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import logging dnl
+import yaml dnl
 divert(-1)
 changequote(`[', `]')
 define([flaskapp], [
@@ -14,6 +15,12 @@ except ImportError:
 
 app = Flask(__name__)
 app.secret_key = 'development' # TODO: Change me.
+
+def get_config():
+    config = None
+    with app.open_instance_resource( 'config.yml', 'r' ) as config_f:
+        config = yaml.load( config_f )
+    return config
 
 @app.route( '/' )
 def roota(template)():
