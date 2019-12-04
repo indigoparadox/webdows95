@@ -32,6 +32,8 @@ def create_app():
 
     with app.app_context():
         from . import routes
+ifelse(do_sqlalchemy, `enabled', `', `dnl')
+ifelse(do_sqlalchemy, `enabled', `db.init_app( app )', `dnl')
 
         return app
 
