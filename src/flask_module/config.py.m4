@@ -6,6 +6,7 @@ class Config( object ):
 
         # Grab config from the file and add it to this object.
         config = yaml.load( config_f )
-        for k, v in config.items():
-            setattr( self, k.upper(), v )
+        if config:
+            for k, v in config.items():
+                setattr( self, k.upper(), v )
 

@@ -105,6 +105,7 @@ if [ $DO_FLASK = 1 ]; then
    TEMPLATE_FILES="
       $TEMPLATE_FILES
       src/$PROJECT_NAME/routes.py
+      src/$PROJECT_NAME/config.py
       Dockerfile
       requirements.txt
       "

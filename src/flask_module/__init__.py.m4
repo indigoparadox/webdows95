@@ -2,15 +2,6 @@
 import logging
 ifelse(do_sqlalchemy, `enabled', `from flask_sqlalchemy import SQLAlchemy', `dnl')
 from flask import Flask, render_template, request
-uwsgi_present = False
-try:
-    import uwsgi
-    uwsgi_present = True
-except ImportError:
-
-    logger = logging.getLogger( 'init.uwsgi' )
-    uwsgi_present = False
-    logger.warning( 'uwsgi not present; connection locking unavailable.' )
 changequote(`[', `]')dnl
 ifelse(do_sqlalchemy, [enabled], [], [dnl])
 ifelse(do_sqlalchemy, [enabled], [# Setup the database stuff.], [dnl])
