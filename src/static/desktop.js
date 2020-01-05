@@ -1,12 +1,39 @@
 
+var associations = {
+    'folder': {
+        'iconImg': 'icons-w95-32x32.png',
+        'iconX': 256,
+        'iconY': 288,
+        'opener': function( e ) {
+            /* Only open the window if it's not already open. */
+            if( 0 >= $('#' + e.data.winID).length ) {
+                var winFolder = windowOpenFolder( e.data.name, e.data.winID, 'icons-w95-16x16.png', 112, 144 );
+                winFolder.data( 'folder-path', e.data.parentPath + '/' + e.data.name );
+            }
+            windowActivate( '#desktop', '#' + e.data.winID );
+            populateFolder( '#' + e.data.winID );
+        }
+    },
+    'notepad': {
+        'iconImg': 'icons-w95-32x32.png',
+        'iconX': 864,
+        'iconY': 544,
+        'opener': function( e ) {
+        }
+    }
+};
+
 function populateFolder( parentWinHandle ) {
     var folderPath = $(parentWinHandle).data( 'folder-path' );
 
     $(parentWinHandle).children( '.icon' ).remove();
     $(parentWinHandle).children( '.window-form' ).children( '.container' ).children( '.icon' ).remove();
 
-    $.get( '/ajax/folders/' + folderPath, function( data ) {
-        console.log( data );
+    var noCache = Math.random().toString( 36 ).substring( 2, 15 ) + 
+        Math.random().toString( 36 ).substring( 2, 15 );
+
+    /* Get a list of icons in the requested folder. */
+    $.get( '/ajax/folders/' + folderPath + '?nc=' + noCache, function( data ) {
         for( var iconIter in data.children ) {
             folderData = data.children[iconIter];
 
@@ -19,30 +46,38 @@ function populateFolder( parentWinHandle ) {
                 container = '#desktop';
             }
 
-            createFolderIcon(
-                container, folderPath, iconIter, folderIconId, folderWindowId,
+            createAssocIcon(
+                container, folderPath, iconIter,
+                folderIconId, folderWindowId,
                 folderData.iconX, folderData.iconY );
         }
     } );
 }
 
-function createFolderIcon( container, parentPath, name, folderIconID, folderWinID, x, y ) {
+function createAssocIcon( container, parentPath, name, iconID, winID, x, y ) {
 
     console.assert( $(container).length == 1 );
+    
+    var noCache = Math.random().toString( 36 ).substring( 2, 15 ) + 
+        Math.random().toString( 36 ).substring( 2, 15 );
 
-    var icon = desktopCreateIcon( name, 'icons-w95-32x32.png', 256, 288, x, y, function() {
-        /* Only open the window if it's not already open. */
-        if( 0 >= $('#' + folderWinID).length ) {
-            var winFolder = windowOpenFolder( name, folderWinID, 'icons-w95-16x16.png', 112, 144 );
-            winFolder.data( 'folder-path', parentPath + '/' + name );
+    /* Get more information on the icon requested individually. */
+    $.get( '/ajax/folders/' + parentPath + '/' + name + '?nc=' + noCache, function( data ) {
+        var iconData = {
+            'name': name,
+            'parentPath': parentPath,
+            'winID': winID,
+        };
+    
+        if( data.type in associations ) {
+            var icon = desktopCreateIcon(
+                name,
+                associations[data.type].iconImg,
+                associations[data.type].iconX,
+                associations[data.type].iconY,
+                x, y, associations[data.type].opener, container, iconData );
         }
-        windowActivate( '#desktop', '#' + folderWinID );
-        populateFolder( '#' + folderWinID );
-    }, container );
-
-    console.log( icon );
-
-    return icon;
+    } );
 }
 
 $(document).ready( function() {
