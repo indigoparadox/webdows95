@@ -1,4 +1,28 @@
 
+var desktop = {"children":{
+    "A Folder":{
+        "children":{
+            "A Text File":{
+                "contents":"This is a text file.",
+                "iconX":10,
+                "iconY":10,
+                "type":"notepad"}},
+            "iconX":20,
+            "iconY":20,
+            "type":"folder"},
+    "Browser":{
+        "archiveEnd":"19991200000000",
+        "archiveStart":"19990100000000",
+        "iconX":20,
+        "iconY":140,
+        "type":"browser"},
+    "Prompt":{
+        "iconX":20,
+        "iconY":80,
+        "prompt":"C:\\>",
+        "type":"prompt"}},
+"type":"desktop"};
+
 var associations = {
     'folder': {
         'iconImg': 'icons-w95-32x32.png',
@@ -6,8 +30,7 @@ var associations = {
         'iconY': 288,
         'opener': function( e ) {
             var winFolder = windowOpenFolder( e.data.name, e.data.winID, 'icons-w95-16x16.png', 112, 144 );
-            winFolder.data( 'folder-path', e.data.parentPath + '/' + e.data.name );
-            populateFolder( '#' + e.data.winID );
+            populateFolder( '#' + e.data.winID, e.data.name, e.data.data.children );
         }
     },
     'notepad': {
@@ -35,38 +58,42 @@ var associations = {
     }
 };
 
-function populateFolder( parentWinHandle ) {
-    var folderPath = $(parentWinHandle).data( 'folder-path' );
+function populateFolder( parentWinHandle, folderName, folderItems ) {
+    //var folderPath = $(parentWinHandle).data( 'folder-path' );
 
+    // Clear out containers before we start.
     $(parentWinHandle).children( '.icon' ).remove();
     $(parentWinHandle).children( '.window-form' ).children( '.container' ).children( '.icon' ).remove();
 
-    var noCache = Math.random().toString( 36 ).substring( 2, 15 ) + 
-        Math.random().toString( 36 ).substring( 2, 15 );
+    // Build/extend folder path.
+    /*
+    if( null == folderPath ) {
+        folderPath = folderName;
+    } else {
+        folderPath = folderPath + '/' + folderName;
+    }
+    */
 
     /* Get a list of icons in the requested folder. */
-    $.get( '/ajax/folders/' + folderPath + '?nc=' + noCache, function( data ) {
-        for( var iconIter in data.children ) {
-            folderData = data.children[iconIter];
+    for( var itemName in folderItems ) {
+        itemData = folderItems[itemName];
 
-            // TODO: Handle nesting in IDs.
-            var folderIconId = 'icon-' + iconIter.replace( / /g, '-' );
-            var folderWindowId = 'window-' + iconIter.replace( / /g, '-' );
+        // TODO: Handle nesting in IDs.
+        var folderIconId = 'icon-' + itemName.replace( / /g, '-' );
+        var folderWindowId = 'window-' + itemName.replace( / /g, '-' );
 
-            var container = $(parentWinHandle).find( '.container' );
-            if( 'desktop' == data.type ) {
-                container = '#desktop';
-            }
-
-            createAssocIcon(
-                container, folderPath, iconIter,
-                folderIconId, folderWindowId,
-                folderData.iconX, folderData.iconY );
+        var container = $(parentWinHandle).find( '.container' );
+        if( 0 == container.length ) {
+            container = $(parentWinHandle);
         }
-    } );
+
+        createAssocIcon(
+            container, itemName, itemData,
+            folderIconId, folderWindowId );
+    }
 }
 
-function createAssocIcon( container, parentPath, name, iconID, winID, x, y ) {
+function createAssocIcon( container, itemName, itemData, iconID, WindowID ) {
 
     console.assert( $(container).length == 1 );
     
@@ -74,29 +101,29 @@ function createAssocIcon( container, parentPath, name, iconID, winID, x, y ) {
         Math.random().toString( 36 ).substring( 2, 15 );
 
     /* Get more information on the icon requested individually. */
-    $.get( '/ajax/folders/' + parentPath + '/' + name + '?nc=' + noCache, function( data ) {
+    var prompt = null;
+    if( 'prompt' in itemData ) {
+        prompt = itemData.prompt;
+    }
 
-        var prompt = null;
-        if( 'prompt' in data ) {
-            prompt = data.prompt;
-        }
+    var iconData = {
+        'name': itemName,
+        'data': itemData,
+        'winID': WindowID,
+        'prompt': prompt
+    };
 
-        var iconData = {
-            'name': name,
-            'parentPath': parentPath,
-            'winID': winID,
-            'prompt': prompt
-        };
-    
-        if( data.type in associations ) {
-            var icon = desktopCreateIcon(
-                name,
-                associations[data.type].iconImg,
-                associations[data.type].iconX,
-                associations[data.type].iconY,
-                data.iconX, data.iconY, associations[data.type].opener, container, iconData );
-        }
-    } );
+    if( itemData.type in associations ) {
+        var icon = desktopCreateIcon(
+            itemName,
+            associations[itemData.type].iconImg,
+            associations[itemData.type].iconX,
+            associations[itemData.type].iconY,
+            itemData.iconX, itemData.iconY,
+            associations[itemData.type].opener,
+            container,
+            iconData );
+    }
 }
 
 $(document).ready( function() {
@@ -115,7 +142,7 @@ $(document).ready( function() {
     } );
     */
     
-   populateFolder( '#desktop' );
+   populateFolder( '#desktop', desktop, desktop.children );
 
     //var win_cmd = windowOpenCommand( 'Command', 'cmd', 'icons-w95-16x16.png', 128, 256 );
 

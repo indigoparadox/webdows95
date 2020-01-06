@@ -3,7 +3,7 @@ __pycache__
 *.swp
 *.pyc
 node_modules
-*.min.js
-*.min.css
+#*.min.js
+#*.min.css
 src/instance/*
 !src/instance/.keep
