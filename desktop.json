@@ -19,5 +19,9 @@
         "iconX":20,
         "iconY":80,
         "prompt":"C:\\>",
-        "type":"prompt"}},
+        "type":"prompt"},
+    "CD Player":{
+        "iconX":240,
+        "iconY":240,
+        "type": "cdplayer"}},
 "type":"desktop"}

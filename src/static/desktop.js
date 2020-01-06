@@ -7,9 +7,9 @@ var desktop = {"children":{
                 "iconX":10,
                 "iconY":10,
                 "type":"notepad"}},
-            "iconX":20,
-            "iconY":20,
-            "type":"folder"},
+        "iconX":20,
+        "iconY":20,
+        "type":"folder"},
     "Browser":{
         "archiveEnd":"19991200000000",
         "archiveStart":"19990100000000",
@@ -20,7 +20,11 @@ var desktop = {"children":{
         "iconX":20,
         "iconY":80,
         "prompt":"C:\\>",
-        "type":"prompt"}},
+        "type":"prompt"},
+    "CD Player":{
+        "iconX":20,
+        "iconY":200,
+        "type": "cdplayer"}},
 "type":"desktop"};
 
 var associations = {
@@ -54,6 +58,14 @@ var associations = {
         'iconY': 736,
         'opener': function( e ) {
             var winFolder = windowOpenBrowser( 'Browser', 'browser', 'icons-w95-16x16.png', 64, 368, 'http://google.com' );
+        }
+    },
+    'cdplayer': {
+        'iconImg': 'icons-w95-32x32.png',
+        'iconX': 480,
+        'iconY': 512,
+        'opener': function( e ) {
+            var winPrompt = windowOpenCDPlayer( e.data.name, e.data.winID, 'icons-w95-16x16.png', 256, 256, [], 100, 100 );
         }
     }
 };
