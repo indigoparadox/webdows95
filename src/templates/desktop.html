@@ -2,6 +2,10 @@
 
 {% block scripts %}
 <link rel="stylesheet" href="{{ url_for( 'static', filename='desktop-1995/desktop.css' ) }}" />
+<link rel="stylesheet" href="{{ url_for( 'static', filename='desktop-1995/window.css' ) }}" />
+<link rel="stylesheet" href="{{ url_for( 'static', filename='desktop-1995/icon.css' ) }}" />
+<link rel="stylesheet" href="{{ url_for( 'static', filename='desktop-1995/menu.css' ) }}" />
+<link rel="stylesheet" href="{{ url_for( 'static', filename='desktop-1995/control.css' ) }}" />
 <script
   src="https://code.jquery.com/jquery-3.4.1.min.js"
   integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
@@ -16,4 +20,5 @@
 
 {% block content %}
 <div id="desktop" class="container" data-folder-path="desktop"></div>
+<div id="taskbar" class="taskbar"></div>
 {% endblock %}

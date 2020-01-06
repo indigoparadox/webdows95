@@ -5,12 +5,8 @@ var associations = {
         'iconX': 256,
         'iconY': 288,
         'opener': function( e ) {
-            /* Only open the window if it's not already open. */
-            if( 0 >= $('#' + e.data.winID).length ) {
-                var winFolder = windowOpenFolder( e.data.name, e.data.winID, 'icons-w95-16x16.png', 112, 144 );
-                winFolder.data( 'folder-path', e.data.parentPath + '/' + e.data.name );
-            }
-            windowActivate( '#desktop', '#' + e.data.winID );
+            var winFolder = windowOpenFolder( e.data.name, e.data.winID, 'icons-w95-16x16.png', 112, 144 );
+            winFolder.data( 'folder-path', e.data.parentPath + '/' + e.data.name );
             populateFolder( '#' + e.data.winID );
         }
     },
@@ -19,6 +15,22 @@ var associations = {
         'iconX': 864,
         'iconY': 544,
         'opener': function( e ) {
+        }
+    },
+    'prompt': {
+        'iconImg': 'icons-w95-32x32.png',
+        'iconX': 256,
+        'iconY': 512,
+        'opener': function( e ) {
+            var winPrompt = windowOpenCommand( e.data.name, e.data.winID, 'icons-w95-16x16.png', 128, 256, null, e.data.prompt );
+        }
+    },
+    'browser': {
+        'iconImg': 'icons-w95-32x32.png',
+        'iconX': 96,
+        'iconY': 736,
+        'opener': function( e ) {
+            var winFolder = windowOpenBrowser( 'Browser', 'browser', 'icons-w95-16x16.png', 64, 368, 'http://google.com' );
         }
     }
 };
@@ -63,10 +75,17 @@ function createAssocIcon( container, parentPath, name, iconID, winID, x, y ) {
 
     /* Get more information on the icon requested individually. */
     $.get( '/ajax/folders/' + parentPath + '/' + name + '?nc=' + noCache, function( data ) {
+
+        var prompt = null;
+        if( 'prompt' in data ) {
+            prompt = data.prompt;
+        }
+
         var iconData = {
             'name': name,
             'parentPath': parentPath,
             'winID': winID,
+            'prompt': prompt
         };
     
         if( data.type in associations ) {
@@ -75,7 +94,7 @@ function createAssocIcon( container, parentPath, name, iconID, winID, x, y ) {
                 associations[data.type].iconImg,
                 associations[data.type].iconX,
                 associations[data.type].iconY,
-                x, y, associations[data.type].opener, container, iconData );
+                data.iconX, data.iconY, associations[data.type].opener, container, iconData );
         }
     } );
 }

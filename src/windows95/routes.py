@@ -9,8 +9,8 @@ icons = {
             'children': {
                 'A Folder': {
                     'type': 'folder',
-                    'iconX': 50,
-                    'iconY': 50,
+                    'iconX': 20,
+                    'iconY': 20,
                     'children': {
                         'A Text File': {
                             'type': 'notepad',
@@ -19,6 +19,19 @@ icons = {
                             'contents': 'This is a text file.'
                         }
                     }
+                },
+                'Prompt': {
+                    'type': 'prompt',
+                    'iconX': 20,
+                    'iconY': 80,
+                    'prompt': 'C:\\>'
+                },
+                'Browser': {
+                    'type': 'browser',
+                    'iconX': 20,
+                    'iconY': 140,
+                    'archiveStart': '19990100000000',
+                    'archiveEnd': '19991200000000'
                 }
             }
         }
