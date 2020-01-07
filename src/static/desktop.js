@@ -24,7 +24,16 @@ var desktop = {"children":{
     "CD Player":{
         "iconX":20,
         "iconY":200,
-        "type": "cdplayer"}},
+        "type": "cdplayer"},
+    "ReadMe.txt":{
+        "contents":`
+Welcome to the world of the past!
+
+This demonstration has a number of unique features in an attempt to simulate the feel of a bygone era.
+`,
+        "iconX":20,
+        "iconY":260,
+        "type":"notepad"}},
 "type":"desktop"};
 
 var associations = {
@@ -42,6 +51,7 @@ var associations = {
         'iconX': 864,
         'iconY': 544,
         'opener': function( e ) {
+            var winText = windowOpenNotepad( e.data.name, e.data.winID, 'icons-w95-16x16.png', 480, 272, e.data.contents );
         }
     },
     'prompt': {
@@ -118,11 +128,17 @@ function createAssocIcon( container, itemName, itemData, iconID, WindowID ) {
         prompt = itemData.prompt;
     }
 
+    var contents = null;
+    if( 'contents' in itemData ) {
+        contents = itemData.contents;
+    }
+
     var iconData = {
         'name': itemName,
         'data': itemData,
         'winID': WindowID,
-        'prompt': prompt
+        'prompt': prompt,
+        'contents': contents
     };
 
     if( itemData.type in associations ) {
