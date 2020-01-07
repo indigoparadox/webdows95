@@ -1,35 +1,40 @@
 
-var desktop = {"children":{
-    "A Folder":{
-        "children":{
-            "A Text File":{
-                "contents":"This is a text file.",
-                "iconX":10,
-                "iconY":10,
-                "type":"notepad"}},
-        "iconX":20,
-        "iconY":20,
-        "type":"folder"},
-    "Browser":{
-        "archiveEnd":"19991200000000",
-        "archiveStart":"19990100000000",
-        "iconX":20,
-        "iconY":140,
-        "type":"browser"},
-    "Prompt":{
-        "iconX":20,
-        "iconY":80,
-        "prompt":"C:\\>",
-        "type":"prompt"},
-    "CD Player":{
-        "iconX":20,
-        "iconY":200,
-        "type": "cdplayer",
-        "playlist": [
-            "finalizing.mp3",
+var desktop = {'children':{
+    'A Folder':{
+        'children':{
+            'A Text File':{
+                'contents':'This is a text file.',
+                'iconX':10,
+                'iconY':10,
+                'type':'notepad'}},
+        'iconX':20,
+        'iconY':20,
+        'type':'folder'},
+    'Browser':{
+        'archiveEnd':'19991200000000',
+        'archiveStart':'19990100000000',
+        'iconX':20,
+        'iconY':140,
+        'type':'browser'},
+    'Prompt':{
+        'iconX':20,
+        'iconY':80,
+        'prompt':'C:\\>',
+        'type':'prompt'},
+    'CD Player':{
+        'iconX':20,
+        'iconY':200,
+        'type': 'cdplayer',
+        'playlist': [
+            {
+                'url': 'finalizing.mp3',
+                'artist': '</body>',
+                'album': 'Initializing...',
+                'title': 'Finalizing...'
+            }
         ]},
-    "ReadMe.txt":{
-        "contents":`
+    'ReadMe.txt':{
+        'contents':`
 Welcome to the world of the past!
 
 This demonstration has a number of unique features in an attempt to simulate the feel of a bygone era:
@@ -44,10 +49,10 @@ This demonstration has a number of unique features in an attempt to simulate the
 
  Please feel free to look around and explore. Thank you for visiting!
 `,
-        "iconX":20,
-        "iconY":260,
-        "type":"notepad"}},
-"type":"desktop"};
+        'iconX':20,
+        'iconY':260,
+        'type':'notepad'}},
+'type':'desktop'};
 
 var associations = {
     'folder': {

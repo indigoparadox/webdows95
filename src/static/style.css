@@ -1,0 +1,28 @@
+
+.logo-menu .menu-item-programs .menu-icon {
+    background: url( icons-w95-32x32.png ) no-repeat -64px -608px;
+}
+
+.logo-menu .menu-item-documents .menu-icon {
+    background: url( icons-w95-32x32.png ) no-repeat 0 -192px;
+}
+
+.logo-menu .menu-item-settings .menu-icon {
+    background: url( icons-w95-32x32.png ) no-repeat -128px -704px;
+}
+
+.logo-menu .menu-item-find .menu-icon {
+    background: url( icons-w95-32x32.png ) no-repeat -288px -672px;
+}
+
+.logo-menu .menu-item-help .menu-icon {
+    background: url( icons-w95-32x32.png ) no-repeat -320px -288px;
+}
+
+.logo-menu .menu-item-run .menu-icon {
+    background: url( icons-w95-32x32.png ) no-repeat -480px -608px;
+}
+
+.logo-menu .menu-item-shutdown .menu-icon {
+    background: url( icons-w95-32x32.png ) no-repeat -736px -768px;
+}
