@@ -24,7 +24,10 @@ var desktop = {"children":{
     "CD Player":{
         "iconX":20,
         "iconY":200,
-        "type": "cdplayer"},
+        "type": "cdplayer",
+        "playlist": [
+            "finalizing.mp3",
+        ]},
     "ReadMe.txt":{
         "contents":`
 Welcome to the world of the past!
@@ -85,7 +88,7 @@ var associations = {
         'iconX': 480,
         'iconY': 512,
         'opener': function( e ) {
-            var winPrompt = windowOpenCDPlayer( e.data.name, e.data.winID, 'icons-w95-16x16.png', 256, 256, [], 100, 100 );
+            var winPrompt = windowOpenCDPlayer( e.data.name, e.data.winID, 'icons-w95-16x16.png', 256, 256, e.data.playlist, 100, 100 );
         }
     }
 };
@@ -143,12 +146,18 @@ function createAssocIcon( container, itemName, itemData, iconID, WindowID ) {
         contents = itemData.contents;
     }
 
+    var playlist = null;
+    if( 'playlist' in itemData ) {
+        playlist = itemData.playlist;
+    }
+
     var iconData = {
         'name': itemName,
         'data': itemData,
         'winID': WindowID,
         'prompt': prompt,
-        'contents': contents
+        'contents': contents,
+        'playlist': playlist
     };
 
     if( itemData.type in associations ) {
