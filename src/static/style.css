@@ -26,3 +26,7 @@
 .logo-menu .menu-item-shutdown .menu-icon {
     background: url( icons-w95-32x32.png ) no-repeat -736px -768px;
 }
+
+.button-start .icon-start {
+    background: url( icons-w95-16x16.png ) no-repeat -240px -432px;
+}
