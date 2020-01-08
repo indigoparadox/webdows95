@@ -34,24 +34,10 @@ var desktop = {'children':{
             }
         ]},
     'ReadMe.txt':{
-        'contents':`
-Welcome to the world of the past!
-
-This demonstration has a number of unique features in an attempt to simulate the feel of a bygone era:
-
- * The command prompt has an old-timey blinkey cursor and text feel.
-
- * The web browser sends URL requests to the past (~1999) via archive.org.
-
- * The CD player plays CD-quality music graciously permitted for use here by </body> (https://bodyendtag.bandcamp.com/album/initializing).
-
- * Notepad!
-
- Please feel free to look around and explore. Thank you for visiting!
-`,
+        'url':'README.md',
         'iconX':20,
         'iconY':260,
-        'type':'notepad'}},
+        'type':'wordpad'}},
 'type':'desktop'};
 
 var associations = {
@@ -70,6 +56,14 @@ var associations = {
         'iconY': 544,
         'opener': function( e ) {
             var winText = windowOpenNotepad( e.data.name, e.data.winID, 'icons-w95-16x16.png', 480, 272, e.data.contents );
+        }
+    },
+    'wordpad': {
+        'iconImg': 'icons-w95-32x32.png',
+        'iconX': 864,
+        'iconY': 544,
+        'opener': function( e ) {
+            var winText = windowOpenWordpad( e.data.name, e.data.winID, 'icons-w95-16x16.png', 480, 272, e.data.url );
         }
     },
     'prompt': {
@@ -147,13 +141,19 @@ function createAssocIcon( container, itemName, itemData, iconID, WindowID ) {
         playlist = itemData.playlist;
     }
 
+    var url = null;
+    if( 'url' in itemData ) {
+        url = itemData.url;
+    }
+
     var iconData = {
         'name': itemName,
         'data': itemData,
         'winID': WindowID,
         'prompt': prompt,
         'contents': contents,
-        'playlist': playlist
+        'playlist': playlist,
+        'url': url
     };
 
     if( itemData.type in associations ) {
