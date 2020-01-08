@@ -41,9 +41,9 @@ This demonstration has a number of unique features in an attempt to simulate the
 
  * The command prompt has an old-timey blinkey cursor and text feel.
 
- * The web browser filters sends URL requests to the past (~1999) via archive.org.
+ * The web browser sends URL requests to the past (~1999) via archive.org.
 
- * The CD player plays CD-quality music.
+ * The CD player plays CD-quality music graciously permitted for use here by </body> (https://bodyendtag.bandcamp.com/album/initializing).
 
  * Notepad!
 
@@ -105,22 +105,13 @@ function populateFolder( parentWinHandle, folderName, folderItems ) {
     $(parentWinHandle).children( '.icon' ).remove();
     $(parentWinHandle).children( '.window-form' ).children( '.container' ).children( '.icon' ).remove();
 
-    // Build/extend folder path.
-    /*
-    if( null == folderPath ) {
-        folderPath = folderName;
-    } else {
-        folderPath = folderPath + '/' + folderName;
-    }
-    */
-
-    /* Get a list of icons in the requested folder. */
+    // Get a list of icons in the requested folder.
     for( var itemName in folderItems ) {
         itemData = folderItems[itemName];
 
-        // TODO: Handle nesting in IDs.
-        var folderIconId = 'icon-' + itemName.replace( / /g, '-' );
-        var folderWindowId = 'window-' + itemName.replace( / /g, '-' );
+        // Handle nesting in IDs.
+        var folderIconId = 'i-' + $(parentWinHandle).attr( 'id' ) + '-' + _htmlStrToClass( itemName );
+        var folderWindowId = 'w-' + $(parentWinHandle).attr( 'id' ) + '-' + _htmlStrToClass( itemName );
 
         var container = $(parentWinHandle).find( '.container' );
         if( 0 == container.length ) {
@@ -194,7 +185,7 @@ $(document).ready( function() {
     } );
     */
     
-   populateFolder( '#desktop', desktop, desktop.children );
+    populateFolder( '#desktop', desktop, desktop.children );
 
     //var win_cmd = windowOpenCommand( 'Command', 'cmd', 'icons-w95-16x16.png', 128, 256 );
 
@@ -232,6 +223,7 @@ $(document).ready( function() {
             ]},
             {'divider': true},
             {'text': 'Properties', 'callback': function( m ) {
+                windowOpenProperties( 'Display Properties', 'w-props-display', 100, 100 );
             }}
         ], e.pageX, e.pageY );
     } );
