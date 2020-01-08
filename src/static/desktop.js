@@ -46,8 +46,8 @@ var associations = {
         'iconX': 256,
         'iconY': 288,
         'opener': function( e ) {
-            var winFolder = windowOpenFolder( e.data.name, e.data.winID, 'icons-w95-16x16.png', 112, 144 );
-            populateFolder( '#' + e.data.winID, e.data.name, e.data.data.children );
+            var winFolder = windowOpenFolder( { 'caption': e.data.name, 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 112, 'icoY': 144 } );
+            populateFolder( winFolder, e.data.name, e.data.data.children );
         }
     },
     'notepad': {
@@ -63,7 +63,8 @@ var associations = {
         'iconX': 864,
         'iconY': 544,
         'opener': function( e ) {
-            var winText = windowOpenWordpad( e.data.name, e.data.winID, 'icons-w95-16x16.png', 480, 272, e.data.url );
+            var winText = $('#desktop').notepad95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 480, 'icoY': 272 } );
+            winText.notepad95( 'readURL', { 'url': e.data.url} );
         }
     },
     'prompt': {
@@ -71,7 +72,7 @@ var associations = {
         'iconX': 256,
         'iconY': 512,
         'opener': function( e ) {
-            var winPrompt = windowOpenCommand( e.data.name, e.data.winID, 'icons-w95-16x16.png', 128, 256, null, e.data.prompt );
+            var winPrompt = $('#desktop').prompt95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 128, 'icoY': 256, 'promptText': e.data.prompt } );
         }
     },
     'browser': {
@@ -79,7 +80,7 @@ var associations = {
         'iconX': 96,
         'iconY': 736,
         'opener': function( e ) {
-            var winFolder = windowOpenBrowser( 'Browser', 'browser', 'icons-w95-16x16.png', 64, 368, 'http://google.com' );
+            var winFolder = $('#desktop').browser95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 64, 'icoY': 368, 'url': 'http://google.com' } );
         }
     },
     'cdplayer': {
@@ -87,7 +88,7 @@ var associations = {
         'iconX': 480,
         'iconY': 512,
         'opener': function( e ) {
-            var winPrompt = windowOpenCDPlayer( e.data.name, e.data.winID, 'icons-w95-16x16.png', 256, 256, e.data.playlist, 100, 100 );
+            var winPrompt = $('#desktop').cdplayer95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 256, 'icoY': 256, 'playlist': e.data.playlist } );
         }
     }
 };

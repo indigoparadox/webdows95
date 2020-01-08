@@ -1,10 +1,10 @@
-
 {
    "name": "template",
    "version": "0.0.0",
    "description": "template",
    "dependencies": {
-      "jquery": "^3.4.1"
+      "jquery": "^3.4.1",
+      "jslint": "^0.12.1"
    },
    "devDependencies": {
       "grunt": "^0.4.5",
