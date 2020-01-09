@@ -33,7 +33,7 @@ var desktop = {'children':{
                 'title': 'Finalizing...'
             }
         ]},
-    'ReadMe.txt':{
+    'ReadMe.rtf':{
         'url':'README.md',
         'iconX':20,
         'iconY':260,
@@ -46,7 +46,7 @@ var associations = {
         'iconX': 256,
         'iconY': 288,
         'opener': function( e ) {
-            var winFolder = windowOpenFolder( { 'caption': e.data.name, 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 112, 'icoY': 144 } );
+            var winFolder = $('#desktop').explorer95( 'open', { 'caption': e.data.name, 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 112, 'icoY': 144 } );
             populateFolder( winFolder, e.data.name, e.data.data.children );
         }
     },
@@ -55,16 +55,20 @@ var associations = {
         'iconX': 864,
         'iconY': 544,
         'opener': function( e ) {
-            var winText = windowOpenNotepad( e.data.name, e.data.winID, 'icons-w95-16x16.png', 480, 272, e.data.contents );
+            var winText = $('#desktop').notepad95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 480, 'icoY': 272 } );
+            winText.notepad95( 'readContents', { 'contents': e.data.contents } );
         }
     },
     'wordpad': {
         'iconImg': 'icons-w95-32x32.png',
-        'iconX': 864,
-        'iconY': 544,
+        'iconX': 608,
+        'iconY': 896,
         'opener': function( e ) {
-            var winText = $('#desktop').notepad95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 480, 'icoY': 272 } );
-            winText.notepad95( 'readURL', { 'url': e.data.url} );
+            var buttonImgs = {
+                'new': {'icoImg': 'icons-w95-16x16.png', 'icoX': 32, 'icoY': 48 }
+            };
+            var winText = $('#desktop').wordpad95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 320, 'icoY': 448, 'buttonImgs': buttonImgs } );
+            winText.wordpad95( 'readURL', { 'url': e.data.url} );
         }
     },
     'prompt': {
@@ -72,7 +76,11 @@ var associations = {
         'iconX': 256,
         'iconY': 512,
         'opener': function( e ) {
-            var winPrompt = $('#desktop').prompt95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 128, 'icoY': 256, 'promptText': e.data.prompt } );
+            var winPrompt = $('#desktop').prompt95( 'open', {
+                'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 128, 'icoY': 256, 'promptText': e.data.prompt,
+                'lineHandler': function( data, winHandle ) {
+                    winHandle.prompt95( 'enter', { 'text': 'Sad command or file name' } )
+                } } );
         }
     },
     'browser': {
@@ -158,15 +166,14 @@ function createAssocIcon( container, itemName, itemData, iconID, WindowID ) {
     };
 
     if( itemData.type in associations ) {
-        var icon = desktopCreateIcon(
-            itemName,
-            associations[itemData.type].iconImg,
-            associations[itemData.type].iconX,
-            associations[itemData.type].iconY,
-            itemData.iconX, itemData.iconY,
-            associations[itemData.type].opener,
-            container,
-            iconData );
+        var icon = container.explorer95( 'icon',
+            { 'caption': itemName,
+            'icoImg': associations[itemData.type].iconImg,
+            'icoX': associations[itemData.type].iconX,
+            'icoY': associations[itemData.type].iconY,
+            'x': itemData.iconX, 'y': itemData.iconY,
+            'callback': associations[itemData.type].opener,
+            'cbData': iconData } );
     }
 }
 
@@ -201,7 +208,7 @@ $(document).ready( function() {
 
     $('#desktop').mousedown( function( e ) {
         if( $(e.target).hasClass( 'container' ) ) {
-            desktopSelectIcon( e.target, null );
+            $(e.target).explorer95( 'select' );
         }
         menuClose( e.target, null );
     } );
