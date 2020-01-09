@@ -223,8 +223,21 @@ $(document).ready( function() {
                 }}
             ]},
             {'divider': true},
+            {'text': 'Paste', 'callback': function( m ) {
+            }},
+            {'divider': true},
+            {'text': 'New', 'children': [
+                {'text': 'Folder', 'callback': function( m ) {
+                }}
+            ]},
+            {'divider': true},
             {'text': 'Properties', 'callback': function( m ) {
-                windowOpenProperties( 'Display Properties', 'w-props-display', 100, 100 );
+                var props = $('#desktop').window95( 'properties', { 'caption': 'Display Properties', 'id': 'w-props-display' } );
+                props.control95( 'tab', 'create', { 'caption': 'Background', 'id': 't-display-background', 'parentClass': 'window-properties-tabs' } );
+                props.control95( 'tab', 'create', { 'caption': 'Screen Saver', 'id': 't-display-screensaver', 'parentClass': 'window-properties-tabs' } );
+                props.control95( 'tab', 'create', { 'caption': 'Appearance', 'id': 't-display-appearance', 'parentClass': 'window-properties-tabs' } );
+                props.control95( 'tab', 'create', { 'caption': 'Settings', 'id': 't-display-settings', 'parentClass': 'window-properties-tabs' } );
+                props.find( '.window-properties-tabs' ).tabs();
             }}
         ], e.pageX, e.pageY );
     } );
