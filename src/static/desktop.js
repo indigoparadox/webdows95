@@ -33,10 +33,15 @@ var desktop = {'children':{
                 'title': 'Finalizing...'
             }
         ]},
+    'VGuide.avi':{
+        'ytube': 'fXpfdq3WYu4',
+        'iconX':20,
+        'iconY':260,
+        'type':'video'},
     'ReadMe.rtf':{
         'url':'README.md',
         'iconX':20,
-        'iconY':260,
+        'iconY':320,
         'type':'wordpad'}},
 'type':'desktop'};
 
@@ -98,6 +103,14 @@ var associations = {
         'opener': function( e ) {
             var winPrompt = $('#desktop').cdplayer95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 256, 'icoY': 256, 'playlist': e.data.playlist } );
         }
+    },
+    'video': {
+        'iconImg': 'icons-w95-32x32.png',
+        'iconX': 672,
+        'iconY': 640,
+        'opener': function( e ) {
+            var winPrompt = $('#desktop').mpvideo95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 352, 'icoY': 320, 'ytube': e.data.ytube, 'w': 300, 'h': 275 } );
+        }
     }
 };
 
@@ -135,7 +148,7 @@ function createAssocIcon( container, itemName, itemData, iconID, WindowID ) {
         Math.random().toString( 36 ).substring( 2, 15 );
 
     /* Get more information on the icon requested individually. */
-    var prompt = null;
+    /*var prompt = null;
     if( 'prompt' in itemData ) {
         prompt = itemData.prompt;
     }
@@ -163,7 +176,10 @@ function createAssocIcon( container, itemName, itemData, iconID, WindowID ) {
         'contents': contents,
         'playlist': playlist,
         'url': url
-    };
+    };*/
+
+    itemData.name = itemName;
+    itemData.winID = WindowID;
 
     if( itemData.type in associations ) {
         var icon = container.explorer95( 'icon',
@@ -173,7 +189,7 @@ function createAssocIcon( container, itemName, itemData, iconID, WindowID ) {
             'icoY': associations[itemData.type].iconY,
             'x': itemData.iconX, 'y': itemData.iconY,
             'callback': associations[itemData.type].opener,
-            'cbData': iconData } );
+            'cbData': itemData } );
     }
 }
 
