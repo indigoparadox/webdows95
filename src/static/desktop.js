@@ -52,7 +52,7 @@ var associations = {
         'iconY': 288,
         'opener': function( e ) {
             var winFolder = $('#desktop').explorer95( 'open', { 'caption': e.data.name, 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 112, 'icoY': 144 } );
-            populateFolder( winFolder, e.data.name, e.data.data.children );
+            populateFolder( winFolder, e.data.name, e.data.children );
         }
     },
     'notepad': {
@@ -93,7 +93,15 @@ var associations = {
         'iconX': 96,
         'iconY': 736,
         'opener': function( e ) {
-            var winFolder = $('#desktop').browser95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 64, 'icoY': 368, 'url': 'http://google.com' } );
+            var buttonImgs = {
+                'open': {'icoImg': 'icons-w95-16x16.png', 'icoX': 48, 'icoY': 128 },
+                'print': {'icoImg': 'icons-w95-16x16.png', 'icoX': 64, 'icoY': 128 },
+                'refresh': {'icoImg': 'icons-w95-16x16.png', 'icoX': 112, 'icoY': 128 },
+                'stop': {'icoImg': 'icons-w95-16x16.png', 'icoX': 128, 'icoY': 128 },
+                'mail': {'icoImg': 'icons-w95-16x16.png', 'icoX': 80, 'icoY': 128 },
+                'home': {'icoImg': 'icons-w95-16x16.png', 'icoX': 96, 'icoY': 128 }
+            };
+            var winFolder = $('#desktop').browser95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 64, 'icoY': 368, 'url': 'http://google.com', 'buttonImgs': buttonImgs } );
         }
     },
     'cdplayer': {
