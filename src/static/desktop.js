@@ -70,10 +70,19 @@ var associations = {
         'iconY': 896,
         'opener': function( e ) {
             var buttonImgs = {
-                'new': {'icoImg': 'icons-w95-16x16.png', 'icoX': 32, 'icoY': 48 }
+                'new': {'icoImg': 'icons-w95-16x16.png', 'icoX': 32, 'icoY': 48 },
+                'open': {'icoImg': 'icons-w95-16x16.png', 'icoX': 48, 'icoY': 128 },
+                'print': {'icoImg': 'icons-w95-16x16.png', 'icoX': 64, 'icoY': 128 },
+                'cut': {'icoImg': 'icons-w95-16x16.png', 'icoX': 176, 'icoY': 128 },
+                'copy': {'icoImg': 'icons-w95-16x16.png', 'icoX': 192, 'icoY': 128 },
+                'paste': {'icoImg': 'icons-w95-16x16.png', 'icoX': 208, 'icoY': 128 },
+                'preview': {'icoImg': 'icons-w95-16x16.png', 'icoX': 240, 'icoY': 128 },
+                'search': {'icoImg': 'icons-w95-16x16.png', 'icoX': 256, 'icoY': 128 },
+                'dateTime': {'icoImg': 'icons-w95-16x16.png', 'icoX': 128, 'icoY': 144 },
+                'undo': {'icoImg': 'icons-w95-16x16.png', 'icoX': 144, 'icoY': 144 },
             };
-            var winText = $('#desktop').wordpad95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 320, 'icoY': 448, 'buttonImgs': buttonImgs } );
-            winText.wordpad95( 'readURL', { 'url': e.data.url} );
+            var winText = $('#desktop').wordpad95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 320, 'icoY': 448, 'x': 20, 'y': 20, 'w': 640, 'h': 480, 'buttonImgs': buttonImgs } );
+            winText.wordpad95( 'readURL', { 'url': e.data.url } );
         }
     },
     'prompt': {
