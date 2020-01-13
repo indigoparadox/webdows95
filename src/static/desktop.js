@@ -243,7 +243,7 @@ $(document).ready( function() {
         if( $(e.target).hasClass( 'container' ) ) {
             $(e.target).explorer95( 'select' );
         }
-        menuClose( e.target, null );
+        $(e.target).menu95( 'close' );
     } );
 
     $('#desktop').contextmenu( function( e ) {
@@ -257,21 +257,23 @@ $(document).ready( function() {
             return;
         }
 
-        var menu = menuPopup( '#desktop', [
-            {'text': 'Arrange Icons', 'children': [
-                {'text': 'By name', 'callback': function( m ) {
+        var menu = $('#desktop').menu95( 'open', {
+        'location': {'x': e.pageX, 'y': e.pageY},
+        'items': [
+            {'caption': 'Arrange Icons', 'type': menu95Type.SUBMENU, 'items': [
+                {'caption': 'By name', 'callback': function( m ) {
                 }}
             ]},
-            {'divider': true},
-            {'text': 'Paste', 'callback': function( m ) {
+            {'type': menu95Type.DIVIDER},
+            {'caption': 'Paste', 'callback': function( m ) {
             }},
-            {'divider': true},
-            {'text': 'New', 'children': [
-                {'text': 'Folder', 'callback': function( m ) {
+            {'type': menu95Type.DIVIDER},
+            {'caption': 'New', 'type': menu95Type.SUBMENU, 'items': [
+                {'caption': 'Folder', 'callback': function( m ) {
                 }}
             ]},
-            {'divider': true},
-            {'text': 'Properties', 'callback': function( m ) {
+            {'type': menu95Type.DIVIDER},
+            {'caption': 'Properties', 'callback': function( m ) {
                 var props = $('#desktop').window95( 'properties', { 'caption': 'Display Properties', 'id': 'w-props-display' } );
                 props.control95( 'tab', 'create', { 'caption': 'Background', 'id': 't-display-background', 'parentClass': 'window-properties-tabs' } );
                 props.control95( 'tab', 'create', { 'caption': 'Screen Saver', 'id': 't-display-screensaver', 'parentClass': 'window-properties-tabs' } );
@@ -279,6 +281,10 @@ $(document).ready( function() {
                 props.control95( 'tab', 'create', { 'caption': 'Settings', 'id': 't-display-settings', 'parentClass': 'window-properties-tabs' } );
                 props.find( '.window-properties-tabs' ).tabs();
             }}
-        ], e.pageX, e.pageY );
+        ] } );
     } );
+
+    $('.button-start').startmenu95( 'enable' );
+
+    $('.tray.notification-area').systray95( 'enable' );
 } );
