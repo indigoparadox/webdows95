@@ -275,11 +275,16 @@ $(document).ready( function() {
             {'type': menu95Type.DIVIDER},
             {'caption': 'Properties', 'callback': function( m ) {
                 var props = $('#desktop').window95( 'properties', { 'caption': 'Display Properties', 'id': 'w-props-display' } );
-                props.control95( 'tab', 'create', { 'caption': 'Background', 'id': 't-display-background', 'parentClass': 'window-properties-tabs' } );
+
+                // Create tabs.
+                var tabBG = props.control95( 'tab', 'create', { 'caption': 'Background', 'id': 't-display-background', 'parentClass': 'window-properties-tabs' } );
                 props.control95( 'tab', 'create', { 'caption': 'Screen Saver', 'id': 't-display-screensaver', 'parentClass': 'window-properties-tabs' } );
                 props.control95( 'tab', 'create', { 'caption': 'Appearance', 'id': 't-display-appearance', 'parentClass': 'window-properties-tabs' } );
                 props.control95( 'tab', 'create', { 'caption': 'Settings', 'id': 't-display-settings', 'parentClass': 'window-properties-tabs' } );
                 props.find( '.window-properties-tabs' ).tabs();
+
+                // Create monitor.
+                tabBG.append( $('#desktop').desktop95( 'propsMonitor' ) );
             }}
         ] } );
     } );
