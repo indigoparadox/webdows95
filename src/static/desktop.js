@@ -132,7 +132,6 @@ var associations = {
 };
 
 function populateFolder( parentWinHandle, folderName, folderItems ) {
-    //var folderPath = $(parentWinHandle).data( 'folder-path' );
 
     // Clear out containers before we start.
     $(parentWinHandle).children( '.icon' ).remove();
@@ -164,37 +163,6 @@ function createAssocIcon( container, itemName, itemData, iconID, WindowID ) {
     var noCache = Math.random().toString( 36 ).substring( 2, 15 ) + 
         Math.random().toString( 36 ).substring( 2, 15 );
 
-    /* Get more information on the icon requested individually. */
-    /*var prompt = null;
-    if( 'prompt' in itemData ) {
-        prompt = itemData.prompt;
-    }
-
-    var contents = null;
-    if( 'contents' in itemData ) {
-        contents = itemData.contents;
-    }
-
-    var playlist = null;
-    if( 'playlist' in itemData ) {
-        playlist = itemData.playlist;
-    }
-
-    var url = null;
-    if( 'url' in itemData ) {
-        url = itemData.url;
-    }
-
-    var iconData = {
-        'name': itemName,
-        'data': itemData,
-        'winID': WindowID,
-        'prompt': prompt,
-        'contents': contents,
-        'playlist': playlist,
-        'url': url
-    };*/
-
     itemData.name = itemName;
     itemData.winID = WindowID;
 
@@ -211,83 +179,10 @@ function createAssocIcon( container, itemName, itemData, iconID, WindowID ) {
 }
 
 $(document).ready( function() {
-    //var win_folder = windowOpenFolder( 'Foo', 'foo', 'icons-w95-16x16.png', 112, 144 );
-    /*desktopCreateIcon( "Test.txt", 'icons-w95-32x32.png', 800, 544, 10, 10, function() {
-
-    }, win_folder.find( '.container' ) );*/
-
-    /*
-    var ico_foo = desktopCreateIcon( "Foo", 'icons-w95-32x32.png', 800, 544, 10, 10, function() {
-        // Only open the window if it's not already open.
-        if( 0 >= $('#window-foo').length ) {
-            var win_foo = windowOpen( 'Foo', 'window-foo', true, 'icons-w95-16x16.png', 400, 272 );
-            var input_txt = windowCreateInputText( win_foo, 'Date', '', '10px', '10px' );
-        }
-    } );
-    */
     
     populateFolder( '#desktop', desktop, desktop.children );
 
-    //var win_cmd = windowOpenCommand( 'Command', 'cmd', 'icons-w95-16x16.png', 128, 256 );
-
-    /*
-    var win_props = windowOpenProperties( 'Properties', 'props' );
-    var tab_general = windowPropertiesAddTab( win_props, "General" );
-    tab_general.append( '<p>This is the general tab.</p>', 'tab-general' );
-    var tab_other = windowPropertiesAddTab( win_props, "Other", 'tab-other' );
-    tab_other.append( '<p>This is the other tab.</p>' );
-    win_props.find( '.window-properties-tabs' ).tabs();
-    */
-
-    $('#desktop').mousedown( function( e ) {
-        if( $(e.target).hasClass( 'container' ) ) {
-            $(e.target).explorer95( 'select' );
-        }
-        $(e.target).menu95( 'close' );
-    } );
-
-    $('#desktop').contextmenu( function( e ) {
-        e.preventDefault();
-
-        if( 
-            $(e.target).parents().hasClass( 'menu' ) ||
-            $(e.target).parents().hasClass( 'window' )
-        ) {
-            /* Don't call menus on menus. */
-            return;
-        }
-
-        var menu = $('#desktop').menu95( 'open', {
-        'location': {'x': e.pageX, 'y': e.pageY},
-        'items': [
-            {'caption': 'Arrange Icons', 'type': menu95Type.SUBMENU, 'items': [
-                {'caption': 'By name', 'callback': function( m ) {
-                }}
-            ]},
-            {'type': menu95Type.DIVIDER},
-            {'caption': 'Paste', 'callback': function( m ) {
-            }},
-            {'type': menu95Type.DIVIDER},
-            {'caption': 'New', 'type': menu95Type.SUBMENU, 'items': [
-                {'caption': 'Folder', 'callback': function( m ) {
-                }}
-            ]},
-            {'type': menu95Type.DIVIDER},
-            {'caption': 'Properties', 'callback': function( m ) {
-                var props = $('#desktop').window95( 'properties', { 'caption': 'Display Properties', 'id': 'w-props-display' } );
-
-                // Create tabs.
-                var tabBG = props.control95( 'tab', 'create', { 'caption': 'Background', 'id': 't-display-background', 'parentClass': 'window-properties-tabs' } );
-                props.control95( 'tab', 'create', { 'caption': 'Screen Saver', 'id': 't-display-screensaver', 'parentClass': 'window-properties-tabs' } );
-                props.control95( 'tab', 'create', { 'caption': 'Appearance', 'id': 't-display-appearance', 'parentClass': 'window-properties-tabs' } );
-                props.control95( 'tab', 'create', { 'caption': 'Settings', 'id': 't-display-settings', 'parentClass': 'window-properties-tabs' } );
-                props.find( '.window-properties-tabs' ).tabs();
-
-                // Create monitor.
-                tabBG.append( $('#desktop').desktop95( 'propsMonitor' ) );
-            }}
-        ] } );
-    } );
+    $('#desktop').desktop95( 'enable' );
 
     $('.button-start').startmenu95( 'enable' );
 
