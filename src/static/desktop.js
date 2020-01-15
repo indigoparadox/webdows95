@@ -81,8 +81,8 @@ var associations = {
                 'dateTime': {'icoImg': 'icons-w95-16x16.png', 'icoX': 128, 'icoY': 144 },
                 'undo': {'icoImg': 'icons-w95-16x16.png', 'icoX': 144, 'icoY': 144 },
             };
-            var winText = $('#desktop').wordpad95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 320, 'icoY': 448, 'x': 20, 'y': 20, 'w': 600, 'h': 400, 'buttonImgs': buttonImgs } );
-            winText.wordpad95( 'readURL', { 'url': e.data.url } );
+            var winText = $('#desktop').wordpad95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 320, 'icoY': 448, 'x': 20, 'y': 20, 'w': 600, 'h': 400, 'buttonImgs': buttonImgs, 'url': e.data.url } );
+            //winText.wordpad95( 'readURL', { 'url': e.data.url } );
         }
     },
     'prompt': {
