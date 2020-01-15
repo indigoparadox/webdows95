@@ -125,9 +125,49 @@ var associations = {
         'opener': function( e ) {
             var winPrompt = $('#desktop').prompt95( 'open', {
                 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 128, 'icoY': 256, 'promptText': e.data.prompt,
-                'lineHandler': function( data, winHandle ) {
-                    winHandle.prompt95( 'enter', { 'text': 'Sad command or file name' } )
+                'lineHandler': function( data, text, winHandle ) {
+                    var cMatch;
+                    if( null != (cMatch = text.match( /^cd (.*)/i )) ) {
+                        // CD command
+                        if( 
+                            'children' in winPrompt.data( 'folder' ) &&
+                            cMatch[1] in winPrompt.data( 'folder' ).children
+                        ) {
+                            winPrompt.data( 'folder-parent', winPrompt.data( 'folder' ) );
+                            winPrompt.data( 'folder-parent-path', winPrompt.data( 'folder-path' ) );
+                            winPrompt.data( 'folder', winPrompt.data( 'folder' ).children[cMatch[1]] );
+                            winPrompt.data( 'folder-path',  winPrompt.data( 'folder-path' ) + '\\' + cMatch[1] );
+                        } else {
+                            winHandle.prompt95( 'enter', {'text': 'Invalid directory'} );
+                        }
+                    } else if( null != (cMatch = text.match( /^dir ?(.*)?/i )) ) {
+                        // DIR command
+                        // TODO: Targeted DIR
+                        winHandle.prompt95( 'enter', {'text': 'Volume in drive C is WEBDOW95'} );
+                        winHandle.prompt95( 'enter', {'text': 'Volume Serial Number is DEAD-BEEF'} );
+                        winHandle.prompt95( 'enter', {'text': 'Directory of ' + winPrompt.data( 'folder-path' )} );
+                        winHandle.prompt95( 'enter', {'text': ''} );
+                        var fileCt = 0;
+                        for( filename in winPrompt.data( 'folder' ).children ) {
+                            var filedata = winPrompt.data( 'folder' ).children[filename];
+                            if( desktop95Types.FOLDER == filedata.type ) {
+                                winHandle.prompt95( 'enter', {'text': filename.toUpperCase() + '\t' + '&lt;DIR&gt;\t01-01-95\t04:20a'} );
+                            } else {
+                                winHandle.prompt95( 'enter', {'text': filename.toUpperCase()} );
+                            }
+                            fileCt += 1;
+                        }
+                        winHandle.prompt95( 'enter', {'text': fileCt.toString() + ' file(s)\t0 bytes'} );
+                        winHandle.prompt95( 'enter', {'text': '0 bytes free'} );
+                        winHandle.prompt95( 'enter', {'text': ''} );
+                    } else {
+                        winHandle.prompt95( 'enter', {'text': 'Sad command or file name'} )
+                    }
                 } } );
+            winPrompt.data( 'folder', fs.children['c:'] );
+            winPrompt.data( 'folder-path', 'c:' );
+            winPrompt.data( 'folder-parent', fs.children['c:'] );
+            winPrompt.data( 'folder-parent-path', 'c:' );
         }
     },
     'browser': {
