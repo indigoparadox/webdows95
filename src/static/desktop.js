@@ -1,58 +1,91 @@
 
-var desktop = {'children':{
-    'A Folder':{
-        'children':{
-            'A Text File':{
-                'contents':'This is a text file.',
-                'iconX':10,
-                'iconY':10,
-                'type':'notepad'}},
-        'iconX':20,
-        'iconY':20,
-        'type':'folder'},
-    'Browser':{
-        'archiveEnd':'19991200000000',
-        'archiveStart':'19990100000000',
-        'iconX':20,
-        'iconY':140,
-        'type':'browser'},
-    'Prompt':{
-        'iconX':20,
-        'iconY':80,
-        'prompt':'C:\\>',
-        'type':'prompt'},
-    'CD Player':{
-        'iconX':20,
-        'iconY':200,
-        'type': 'cdplayer',
-        'playlist': [
-            {
-                'url': 'finalizing.mp3',
-                'artist': '</body>',
-                'album': 'Initializing...',
-                'title': 'Finalizing...'
+const desktop95Types = {
+    'DRIVE': 'drive',
+    'FOLDER': 'folder',
+    'COMPUTER': 'computer',
+};
+
+var fs = null;
+
+var skel = {
+'type': desktop95Types.COMPUTER,
+'children':{
+    'c:': {
+        'type': desktop95Types.DRIVE,
+        'overlay': null,
+        'children': {
+            'windows': {
+                'type': desktop95Types.FOLDER,
+                'children': {
+                    'desktop': {
+                        'type': desktop95Types.FOLDER,
+                        'children': {
+                            'My Computer':{
+                                'type':'computer'},
+                            'A Folder':{
+                                'children':{
+                                    'A Text File':{
+                                        'contents':'This is a text file.',
+                                        'type':'notepad'}},
+                                'type':desktop95Types.FOLDER},
+                            'Browser':{
+                                'archiveEnd':'19991200000000',
+                                'archiveStart':'19990100000000',
+                                'type':'browser'},
+                            'Prompt':{
+                                'prompt':'C:\\>',
+                                'type':'prompt'},
+                            'CD Player':{
+                                'type': 'cdplayer',
+                                'playlist': [
+                                    {
+                                        'url': 'finalizing.mp3',
+                                        'artist': '</body>',
+                                        'album': 'Initializing...',
+                                        'title': 'Finalizing...'
+                                    }
+                                ]},
+                            'VGuide.avi':{
+                                'ytube': 'fXpfdq3WYu4',
+                                'type':'video'},
+                            'ReadMe.rtf':{
+                                'url':'README.md',
+                                'type':'wordpad'}
+                        },
+                    }
+                
+                }
             }
-        ]},
-    'VGuide.avi':{
-        'ytube': 'fXpfdq3WYu4',
-        'iconX':20,
-        'iconY':260,
-        'type':'video'},
-    'ReadMe.rtf':{
-        'url':'README.md',
-        'iconX':20,
-        'iconY':320,
-        'type':'wordpad'}},
-'type':'desktop'};
+        }
+    }
+} };
 
 var associations = {
+    'computer': {
+        'iconImg': 'icons-w95-32x32.png',
+        'iconX': 736,
+        'iconY': 512,
+        'opener': function( e ) {
+            var winFolder = $('#desktop').explorer95( 'open', { 'caption': e.data.name, 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 384, 'icoY': 256 } );
+            populateFolder( winFolder, fs );
+        }
+    },
+    'drive': {
+        'iconImg': 'icons-w95-32x32.png',
+        'iconX': 544,
+        'iconY': 224,
+        'opener': function( e ) {
+            var winFolder = $('#desktop').explorer95( 'open', { 'caption': e.data.name, 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 288, 'icoY': 112 } );
+            populateFolder( winFolder, e.data );
+        }
+    },
     'folder': {
         'iconImg': 'icons-w95-32x32.png',
         'iconX': 256,
         'iconY': 288,
         'opener': function( e ) {
             var winFolder = $('#desktop').explorer95( 'open', { 'caption': e.data.name, 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 112, 'icoY': 144 } );
-            populateFolder( winFolder, e.data.name, e.data.children );
+            populateFolder( winFolder, e.data );
         }
     },
     'notepad': {
@@ -131,15 +164,26 @@ var associations = {
     }
 };
 
-function populateFolder( parentWinHandle, folderName, folderItems ) {
+function populateFolder( parentWinHandle, folder ) {
 
     // Clear out containers before we start.
     $(parentWinHandle).children( '.icon' ).remove();
     $(parentWinHandle).children( '.window-form' ).children( '.container' ).children( '.icon' ).remove();
 
+    var defIconX = 20;
+    var defIconY = 20;
+
     // Get a list of icons in the requested folder.
-    for( var itemName in folderItems ) {
-        itemData = folderItems[itemName];
+    for( var itemName in folder.children ) {
+        itemData = folder.children[itemName];
+
+        if( !('iconX' in itemData) ) {
+            itemData.iconX = defIconX;
+        }
+        if( !('iconY' in itemData) ) {
+            itemData.iconY = defIconY;
+            defIconY += 80;
+        }
 
         // Handle nesting in IDs.
         var folderIconId = 'i-' + $(parentWinHandle).attr( 'id' ) + '-' + _htmlStrToClass( itemName );
@@ -180,7 +224,12 @@ function createAssocIcon( container, itemName, itemData, iconID, WindowID ) {
 
 $(document).ready( function() {
     
-    populateFolder( '#desktop', desktop, desktop.children );
+    fs = JSON.parse( localStorage.getItem( 'fs' ) );
+    if( null == fs ) {
+        fs = skel;
+    }
+
+    populateFolder( '#desktop', fs.children['c:'].children['windows'].children['desktop'] );
 
     $('#desktop').desktop95( 'enable' );
 
