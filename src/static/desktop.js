@@ -143,7 +143,7 @@ var associations = {
                     } else if( null != (cMatch = text.match( /^dir ?(.*)?/i )) ) {
                         // DIR command
                         // TODO: Targeted DIR
-                        winHandle.prompt95( 'enter', {'text': 'Volume in drive C is WEBDOW95'} );
+                        winHandle.prompt95( 'enter', {'text': 'Volume in drive C is WEBDOWS95'} );
                         winHandle.prompt95( 'enter', {'text': 'Volume Serial Number is DEAD-BEEF'} );
                         winHandle.prompt95( 'enter', {'text': 'Directory of ' + winPrompt.data( 'folder-path' )} );
                         winHandle.prompt95( 'enter', {'text': ''} );
@@ -217,12 +217,17 @@ function populateFolder( parentWinHandle, folder ) {
     for( var itemName in folder.children ) {
         itemData = folder.children[itemName];
 
+        if( defIconY >= $(container).height() - 70 ) {
+            defIconY = 20;
+            defIconX += 70;
+        }
+
         if( !('iconX' in itemData) ) {
             itemData.iconX = defIconX;
         }
         if( !('iconY' in itemData) ) {
             itemData.iconY = defIconY;
-            defIconY += 80;
+            defIconY += 70;
         }
 
         // Handle nesting in IDs.
