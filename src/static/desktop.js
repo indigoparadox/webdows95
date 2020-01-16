@@ -17,6 +17,21 @@ var skel = {
             'windows': {
                 'type': desktop95Types.FOLDER,
                 'children': {
+                    'start menu': {
+                        'type': desktop95Types.FOLDER,
+                        'children': {
+                            'programs': {
+                                'type': desktop95Types.FOLDER,
+                                'children': {
+                                    'accessories': {
+                                        'type': desktop95Types.FOLDER,
+                                        'children': {
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                    },
                     'desktop': {
                         'type': desktop95Types.FOLDER,
                         'children': {
@@ -279,6 +294,27 @@ $(document).ready( function() {
     $('#desktop').desktop95( 'enable' );
 
     $('.button-start').startmenu95( 'enable' );
+    $('.button-start').on( 'menu', function( e, menuElement, settings ) { 
+        //console.log( settings );
+        //console.log( menuElement );
+        settings.items = [];
+        switch( settings.caption ) {
+        case 'Programs':
+            var start_menu_progs = fs.children['c:'].children['windows'].children['start menu'].children['programs'];
+            for( itemName in start_menu_progs.children ) {
+                var itemData = start_menu_progs.children[itemName];
+                if( desktop95Types.FOLDER == itemData.type ) {
+                    settings.items.push( {'caption': itemName, 'type': menu95Type.EVENTMENU} );
+                } else {
+                    settings.items.push( {'caption': itemName, 'type': menu95Type.ITEM} );
+                }
+            }
+            break;
+
+        default:
+        }
+        $('#desktop').menu95( 'open', settings );
+    } );
 
     $('.tray.notification-area').systray95( 'enable' );
 } );
