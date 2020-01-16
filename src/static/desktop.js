@@ -135,6 +135,9 @@ var associations = {
         'iconImg': 'icons-w95-32x32.png',
         'iconX': 608,
         'iconY': 896,
+        'iconImg16': 'icons-w95-32x32.png',
+        'iconX16': 608,
+        'iconY16': 896,
         'opener': function( e ) {
             var buttonImgs = {
                 'new': {'icoImg': 'icons-w95-16x16.png', 'icoX': 32, 'icoY': 48 },
@@ -225,6 +228,9 @@ var associations = {
         'iconImg': 'icons-w95-32x32.png',
         'iconX': 480,
         'iconY': 512,
+        'iconImg16': 'icons-w95-16x16.png',
+        'iconX16': 240,
+        'iconY16': 256,
         'opener': function( e ) {
             var winPrompt = $('#desktop').cdplayer95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 256, 'icoY': 256, 'playlist': e.data.playlist } );
         }
@@ -296,6 +302,9 @@ function createAssocIcon( itemName, itemData, WindowID=null ) {
             'icoImg': associations[itemData.type].iconImg,
             'icoX': associations[itemData.type].iconX,
             'icoY': associations[itemData.type].iconY,
+            'iconImg16': associations[itemData.type].iconImg16,
+            'iconX16': associations[itemData.type].iconX16,
+            'iconY16': associations[itemData.type].iconY16,
             'x': itemData.iconX, 'y': itemData.iconY,
             'callback': associations[itemData.type].opener,
             'cbData': itemData };
