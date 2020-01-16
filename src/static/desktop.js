@@ -23,9 +23,28 @@ var skel = {
                             'programs': {
                                 'type': desktop95Types.FOLDER,
                                 'children': {
-                                    'accessories': {
+                                    'Accessories': {
                                         'type': desktop95Types.FOLDER,
                                         'children': {
+                                            'Multimedia': {
+                                                'type': desktop95Types.FOLDER,
+                                                'children': {
+                                                    'CD Player': {
+                                                        'type': 'cdplayer',
+                                                        'playlist': [
+                                                            {
+                                                                'url': 'finalizing.mp3',
+                                                                'artist': '</body>',
+                                                                'album': 'Initializing...',
+                                                                'title': 'Finalizing...'
+                                                            }
+                                                        ]
+                                                    },
+                                                }
+                                            },
+                                            'WordPad':{
+                                                'type':'wordpad'
+                                            },
                                         }
                                     }
                                 }
@@ -129,6 +148,7 @@ var associations = {
                 'dateTime': {'icoImg': 'icons-w95-16x16.png', 'icoX': 128, 'icoY': 144 },
                 'undo': {'icoImg': 'icons-w95-16x16.png', 'icoX': 144, 'icoY': 144 },
             };
+
             var winText = $('#desktop').wordpad95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 320, 'icoY': 448, 'x': 20, 'y': 20, 'w': 600, 'h': 400, 'buttonImgs': buttonImgs, 'url': e.data.url } );
             //winText.wordpad95( 'readURL', { 'url': e.data.url } );
         }
@@ -246,7 +266,7 @@ function populateFolder( parentWinHandle, folder ) {
         }
 
         // Handle nesting in IDs.
-        var folderIconId = 'i-' + $(parentWinHandle).attr( 'id' ) + '-' + _htmlStrToClass( itemName );
+        //var folderIconId = 'i-' + $(parentWinHandle).attr( 'id' ) + '-' + _htmlStrToClass( itemName );
         var folderWindowId = 'w-' + $(parentWinHandle).attr( 'id' ) + '-' + _htmlStrToClass( itemName );
 
         var container = $(parentWinHandle).find( '.container' );
@@ -254,15 +274,16 @@ function populateFolder( parentWinHandle, folder ) {
             container = $(parentWinHandle);
         }
 
-        createAssocIcon(
-            container, itemName, itemData,
-            folderIconId, folderWindowId );
+        var icon = createAssocIcon(
+            itemName, itemData,
+            folderWindowId );
+        container.explorer95( 'icon', icon );
     }
 }
 
-function createAssocIcon( container, itemName, itemData, iconID, WindowID ) {
+function createAssocIcon( itemName, itemData, WindowID=null ) {
 
-    console.assert( $(container).length == 1 );
+    //console.assert( $(container).length == 1 );
     
     var noCache = Math.random().toString( 36 ).substring( 2, 15 ) + 
         Math.random().toString( 36 ).substring( 2, 15 );
@@ -271,14 +292,13 @@ function createAssocIcon( container, itemName, itemData, iconID, WindowID ) {
     itemData.winID = WindowID;
 
     if( itemData.type in associations ) {
-        var icon = container.explorer95( 'icon',
-            { 'caption': itemName,
+        return { 'caption': itemName,
             'icoImg': associations[itemData.type].iconImg,
             'icoX': associations[itemData.type].iconX,
             'icoY': associations[itemData.type].iconY,
             'x': itemData.iconX, 'y': itemData.iconY,
             'callback': associations[itemData.type].opener,
-            'cbData': itemData } );
+            'cbData': itemData };
     }
 }
 
@@ -295,24 +315,35 @@ $(document).ready( function() {
 
     $('.button-start').startmenu95( 'enable' );
     $('.button-start').on( 'menu', function( e, menuElement, settings ) { 
-        //console.log( settings );
-        //console.log( menuElement );
-        settings.items = [];
-        switch( settings.caption ) {
-        case 'Programs':
-            var start_menu_progs = fs.children['c:'].children['windows'].children['start menu'].children['programs'];
-            for( itemName in start_menu_progs.children ) {
-                var itemData = start_menu_progs.children[itemName];
-                if( desktop95Types.FOLDER == itemData.type ) {
-                    settings.items.push( {'caption': itemName, 'type': menu95Type.EVENTMENU} );
-                } else {
-                    settings.items.push( {'caption': itemName, 'type': menu95Type.ITEM} );
-                }
-            }
-            break;
-
-        default:
+        if( !settings.path.startsWith( '/Programs' ) ) {
+            return;
         }
+
+        var menuPath = settings.path.split( '/' );
+        menuPath.shift(); // Remove root.
+        menuPath.shift(); // Remove Programs.
+
+        // Drill down to the submenu subfolder.
+        var start_menu_progs = fs.children['c:'].children['windows'].children['start menu'].children['programs'];
+        while( 0 < menuPath.length ) {
+            var nextFolder = menuPath.shift();
+            start_menu_progs = start_menu_progs.children[nextFolder];
+        }
+
+        settings.items = [];
+        
+        // Build the menu from items in the folder.
+        for( itemName in start_menu_progs.children ) {
+            var itemData = start_menu_progs.children[itemName];
+            if( desktop95Types.FOLDER == itemData.type ) {
+                settings.items.push( {'caption': itemName, 'type': menu95Type.EVENTMENU} );
+            } else {
+                var icon = createAssocIcon( itemName, itemData );
+                icon.type = menu95Type.ITEM;
+                settings.items.push( icon );
+            }
+        }
+
         $('#desktop').menu95( 'open', settings );
     } );
 
