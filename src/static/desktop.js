@@ -270,13 +270,7 @@ function createAssocIcon( itemName, itemData, WindowID=null ) {
 
     if( itemData.type in associations ) {
         return { 'caption': itemName,
-            'icoImg': associations[itemData.type].iconImg,
-            'icoX': associations[itemData.type].iconX,
-            'icoY': associations[itemData.type].iconY,
-            'iconImg16': associations[itemData.type].iconImg16,
-            'iconX16': associations[itemData.type].iconX16,
-            'iconY16': associations[itemData.type].iconY16,
-            'icon': associations[itemData.type].icon,
+            'icon': (null != itemData.url || null != itemData.contents) ? associations[itemData.type].iconDoc : associations[itemData.type].icon,
             'x': itemData.iconX, 'y': itemData.iconY,
             'callback': associations[itemData.type].opener,
             'cbData': itemData };
