@@ -52,6 +52,9 @@ var skel = {
                                                     },
                                                 }
                                             },
+                                            'Notepad':{
+                                                'type':'notepad'
+                                            },
                                             'WordPad':{
                                                 'type':'wordpad'
                                             },
@@ -106,62 +109,47 @@ var skel = {
 
 var associations = {
     'computer': {
-        'iconImg': 'icons-w95-32x32.png',
-        'iconX': 736,
-        'iconY': 512,
+        'icon': 'computer',
         'opener': function( e ) {
-            var winFolder = $('#desktop').explorer95( 'open', { 'caption': e.data.name, 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 384, 'icoY': 256 } );
+            var winFolder = $('#desktop').explorer95( 'open', { 'caption': e.data.name, 'id': e.data.winID } );
             populateFolder( winFolder, fs );
         }
     },
     'drive': {
-        'iconImg': 'icons-w95-32x32.png',
-        'iconX': 544,
-        'iconY': 224,
+        'icon': 'drive',
         'opener': function( e ) {
-            var winFolder = $('#desktop').explorer95( 'open', { 'caption': e.data.name, 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 288, 'icoY': 112 } );
+            var winFolder = $('#desktop').explorer95( 'open', { 'caption': e.data.name, 'id': e.data.winID } );
             populateFolder( winFolder, e.data );
         }
     },
     'folder': {
-        'iconImg': 'icons-w95-32x32.png',
-        'iconX': 256,
-        'iconY': 288,
+        'icon': 'folder',
         'opener': function( e ) {
-            var winFolder = $('#desktop').explorer95( 'open', { 'caption': e.data.name, 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 112, 'icoY': 144 } );
+            var winFolder = $('#desktop').explorer95( 'open', { 'caption': e.data.name, 'id': e.data.winID } );
             populateFolder( winFolder, e.data );
         }
     },
     'notepad': {
-        'iconImg': 'icons-w95-32x32.png',
-        'iconX': 864,
-        'iconY': 544,
+        'icon': 'notepad',
+        'iconDoc': 'txt',
         'opener': function( e ) {
-            var winText = $('#desktop').notepad95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 480, 'icoY': 272 } );
+            var winText = $('#desktop').notepad95( 'open', { 'id': e.data.winID } );
             winText.notepad95( 'readContents', { 'contents': e.data.contents } );
         }
     },
     'wordpad': {
-        'iconImg': 'icons-w95-32x32.png',
-        'iconX': 608,
-        'iconY': 896,
-        'iconImg16': 'icons-w95-32x32.png',
-        'iconX16': 608,
-        'iconY16': 896,
         'icon': 'wordpad',
         'iconDoc': 'rtf',
         'opener': function( e ) {
-            var winText = $('#desktop').wordpad95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 320, 'icoY': 448, 'x': 20, 'y': 20, 'w': 600, 'h': 400, 'url': e.data.url } );
+            var winText = $('#desktop').wordpad95( 'open', { 'id': e.data.winID, 'x': 20, 'y': 20, 'w': 600, 'h': 400, 'url': e.data.url } );
             //winText.wordpad95( 'readURL', { 'url': e.data.url } );
         }
     },
     'prompt': {
-        'iconImg': 'icons-w95-32x32.png',
-        'iconX': 256,
-        'iconY': 512,
+        'icon': 'prompt',
         'opener': function( e ) {
             var winPrompt = $('#desktop').prompt95( 'open', {
-                'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 128, 'icoY': 256, 'promptText': e.data.prompt,
+                'id': e.data.winID, 'promptText': e.data.prompt,
                 'lineHandler': function( data, text, winHandle ) {
                     var cMatch;
                     if( null != (cMatch = text.match( /^cd (.*)/i )) ) {
@@ -208,32 +196,22 @@ var associations = {
         }
     },
     'browser': {
-        'iconImg': 'icons-w95-32x32.png',
-        'iconX': 96,
-        'iconY': 736,
         'icon': 'browser',
         'opener': function( e ) {
-            var winFolder = $('#desktop').browser95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 64, 'icoY': 368, 'url': 'http://google.com' } );
+            var winFolder = $('#desktop').browser95( 'open', { 'id': e.data.winID, 'url': 'http://google.com' } );
         }
     },
     'cdplayer': {
-        'iconImg': 'icons-w95-32x32.png',
-        'iconX': 480,
-        'iconY': 512,
-        'iconImg16': 'icons-w95-16x16.png',
-        'iconX16': 240,
-        'iconY16': 256,
         'icon': 'cdplayer',
         'opener': function( e ) {
-            var winPrompt = $('#desktop').cdplayer95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 256, 'icoY': 256, 'playlist': e.data.playlist } );
+            var winPrompt = $('#desktop').cdplayer95( 'open', { 'id': e.data.winID, 'playlist': e.data.playlist } );
         }
     },
     'video': {
-        'iconImg': 'icons-w95-32x32.png',
-        'iconX': 672,
-        'iconY': 640,
+        'icon': 'avi',
+        'iconDoc': 'avi',
         'opener': function( e ) {
-            var winPrompt = $('#desktop').mpvideo95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 352, 'icoY': 320, 'ytube': e.data.ytube, 'w': 300, 'h': 275 } );
+            var winPrompt = $('#desktop').mpvideo95( 'open', { 'id': e.data.winID, 'ytube': e.data.ytube, 'w': 300, 'h': 275 } );
         }
     }
 };

@@ -11,6 +11,14 @@
     background: url( icons-w95-16x16.png ) right 112px bottom 144px;
 }
 
+.icon-notepad-16 {
+    background: url( icons-w95-16x16.png ) right 464px bottom 272px;
+}
+
+.icon-txt-16 {
+    background: url( icons-w95-16x16.png ) right 448px bottom 272px;
+}
+
 .icon-prompt-16 {
     background: url( icons-w95-16x16.png ) right 128px bottom 256px;
 }
@@ -48,7 +56,7 @@
 }
 
 .icon-copy-16 {
-    background: url( icons-w95-16x16.png ) right 192x bottom 128px;
+    background: url( icons-w95-16x16.png ) right 192px bottom 128px;
 }
 
 .icon-paste-16 {
@@ -89,20 +97,129 @@
 
 /* 32x32 */
 
+.desktop-icon-img {
+    -webkit-mask-image: url( icons-w95-32x32.png );
+}
+
+.icon-avi-32 {
+    background: url( icons-w95-32x32.png ) 384px 416px;
+    -webkit-mask-position-x: 384px;
+    -webkit-mask-position-y: 416px;
+}
+
+.desktop-icon-selected .icon-avi-32 {
+    background: linear-gradient(to bottom, rgba(0, 0, 127, 0.3), rgba(0, 0, 127, 0.3)),
+        url( icons-w95-32x32.png ) 384px 416px;
+}
+
+.icon-browser-32 {
+    background: url( icons-w95-32x32.png ) 960px 320px;
+    -webkit-mask-position-x: 960px;
+    -webkit-mask-position-y: 320px;
+}
+
+.desktop-icon-selected .icon-browser-32 {
+    background: linear-gradient(to bottom, rgba(0, 0, 127, 0.3), rgba(0, 0, 127, 0.3)),
+        url( icons-w95-32x32.png ) 960px 320px;
+}
+
 .icon-prompt-32 {
-    background: url( icons-w95-32x32.png ) no-repeat -256px -512px;
+    background: url( icons-w95-32x32.png ) 800px 544px;
+    -webkit-mask-position-x: 800px;
+    -webkit-mask-position-y: 544px;
+}
+
+.desktop-icon-selected .icon-prompt-32 {
+    background: linear-gradient(to bottom, rgba(0, 0, 127, 0.3), rgba(0, 0, 127, 0.3)),
+        url( icons-w95-32x32.png ) 800px 544px;
 }
 
 .icon-folder-32 {
-    background: url( icons-w95-32x32.png ) no-repeat -256px -238px;
+    background: url( icons-w95-32x32.png ) 800px 768px;
+    -webkit-mask-position-x: 800px;
+    -webkit-mask-position-y: 768px;
+}
+
+.desktop-icon-selected .icon-folder-32 {
+    background: linear-gradient(to bottom, rgba(0, 0, 127, 0.3), rgba(0, 0, 127, 0.3)),
+        url( icons-w95-32x32.png ) 800px 768px;
 }
 
 .icon-cdplayer-32 {
-    background: url( icons-w95-32x32.png ) no-repeat -480px -512px;
+    background: url( icons-w95-32x32.png ) 576px 544px;
+    -webkit-mask-position-x: 576px;
+    -webkit-mask-position-y: 544px;
+}
+
+.desktop-icon-selected .icon-cdplayer-32 {
+    background: linear-gradient(to bottom, rgba(0, 0, 127, 0.3), rgba(0, 0, 127, 0.3)),
+        url( icons-w95-32x32.png ) 576px 544px;
 }
 
 .icon-computer-32 {
-    background: url( icons-w95-32x32.png ) no-repeat -736px -512px;
+    background: url( icons-w95-32x32.png ) 320px 544px;
+    -webkit-mask-position-x: 320px;
+    -webkit-mask-position-y: 544px;
+}
+
+.desktop-icon-selected .icon-computer-32 {
+    background: linear-gradient(to bottom, rgba(0, 0, 127, 0.3), rgba(0, 0, 127, 0.3)),
+        url( icons-w95-32x32.png ) 320px 544px;
+}
+
+.icon-drive-32 {
+    background: url( icons-w95-32x32.png ) 512px 832px;
+    -webkit-mask-position-x: 512px;
+    -webkit-mask-position-y: 832px;
+}
+
+.desktop-icon-selected .icon-drive-32 {
+    background: linear-gradient(to bottom, rgba(0, 0, 127, 0.3), rgba(0, 0, 127, 0.3)),
+        url( icons-w95-32x32.png ) 512px 832px;
+}
+
+.icon-notepad-32 {
+    background: url( icons-w95-32x32.png ) 96px 512px;
+    -webkit-mask-position-x: 96px;
+    -webkit-mask-position-y: 512px;
+}
+
+.desktop-icon-selected .icon-notepad-32 {
+    background: linear-gradient(to bottom, rgba(0, 0, 127, 0.3), rgba(0, 0, 127, 0.3)),
+        url( icons-w95-32x32.png ) 96px 512px;
+}
+
+.icon-txt-32 {
+    background: url( icons-w95-32x32.png ) 192px 512px;
+    -webkit-mask-position-x: 192px;
+    -webkit-mask-position-y: 512px;
+}
+
+.desktop-icon-selected .icon-txt-32 {
+    background: linear-gradient(to bottom, rgba(0, 0, 127, 0.3), rgba(0, 0, 127, 0.3)),
+        url( icons-w95-32x32.png ) 192px 512px;
+}
+
+.icon-wordpad-32 {
+    background: url( icons-w95-32x32.png ) 384px 160px;
+    -webkit-mask-position-x: 384px;
+    -webkit-mask-position-y: 160px;
+}
+
+.desktop-icon-selected .icon-wordpad-32 {
+    background: linear-gradient(to bottom, rgba(0, 0, 127, 0.3), rgba(0, 0, 127, 0.3)),
+        url( icons-w95-32x32.png ) 384px 160px;
+}
+
+.icon-rtf-32 {
+    background: url( icons-w95-32x32.png ) 448px 160px;
+    -webkit-mask-position-x: 448px;
+    -webkit-mask-position-y: 160px;
+}
+
+.desktop-icon-selected .icon-rtf-32 {
+    background: linear-gradient(to bottom, rgba(0, 0, 127, 0.3), rgba(0, 0, 127, 0.3)),
+        url( icons-w95-32x32.png ) 448px 160px;
 }
 
 .icon-programs-32 {
