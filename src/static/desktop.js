@@ -26,6 +26,16 @@ var skel = {
                                     'Accessories': {
                                         'type': desktop95Types.FOLDER,
                                         'children': {
+                                            'Internet Tools': {
+                                                'type': desktop95Types.FOLDER,
+                                                'children': {
+                                                    'Browser': {
+                                                        'archiveEnd':'19991200000000',
+                                                        'archiveStart':'19990100000000',
+                                                        'type': 'browser',
+                                                    },
+                                                }
+                                            },
                                             'Multimedia': {
                                                 'type': desktop95Types.FOLDER,
                                                 'children': {
@@ -138,21 +148,10 @@ var associations = {
         'iconImg16': 'icons-w95-32x32.png',
         'iconX16': 608,
         'iconY16': 896,
+        'icon': 'wordpad',
+        'iconDoc': 'rtf',
         'opener': function( e ) {
-            var buttonImgs = {
-                'new': {'icoImg': 'icons-w95-16x16.png', 'icoX': 32, 'icoY': 48 },
-                'open': {'icoImg': 'icons-w95-16x16.png', 'icoX': 48, 'icoY': 128 },
-                'print': {'icoImg': 'icons-w95-16x16.png', 'icoX': 64, 'icoY': 128 },
-                'cut': {'icoImg': 'icons-w95-16x16.png', 'icoX': 176, 'icoY': 128 },
-                'copy': {'icoImg': 'icons-w95-16x16.png', 'icoX': 192, 'icoY': 128 },
-                'paste': {'icoImg': 'icons-w95-16x16.png', 'icoX': 208, 'icoY': 128 },
-                'preview': {'icoImg': 'icons-w95-16x16.png', 'icoX': 240, 'icoY': 128 },
-                'search': {'icoImg': 'icons-w95-16x16.png', 'icoX': 256, 'icoY': 128 },
-                'dateTime': {'icoImg': 'icons-w95-16x16.png', 'icoX': 128, 'icoY': 144 },
-                'undo': {'icoImg': 'icons-w95-16x16.png', 'icoX': 144, 'icoY': 144 },
-            };
-
-            var winText = $('#desktop').wordpad95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 320, 'icoY': 448, 'x': 20, 'y': 20, 'w': 600, 'h': 400, 'buttonImgs': buttonImgs, 'url': e.data.url } );
+            var winText = $('#desktop').wordpad95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 320, 'icoY': 448, 'x': 20, 'y': 20, 'w': 600, 'h': 400, 'url': e.data.url } );
             //winText.wordpad95( 'readURL', { 'url': e.data.url } );
         }
     },
@@ -212,16 +211,9 @@ var associations = {
         'iconImg': 'icons-w95-32x32.png',
         'iconX': 96,
         'iconY': 736,
+        'icon': 'browser',
         'opener': function( e ) {
-            var buttonImgs = {
-                'open': {'icoImg': 'icons-w95-16x16.png', 'icoX': 48, 'icoY': 128 },
-                'print': {'icoImg': 'icons-w95-16x16.png', 'icoX': 64, 'icoY': 128 },
-                'refresh': {'icoImg': 'icons-w95-16x16.png', 'icoX': 112, 'icoY': 128 },
-                'stop': {'icoImg': 'icons-w95-16x16.png', 'icoX': 128, 'icoY': 128 },
-                'mail': {'icoImg': 'icons-w95-16x16.png', 'icoX': 80, 'icoY': 128 },
-                'home': {'icoImg': 'icons-w95-16x16.png', 'icoX': 96, 'icoY': 128 }
-            };
-            var winFolder = $('#desktop').browser95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 64, 'icoY': 368, 'url': 'http://google.com', 'buttonImgs': buttonImgs } );
+            var winFolder = $('#desktop').browser95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 64, 'icoY': 368, 'url': 'http://google.com' } );
         }
     },
     'cdplayer': {
@@ -231,6 +223,7 @@ var associations = {
         'iconImg16': 'icons-w95-16x16.png',
         'iconX16': 240,
         'iconY16': 256,
+        'icon': 'cdplayer',
         'opener': function( e ) {
             var winPrompt = $('#desktop').cdplayer95( 'open', { 'id': e.data.winID, 'icoImg': 'icons-w95-16x16.png', 'icoX': 256, 'icoY': 256, 'playlist': e.data.playlist } );
         }
@@ -305,6 +298,7 @@ function createAssocIcon( itemName, itemData, WindowID=null ) {
             'iconImg16': associations[itemData.type].iconImg16,
             'iconX16': associations[itemData.type].iconX16,
             'iconY16': associations[itemData.type].iconY16,
+            'icon': associations[itemData.type].icon,
             'x': itemData.iconX, 'y': itemData.iconY,
             'callback': associations[itemData.type].opener,
             'cbData': itemData };
@@ -345,7 +339,7 @@ $(document).ready( function() {
         for( itemName in start_menu_progs.children ) {
             var itemData = start_menu_progs.children[itemName];
             if( desktop95Types.FOLDER == itemData.type ) {
-                settings.items.push( {'caption': itemName, 'type': menu95Type.EVENTMENU} );
+                settings.items.push( {'caption': itemName, 'type': menu95Type.EVENTMENU, 'icon': 'programs'} );
             } else {
                 var icon = createAssocIcon( itemName, itemData );
                 icon.type = menu95Type.ITEM;
