@@ -101,6 +101,17 @@
     -webkit-mask-image: url( icons-w95-32x32.png );
 }
 
+.icon-exe-32 {
+    background: url( icons-w95-32x32.png ) 896px 416px;
+    -webkit-mask-position-x: 896px;
+    -webkit-mask-position-y: 416px;
+}
+
+.desktop-icon-selected .icon-exe-32 {
+    background: linear-gradient(to bottom, rgba(0, 0, 127, 0.3), rgba(0, 0, 127, 0.3)),
+        url( icons-w95-32x32.png ) 896px 416px;
+}
+
 .icon-avi-32 {
     background: url( icons-w95-32x32.png ) 384px 416px;
     -webkit-mask-position-x: 384px;

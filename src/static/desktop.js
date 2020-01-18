@@ -182,20 +182,24 @@ var associations = {
     'drive': {
         'icon': 'drive',
         'opener': function( e ) {
-            var winFolder = $('#desktop').explorer95( 'open', { 'caption': e.data.name, 'id': e.data.winID } );
-            populateFolder( winFolder, e.data );
+            loadExe( 'c:/windows/explorer.js' ).done( function() {
+                var winFolder = $('#desktop').explorer95( 'open', { 'caption': e.data.name, 'id': e.data.winID } );
+                populateFolder( winFolder, e.data );
+            } );
         }
     },
     'folder': {
         'icon': 'folder',
         'opener': function( e ) {
-            var winFolder = $('#desktop').explorer95( 'open', { 'caption': e.data.name, 'id': e.data.winID } );
-            populateFolder( winFolder, e.data );
+            loadExe( 'c:/windows/explorer.js' ).done( function() {
+                var winFolder = $('#desktop').explorer95( 'open', { 'caption': e.data.name, 'id': e.data.winID } );
+                populateFolder( winFolder, e.data );
+            } );
         }
     },
     'notepad': {
         'icon': 'notepad',
-        'iconDoc': 'txt',
+        'docIcon': 'txt',
         'opener': function( e ) {
             loadExe( 'c:/windows/notepad.js' ).done( function() {
                 var winText = $('#desktop').notepad95( 'open', { 'id': e.data.winID } );
@@ -205,7 +209,7 @@ var associations = {
     },
     'wordpad': {
         'icon': 'wordpad',
-        'iconDoc': 'rtf',
+        'docIcon': 'rtf',
         'opener': function( e ) {
             loadExe( 'c:/windows/wordpad.js' ).done( function() {
                 var winText = $('#desktop').wordpad95( 'open', { 'id': e.data.winID, 'x': 20, 'y': 20, 'w': 600, 'h': 400, 'url': e.data.url } );
@@ -283,7 +287,7 @@ var associations = {
     },
     'video': {
         'icon': 'avi',
-        'iconDoc': 'avi',
+        'docIcon': 'avi',
         'opener': function( e ) {
             loadExe( 'c:/windows/mpvideo.js' ).done( function() {
                 var winPrompt = $('#desktop').mpvideo95( 'open', { 'id': e.data.winID, 'ytube': e.data.ytube, 'w': 300, 'h': 275 } );
@@ -305,6 +309,7 @@ function populateFolder( parentWinHandle, folder ) {
     for( var itemName in folder.children ) {
         itemData = folder.children[itemName];
 
+        // Setup the icon's position on the folder window/desktop.
         if( defIconY >= $(container).height() - 70 ) {
             defIconY = 20;
             defIconX += 70;
@@ -344,15 +349,28 @@ function createAssocIcon( itemName, itemData, WindowID=null ) {
     itemData.name = itemName;
     itemData.winID = WindowID;
 
+    var iconName = '';
+    if(
+        itemData.type in associations &&
+        ('src' in itemData ||
+        'url' in itemData ||
+        'contents' in itemData) &&
+        'docIcon' in associations[itemData.type]
+    ) {
+        // This is a document, so use the doc icon.
+        iconName = associations[itemData.type].docIcon;
+
+    } else if( itemData.type in associations && 'icon' in associations[itemData.type] ) {
+        iconName = associations[itemData.type].icon;
+    } else if( 'icon' in itemData ) {
+        iconName = itemData.icon;
+    } else {
+        iconName = 'generic';
+    }
+
     if( itemData.type in associations ) {
         return { 'caption': itemName,
-            'icoImg': associations[itemData.type].iconImg,
-            'icoX': associations[itemData.type].iconX,
-            'icoY': associations[itemData.type].iconY,
-            'iconImg16': associations[itemData.type].iconImg16,
-            'iconX16': associations[itemData.type].iconX16,
-            'iconY16': associations[itemData.type].iconY16,
-            'icon': associations[itemData.type].icon,
+            'icon': iconName,
             'x': itemData.iconX, 'y': itemData.iconY,
             'callback': associations[itemData.type].opener,
             'cbData': itemData };
