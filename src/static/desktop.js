@@ -34,6 +34,10 @@ var skel = {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'src/static/desktop-1995/apps/command.js'
                     },
+                    'notepad.js': {
+                        'type': desktop95Types.EXECUTABLE,
+                        'src': 'src/static/desktop-1995/apps/notepad.js'
+                    },
                     'wordpad.js': {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'src/static/desktop-1995/apps/wordpad.js'
