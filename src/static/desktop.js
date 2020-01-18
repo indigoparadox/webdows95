@@ -3,6 +3,7 @@ const desktop95Types = {
     'DRIVE': 'drive',
     'FOLDER': 'folder',
     'COMPUTER': 'computer',
+    'EXECUTABLE': 'executable',
 };
 
 var fs = null;
@@ -17,6 +18,30 @@ var skel = {
             'windows': {
                 'type': desktop95Types.FOLDER,
                 'children': {
+                    'explorer.js': {
+                        'type': desktop95Types.EXECUTABLE,
+                        'src': 'src/static/desktop-1995/apps/explorer.js'
+                    },
+                    'browser.js': {
+                        'type': desktop95Types.EXECUTABLE,
+                        'src': 'src/static/desktop-1995/apps/browser.js'
+                    },
+                    'cdplayer.js': {
+                        'type': desktop95Types.EXECUTABLE,
+                        'src': 'src/static/desktop-1995/apps/cdplayer.js'
+                    },
+                    'command.js': {
+                        'type': desktop95Types.EXECUTABLE,
+                        'src': 'src/static/desktop-1995/apps/command.js'
+                    },
+                    'wordpad.js': {
+                        'type': desktop95Types.EXECUTABLE,
+                        'src': 'src/static/desktop-1995/apps/wordpad.js'
+                    },
+                    'mpvideo.js': {
+                        'type': desktop95Types.EXECUTABLE,
+                        'src': 'src/static/desktop-1995/apps/mpvideo.js'
+                    },
                     'start menu': {
                         'type': desktop95Types.FOLDER,
                         'children': {
@@ -97,7 +122,7 @@ var skel = {
                                 'type':'video'},
                             'ReadMe.rtf':{
                                 'url':'README.md',
-                                'type':'wordpad'}
+                                'type':'wordpad'},
                         },
                     }
                 
@@ -107,12 +132,51 @@ var skel = {
     }
 } };
 
+function loadExe( path ) {
+    // This will resolve once the exe is loaded.
+    def = new $.Deferred();
+
+    // TODO: Turn the mouse into an hourglass.
+
+    // Drill down to the executable.
+    path = path.split( '/' );
+    file = fs.children[path.shift()];
+    while( 0 < path.length ) {
+        var next = path.shift();
+        file = file.children[next];
+    }
+
+    if( 0 < $('#exe-' + _htmlStrToClass( file.src )).length ) {
+        // We're already loaded.
+        def.resolve();
+        return def.promise();
+    }
+
+    // Load the executable code and resolve the promise when ready.
+    $('#desktop').css( 'cursor', 'progress' );
+    $.get( file.src, function( data ) {
+        var scriptElement = $('<script id="exe-' + _htmlStrToClass( file.src ) + '" type="text/javascript">' + data + '</script>');
+        $('head').append( scriptElement );
+        $('#desktop').css( 'cursor', 'auto' );
+        def.resolve();
+    } );
+
+    return def.promise(); // Hang tight until we're loaded.
+}
+
 var associations = {
+    'executable': {
+        'icon': 'exe',
+        'opener': function( e ) {
+        },
+    },
     'computer': {
         'icon': 'computer',
         'opener': function( e ) {
-            var winFolder = $('#desktop').explorer95( 'open', { 'caption': e.data.name, 'id': e.data.winID } );
-            populateFolder( winFolder, fs );
+            loadExe( 'c:/windows/explorer.js' ).done( function() {
+                var winFolder = $('#desktop').explorer95( 'open', { 'caption': e.data.name, 'id': e.data.winID } );
+                populateFolder( winFolder, fs );
+            } );
         }
     },
     'drive': {
@@ -133,85 +197,97 @@ var associations = {
         'icon': 'notepad',
         'iconDoc': 'txt',
         'opener': function( e ) {
-            var winText = $('#desktop').notepad95( 'open', { 'id': e.data.winID } );
-            winText.notepad95( 'readContents', { 'contents': e.data.contents } );
+            loadExe( 'c:/windows/notepad.js' ).done( function() {
+                var winText = $('#desktop').notepad95( 'open', { 'id': e.data.winID } );
+                winText.notepad95( 'readContents', { 'contents': e.data.contents } );
+            } );
         }
     },
     'wordpad': {
         'icon': 'wordpad',
         'iconDoc': 'rtf',
         'opener': function( e ) {
-            var winText = $('#desktop').wordpad95( 'open', { 'id': e.data.winID, 'x': 20, 'y': 20, 'w': 600, 'h': 400, 'url': e.data.url } );
-            //winText.wordpad95( 'readURL', { 'url': e.data.url } );
+            loadExe( 'c:/windows/wordpad.js' ).done( function() {
+                var winText = $('#desktop').wordpad95( 'open', { 'id': e.data.winID, 'x': 20, 'y': 20, 'w': 600, 'h': 400, 'url': e.data.url } );
+                //winText.wordpad95( 'readURL', { 'url': e.data.url } );
+            } );
         }
     },
     'prompt': {
         'icon': 'prompt',
         'opener': function( e ) {
-            var winPrompt = $('#desktop').prompt95( 'open', {
-                'id': e.data.winID, 'promptText': e.data.prompt,
-                'lineHandler': function( data, text, winHandle ) {
-                    var cMatch;
-                    if( null != (cMatch = text.match( /^cd (.*)/i )) ) {
-                        // CD command
-                        if( 
-                            'children' in winPrompt.data( 'folder' ) &&
-                            cMatch[1] in winPrompt.data( 'folder' ).children
-                        ) {
-                            winPrompt.data( 'folder-parent', winPrompt.data( 'folder' ) );
-                            winPrompt.data( 'folder-parent-path', winPrompt.data( 'folder-path' ) );
-                            winPrompt.data( 'folder', winPrompt.data( 'folder' ).children[cMatch[1]] );
-                            winPrompt.data( 'folder-path',  winPrompt.data( 'folder-path' ) + '\\' + cMatch[1] );
-                        } else {
-                            winHandle.prompt95( 'enter', {'text': 'Invalid directory'} );
-                        }
-                    } else if( null != (cMatch = text.match( /^dir ?(.*)?/i )) ) {
-                        // DIR command
-                        // TODO: Targeted DIR
-                        winHandle.prompt95( 'enter', {'text': 'Volume in drive C is WEBDOWS95'} );
-                        winHandle.prompt95( 'enter', {'text': 'Volume Serial Number is DEAD-BEEF'} );
-                        winHandle.prompt95( 'enter', {'text': 'Directory of ' + winPrompt.data( 'folder-path' )} );
-                        winHandle.prompt95( 'enter', {'text': ''} );
-                        var fileCt = 0;
-                        for( filename in winPrompt.data( 'folder' ).children ) {
-                            var filedata = winPrompt.data( 'folder' ).children[filename];
-                            if( desktop95Types.FOLDER == filedata.type ) {
-                                winHandle.prompt95( 'enter', {'text': filename.toUpperCase() + '\t' + '&lt;DIR&gt;\t01-01-95\t04:20a'} );
+            loadExe( 'c:/windows/command.js' ).done( function() {
+                var winPrompt = $('#desktop').command95( 'open', {
+                    'id': e.data.winID, 'promptText': e.data.prompt,
+                    'lineHandler': function( data, text, winHandle ) {
+                        var cMatch;
+                        if( null != (cMatch = text.match( /^cd (.*)/i )) ) {
+                            // CD command
+                            if( 
+                                'children' in winPrompt.data( 'folder' ) &&
+                                cMatch[1] in winPrompt.data( 'folder' ).children
+                            ) {
+                                winPrompt.data( 'folder-parent', winPrompt.data( 'folder' ) );
+                                winPrompt.data( 'folder-parent-path', winPrompt.data( 'folder-path' ) );
+                                winPrompt.data( 'folder', winPrompt.data( 'folder' ).children[cMatch[1]] );
+                                winPrompt.data( 'folder-path',  winPrompt.data( 'folder-path' ) + '\\' + cMatch[1] );
                             } else {
-                                winHandle.prompt95( 'enter', {'text': filename.toUpperCase()} );
+                                winHandle.command95( 'enter', {'text': 'Invalid directory'} );
                             }
-                            fileCt += 1;
+                        } else if( null != (cMatch = text.match( /^dir ?(.*)?/i )) ) {
+                            // DIR command
+                            // TODO: Targeted DIR
+                            winHandle.command95( 'enter', {'text': 'Volume in drive C is WEBDOWS95'} );
+                            winHandle.command95( 'enter', {'text': 'Volume Serial Number is DEAD-BEEF'} );
+                            winHandle.command95( 'enter', {'text': 'Directory of ' + winPrompt.data( 'folder-path' )} );
+                            winHandle.command95( 'enter', {'text': ''} );
+                            var fileCt = 0;
+                            for( filename in winPrompt.data( 'folder' ).children ) {
+                                var filedata = winPrompt.data( 'folder' ).children[filename];
+                                if( desktop95Types.FOLDER == filedata.type ) {
+                                    winHandle.command95( 'enter', {'text': filename.toUpperCase() + '\t' + '&lt;DIR&gt;\t01-01-95\t04:20a'} );
+                                } else {
+                                    winHandle.command95( 'enter', {'text': filename.toUpperCase()} );
+                                }
+                                fileCt += 1;
+                            }
+                            winHandle.command95( 'enter', {'text': fileCt.toString() + ' file(s)\t0 bytes'} );
+                            winHandle.command95( 'enter', {'text': '0 bytes free'} );
+                            winHandle.command95( 'enter', {'text': ''} );
+                        } else {
+                            winHandle.command95( 'enter', {'text': 'Sad command or file name'} )
                         }
-                        winHandle.prompt95( 'enter', {'text': fileCt.toString() + ' file(s)\t0 bytes'} );
-                        winHandle.prompt95( 'enter', {'text': '0 bytes free'} );
-                        winHandle.prompt95( 'enter', {'text': ''} );
-                    } else {
-                        winHandle.prompt95( 'enter', {'text': 'Sad command or file name'} )
-                    }
-                } } );
-            winPrompt.data( 'folder', fs.children['c:'] );
-            winPrompt.data( 'folder-path', 'c:' );
-            winPrompt.data( 'folder-parent', fs.children['c:'] );
-            winPrompt.data( 'folder-parent-path', 'c:' );
+                    } } );
+                winPrompt.data( 'folder', fs.children['c:'] );
+                winPrompt.data( 'folder-path', 'c:' );
+                winPrompt.data( 'folder-parent', fs.children['c:'] );
+                winPrompt.data( 'folder-parent-path', 'c:' );
+            } );
         }
     },
     'browser': {
         'icon': 'browser',
         'opener': function( e ) {
-            var winFolder = $('#desktop').browser95( 'open', { 'id': e.data.winID, 'url': 'http://google.com' } );
+            loadExe( 'c:/windows/browser.js' ).done( function() {
+                var winFolder = $('#desktop').browser95( 'open', { 'id': e.data.winID, 'url': 'http://google.com' } );
+            } );
         }
     },
     'cdplayer': {
         'icon': 'cdplayer',
         'opener': function( e ) {
-            var winPrompt = $('#desktop').cdplayer95( 'open', { 'id': e.data.winID, 'playlist': e.data.playlist } );
+            loadExe( 'c:/windows/cdplayer.js' ).done( function() {
+                var winPrompt = $('#desktop').cdplayer95( 'open', { 'id': e.data.winID, 'playlist': e.data.playlist } );
+            } );
         }
     },
     'video': {
         'icon': 'avi',
         'iconDoc': 'avi',
         'opener': function( e ) {
-            var winPrompt = $('#desktop').mpvideo95( 'open', { 'id': e.data.winID, 'ytube': e.data.ytube, 'w': 300, 'h': 275 } );
+            loadExe( 'c:/windows/mpvideo.js' ).done( function() {
+                var winPrompt = $('#desktop').mpvideo95( 'open', { 'id': e.data.winID, 'ytube': e.data.ytube, 'w': 300, 'h': 275 } );
+            } );
         }
     }
 };
@@ -254,7 +330,7 @@ function populateFolder( parentWinHandle, folder ) {
         var icon = createAssocIcon(
             itemName, itemData,
             folderWindowId );
-        container.explorer95( 'icon', icon );
+        container.desktop95( 'icon', icon );
     }
 }
 
