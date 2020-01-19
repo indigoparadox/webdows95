@@ -4,6 +4,7 @@ const desktop95Types = {
     'FOLDER': 'folder',
     'COMPUTER': 'computer',
     'EXECUTABLE': 'executable',
+    'SHORTCUT': 'shortcut',
 };
 
 var fs = null;
@@ -33,11 +34,28 @@ var skel = {
                     'browser.js': {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'src/static/desktop-1995/apps/browser.js',
-                        'entry': 'browser95'
+                        'entry': 'browser95',
+                        'args': {
+                            'archiveEnd':'19991200000000',
+                            'archiveStart':'19990100000000',
+                            'url': 'http://google.com',
+                            'id': 'w-browser',
+                        },
                     },
                     'cdplayer.js': {
                         'type': desktop95Types.EXECUTABLE,
-                        'src': 'src/static/desktop-1995/apps/cdplayer.js'
+                        'src': 'src/static/desktop-1995/apps/cdplayer.js',
+                        'args': {
+                            'playlist': [
+                                {
+                                    'url': 'finalizing.mp3',
+                                    'artist': '</body>',
+                                    'album': 'Initializing...',
+                                    'title': 'Finalizing...'
+                                }
+                            ],
+                            'id': 'w-cdplayer',
+                        },
                     },
                     'command.js': {
                         'type': desktop95Types.EXECUTABLE,
@@ -47,19 +65,32 @@ var skel = {
                             winCommand.data( 'folder-path', 'c:' );
                             winCommand.data( 'folder-parent', fs.children['c:'] );
                             winCommand.data( 'folder-parent-path', 'c:' );
+                        },
+                        'args': {
+                            'id': 'w-command',
+                            'lineHandler': handlePromptLine,
                         }
                     },
                     'notepad.js': {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'src/static/desktop-1995/apps/notepad.js',
+                        'args': {
+                            'id': 'w-notepad',
+                        }
                     },
                     'wordpad.js': {
                         'type': desktop95Types.EXECUTABLE,
-                        'src': 'src/static/desktop-1995/apps/wordpad.js'
+                        'src': 'src/static/desktop-1995/apps/wordpad.js',
+                        'args': {
+                            'id': 'w-wordpad',
+                        }
                     },
                     'mpvideo.js': {
                         'type': desktop95Types.EXECUTABLE,
-                        'src': 'src/static/desktop-1995/apps/mpvideo.js'
+                        'src': 'src/static/desktop-1995/apps/mpvideo.js',
+                        'args': {
+                            'id': 'w-mpvideo',
+                        }
                     },
                     'start menu': {
                         'type': desktop95Types.FOLDER,
@@ -74,13 +105,9 @@ var skel = {
                                                 'type': desktop95Types.FOLDER,
                                                 'children': {
                                                     'Browser': {
-                                                        'args': {
-                                                            'archiveEnd':'19991200000000',
-                                                            'archiveStart':'19990100000000',
-                                                            'url': 'http://google.com',
-                                                            'id': 'w-browser',
-                                                        },
-                                                        'type': 'browser',
+                                                        'type': 'shortcut',
+                                                        'exec': 'c:\\windows\\browser.js',
+                                                        'icon': 'browser',
                                                     },
                                                 }
                                             },
@@ -88,35 +115,28 @@ var skel = {
                                                 'type': desktop95Types.FOLDER,
                                                 'children': {
                                                     'CD Player': {
-                                                        'type': 'cdplayer',
-                                                        'args': {
-                                                            'playlist': [
-                                                                {
-                                                                    'url': 'finalizing.mp3',
-                                                                    'artist': '</body>',
-                                                                    'album': 'Initializing...',
-                                                                    'title': 'Finalizing...'
-                                                                }
-                                                            ],
-                                                            'id': 'w-cd-player',
-                                                        }
+                                                        'type': 'shortcut',
+                                                        'exec': 'c:\\windows\\cdplayer.js',
+                                                        'icon': 'cdplayer',
                                                     },
                                                 }
                                             },
                                             'Notepad':{
-                                                'type':'notepad'
+                                                'type': 'shortcut',
+                                                'exec': 'c:\\windows\\notepad.js',
+                                                'icon': 'notepad',
                                             },
                                             'WordPad':{
-                                                'type':'wordpad'
+                                                'type': 'shortcut',
+                                                'exec': 'c:\\windows\\wordpad.js',
+                                                'icon': 'wordpad',
                                             },
                                         }
                                     },
                                     'Prompt': {
-                                        'type':'prompt',
-                                        'args': {
-                                            'id': 'w-command',
-                                            'lineHandler': handlePromptLine,
-                                        }
+                                        'type': 'shortcut',
+                                        'exec': 'c:\\windows\\command.js',
+                                        'icon': 'prompt',
                                     },
                                 },
                             }
@@ -138,33 +158,19 @@ var skel = {
                                     },
                                 'type':desktop95Types.FOLDER},
                             'Browser':{
-                                'args': {
-                                    'archiveEnd':'19991200000000',
-                                    'archiveStart':'19990100000000',
-                                    'url': 'http://google.com',
-                                    'id': 'w-browser',
-                                },
-                                'type':'browser'},
+                                'exec': 'c:\\windows\\browser.js',
+                                'icon': 'browser',
+                                'type': 'shortcut'
+                            },
                             'Prompt':{
-                                'type':'prompt',
-                                'args': {
-                                    'id': 'w-command',
-                                    'lineHandler': handlePromptLine,
-                                }
+                                'type': 'shortcut',
+                                'exec': 'c:\\windows\\command.js',
+                                'icon': 'prompt',
                             },
                             'CD Player':{
-                                'type': 'cdplayer',
-                                'args': {
-                                    'playlist': [
-                                        {
-                                            'url': 'finalizing.mp3',
-                                            'artist': '</body>',
-                                            'album': 'Initializing...',
-                                            'title': 'Finalizing...'
-                                        }
-                                    ],
-                                    'id': 'w-cd-player',
-                                },
+                                'type': 'shortcut',
+                                'exec': 'c:\\windows\\cdplayer.js',
+                                'icon': 'cdplayer',
                             },
                             'VGuide.avi':{
                                 'args': {
@@ -216,29 +222,35 @@ function loadExe( pathString, callerPath ) {
     caller.path = callerPath;
 
     // Drill down to the executable.
-    file = resolvePath( pathString );
+    var exec = resolvePath( pathString );
 
     var _exeRunAfterLoad = function() {
+    
         // Always have an args object.
         if( !('args' in caller) ) {
             caller.args = {};
+        }
+
+        // Use default args baked into exec.
+        if( 'args' in exec ) {
+            $.extend( caller.args, exec.args );
         }
         
         if( !('id' in caller.args) ) {
             caller.args.id = 'w-' + _htmlStrToClass( callerPath );
         }
 
-        if( !('entry' in file) ) {
-            file.entry = file.name.split( '.' )[0] + '95';
+        if( !('entry' in exec) ) {
+            exec.entry = exec.name.split( '.' )[0] + '95';
         }
-        var winHandle = $('#desktop')[file.entry]( 'open', caller.args );
-        if( 'onOpen' in file ) {
-            file.onOpen( winHandle, caller );
+        var winHandle = $('#desktop')[exec.entry]( 'open', caller.args );
+        if( 'onOpen' in exec ) {
+            exec.onOpen( winHandle, caller );
         }
         def.resolve();
     }
 
-    if( 0 < $('#exe-' + _htmlStrToClass( file.src )).length ) {
+    if( 0 < $('#exe-' + _htmlStrToClass( exec.src )).length ) {
         // We're already loaded.
         _exeRunAfterLoad();
         return def.promise();
@@ -246,8 +258,8 @@ function loadExe( pathString, callerPath ) {
 
     // Load the executable code and resolve the promise when ready.
     $('#desktop').css( 'cursor', 'progress' );
-    $.get( file.src, function( data ) {
-        var scriptElement = $('<script id="exe-' + _htmlStrToClass( file.src ) + '" type="text/javascript">' + data + '</script>');
+    $.get( exec.src, function( data ) {
+        var scriptElement = $('<script id="exe-' + _htmlStrToClass( exec.src ) + '" type="text/javascript">' + data + '</script>');
         $('head').append( scriptElement );
         $('#desktop').css( 'cursor', 'auto' );
         _exeRunAfterLoad();
@@ -301,6 +313,9 @@ var associations = {
     'executable': {
         'icon': 'exe',
     },
+    'shortcut': {
+        'icon': 'lnk',
+    },
     'computer': {
         'icon': 'computer',
         'exec': 'c:/windows/explorer.js',
@@ -333,6 +348,7 @@ var associations = {
     },
     'cdplayer': {
         'icon': 'cdplayer',
+        'docIcon': 'cda',
         'exec': 'c:/windows/cdplayer.js',
     },
     'video': {
@@ -402,17 +418,26 @@ function createAssocIcon( itemName, itemPath ) {
         // This is a document, so use the doc icon.
         iconName = associations[itemData.type].docIcon;
 
-    } else if( itemData.type in associations && 'icon' in associations[itemData.type] ) {
-        // Use the association icon.
-        iconName = associations[itemData.type].icon;
-
     } else if( 'icon' in itemData ) {
         // Use the icon embedded in the file.
         iconName = itemData.icon;
 
+    } else if( 
+        itemData.type in associations &&
+        'icon' in associations[itemData.type] ) {
+        // Use the association icon.
+        iconName = associations[itemData.type].icon;
+
     } else {
         // Use a generic icon.
         iconName = 'generic';
+    }
+
+    var exec = '';
+    if( 'exec' in associations[itemData.type] ) {
+        exec = associations[itemData.type].exec;
+    } else if( 'exec' in itemData ) {
+        exec = itemData.exec;
     }
 
     // Create the icon settings pack.
@@ -421,7 +446,7 @@ function createAssocIcon( itemName, itemPath ) {
             'icon': iconName,
             'x': itemData.iconX, 'y': itemData.iconY,
             'callback': function() {
-                loadExe( associations[itemData.type].exec, itemPath );
+                loadExe( exec, itemPath );
             },
         };
     }
