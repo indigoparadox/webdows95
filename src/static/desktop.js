@@ -22,8 +22,12 @@ var skel = {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'src/static/desktop-1995/apps/explorer.js',
                         'entry': 'explorer95',
-                        'onOpen': function( winFolder, shortcut ) {
-                            populateFolder( winFolder, shortcut.path );
+                        'onOpen': function( winFolder, shortcut ) {            
+                            if( desktop95Types.COMPUTER == shortcut.type ) {
+                                populateFolder( winFolder, '' );
+                            } else {
+                                populateFolder( winFolder, shortcut.path );
+                            }
                         }
                     },
                     'browser.js': {
@@ -184,7 +188,11 @@ var skel = {
     }
 } };
 
-function resolvePath( pathString ) {
+function resolvePath( pathString=null ) {
+    console.log( pathString );
+    if( null == pathString || '' == pathString ) {
+        return fs;
+    }
     if( pathString.endsWith( '/' ) || pathString.endsWith( '\\' ) ) {
         pathString = pathString.substring( 0, pathString.length - 1 );
     }
@@ -390,13 +398,17 @@ function populateFolder( parentWinHandle, folderPath ) {
             container = $(parentWinHandle);
         }
 
-        var icon = createAssocIcon(
-            itemName, folderPath + '/' + itemName );
+        var itemPath = folderPath + '/' + itemName;
+        if( null == folderPath || 0 == folderPath.length ) {
+            itemPath = itemName;
+        }
+
+        var icon = createAssocIcon( itemName, itemPath );
         container.desktop95( 'icon', icon );
     }
 }
 
-function createAssocIcon( itemName, itemPath) {
+function createAssocIcon( itemName, itemPath ) {
     var itemData = resolvePath( itemPath );
 
     // Setup the icon image.
