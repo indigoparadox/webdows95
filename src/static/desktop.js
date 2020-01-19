@@ -7,6 +7,10 @@ const desktop95Types = {
     'SHORTCUT': 'shortcut',
 };
 
+const desktop95FileException = {
+    'FILEEXISTS': 'fileexists',
+};
+
 var fs = null;
 
 var skel = {
@@ -25,9 +29,9 @@ var skel = {
                         'entry': 'explorer95',
                         'onOpen': function( winFolder, shortcut ) {            
                             if( desktop95Types.COMPUTER == shortcut.type ) {
-                                populateFolder( winFolder, '' );
+                                populateFolder( winFolder.find( '.container' ), '' );
                             } else {
-                                populateFolder( winFolder, shortcut.path );
+                                populateFolder( winFolder.find( '.container' ), shortcut.path );
                             }
                         }
                     },
@@ -193,6 +197,19 @@ var skel = {
         }
     }
 } };
+
+function newFolder( parent, name ) {
+    if( name in parent.children ) {
+        throw { 'type': desktop95FileException.FILEEXISTS };
+    }
+
+    parent.children[name] = {
+        'type': desktop95Types.FOLDER,
+        'children': {},
+    }
+
+    return parent.children[name];
+}
 
 function resolvePath( pathString=null ) {
     if( null == pathString || '' == pathString ) {
@@ -375,39 +392,50 @@ var associations = {
     }
 };
 
-function populateFolder( parentWinHandle, folderPath ) {
+function getNextIconPosition( container, reset=false ) {
+    if( reset || undefined == $(container).data( 'default-icon-x' ) ) {
+        $(container).data( 'default-icon-x', 20 );
+    }
+    if( reset || undefined == $(container).data( 'default-icon-y' ) ) {
+        $(container).data( 'default-icon-y', 20 );
+    }
+
+    // Setup the icon's position on the folder window/desktop.
+    if( 
+        $(container).data( 'default-icon-y' ) >= $(container).height() - 70 &&
+        $(container).data( 'default-icon-x' ) < $(container).width() - 70
+    ) {
+        $(container).data( 'default-icon-x',
+            $(container).data( 'default-icon-x' ) + 70 );
+        $(container).data( 'default-icon-y', 20 );
+    }
+
+    var iconX = $(container).data( 'default-icon-x' );
+    var iconY = $(container).data( 'default-icon-y' );
+    $(container).data( 'default-icon-y',
+        $(container).data( 'default-icon-y' ) + 70 );
+    return [iconX, iconY];
+}
+
+function populateFolder( container, folderPath ) {
 
     // Clear out containers before we start.
-    $(parentWinHandle).children( '.icon' ).remove();
-    $(parentWinHandle).children( '.window-form' ).children( '.container' ).children( '.icon' ).remove();
-
+    $(container).children( '.desktop-icon' ).remove();
+    
     var folder = resolvePath( folderPath );
 
-    var defIconX = 20;
-    var defIconY = 20;
+    $(container).data( 'default-icon-x', 20 );
+    $(container).data( 'default-icon-y', 20 );
 
     // Get a list of icons in the requested folder.
     for( var itemName in folder.children ) {
         itemData = folder.children[itemName];
 
-        // Setup the icon's position on the folder window/desktop.
-        if( defIconY >= $(container).height() - 70 ) {
-            defIconY = 20;
-            defIconX += 70;
-        }
-
+        var iconPos = [];
         if( !('iconX' in itemData) ) {
-            itemData.iconX = defIconX;
-        }
-        if( !('iconY' in itemData) ) {
-            itemData.iconY = defIconY;
-            defIconY += 70;
-        }
-
-        // Figure out where the container is (e.g. if asked to populate a window).
-        var container = $(parentWinHandle).find( '.container' );
-        if( 0 == container.length ) {
-            container = $(parentWinHandle);
+            iconPos = getNextIconPosition( container );
+        } else {
+            iconPos = [itemData.iconX, itemData.iconY];
         }
 
         var itemPath = folderPath + '/' + itemName;
@@ -416,7 +444,10 @@ function populateFolder( parentWinHandle, folderPath ) {
         }
 
         var icon = createAssocIcon( itemName, itemPath );
-        container.desktop95( 'icon', icon );
+        icon.x = iconPos[0];
+        icon.y = iconPos[1];
+        console.log( icon );
+        $(container).desktop95( 'icon', icon );
     }
 }
 
@@ -479,6 +510,10 @@ $(document).ready( function() {
     populateFolder( '#desktop', 'c:/windows/desktop' );
 
     $('#desktop').desktop95( 'enable' );
+    $('#desktop').on( 'new-folder', function( e ) {
+        newFolder( resolvePath( 'c:\\windows\\desktop' ), 'New Folder' );
+        populateFolder( this, 'c:\\windows\\desktop' );
+    } );
 
     //$('#desktop').window95( 'dialog', {'icon': 'info', 'caption': 'Test Message', 'message': 'This is a test.'});
 
