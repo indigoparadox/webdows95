@@ -189,7 +189,6 @@ var skel = {
 } };
 
 function resolvePath( pathString=null ) {
-    console.log( pathString );
     if( null == pathString || '' == pathString ) {
         return fs;
     }
