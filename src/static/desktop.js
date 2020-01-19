@@ -239,6 +239,7 @@ var associations = {
                                 winPrompt.data( 'folder-parent-path', winPrompt.data( 'folder-path' ) );
                                 winPrompt.data( 'folder', winPrompt.data( 'folder' ).children[cMatch[1]] );
                                 winPrompt.data( 'folder-path',  winPrompt.data( 'folder-path' ) + '\\' + cMatch[1] );
+                                winPrompt.command95( 'setPrompt', {'promptText': winPrompt.data( 'folder-path' ).toUpperCase() + '>'})
                             } else {
                                 winHandle.command95( 'enter', {'text': 'Invalid directory'} );
                             }
