@@ -39,7 +39,7 @@ var skel = {
                             'archiveEnd':'19991200000000',
                             'archiveStart':'19990100000000',
                             'url': 'http://google.com',
-                            'id': 'w-browser',
+                            'id': null, // Always allow new windows.
                         },
                     },
                     'cdplayer.js': {
@@ -67,7 +67,7 @@ var skel = {
                             winCommand.data( 'folder-parent-path', 'c:' );
                         },
                         'args': {
-                            'id': 'w-command',
+                            'id': null, // Always allow new windows.
                             'lineHandler': handlePromptLine,
                         }
                     },
@@ -75,14 +75,14 @@ var skel = {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'src/static/desktop-1995/apps/notepad.js',
                         'args': {
-                            'id': 'w-notepad',
+                            'id': null, // Always allow new windows.
                         }
                     },
                     'wordpad.js': {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'src/static/desktop-1995/apps/wordpad.js',
                         'args': {
-                            'id': 'w-wordpad',
+                            'id': null, // Always allow new windows.
                         }
                     },
                     'mpvideo.js': {
@@ -211,15 +211,17 @@ function resolvePath( pathString=null ) {
     return file;
 }
 
-function loadExe( pathString, callerPath ) {
+function loadExe( pathString, callerPath='', caller=null ) {
 
     // This will resolve once the exe is loaded.
     def = new $.Deferred();
 
     // This is the beginning of stuff that runs at call time (not define time),
     // so we can start resolving things from keys to dicts.
-    caller = resolvePath( callerPath );
-    caller.path = callerPath;
+    if( null == caller ) {
+        caller = resolvePath( callerPath );
+        caller.path = callerPath;
+    }
 
     // Drill down to the executable.
     var exec = resolvePath( pathString );
@@ -236,7 +238,11 @@ function loadExe( pathString, callerPath ) {
             $.extend( caller.args, exec.args );
         }
         
-        if( !('id' in caller.args) ) {
+        console.log( caller.type );
+        if(
+            !(desktop95Types.EXECUTABLE == caller.type || desktop95Types.SHORTCUT == caller.type) ||
+            !('id' in caller.args)
+        ) {
             caller.args.id = 'w-' + _htmlStrToClass( callerPath );
         }
 
@@ -304,6 +310,17 @@ function handlePromptLine( data, text, winPrompt ) {
         winPrompt.command95( 'enter', {'text': fileCt.toString() + ' file(s)\t0 bytes'} );
         winPrompt.command95( 'enter', {'text': '0 bytes free'} );
         winPrompt.command95( 'enter', {'text': ''} );
+    } else if(
+        text in winPrompt.data( 'folder' ).children &&
+        resolvePath( winPrompt.data( 'folder-path' ) + '\\' + text ).type == desktop95Types.EXECUTABLE
+    ) {
+        // Open the specified executable with a fake shortcut.
+        caller = {
+            'type': 'shortcut',
+            'exec': winPrompt.data( 'folder-path' ) + '\\' + text,
+            'icon': 'prompt',
+        };
+        loadExe( winPrompt.data( 'folder-path' ) + '\\' + text, '', caller );
     } else {
         winPrompt.command95( 'enter', {'text': 'Sad command or file name'} )
     }
