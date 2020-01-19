@@ -300,65 +300,45 @@ function handlePromptLine( data, text, winPrompt ) {
 var associations = {
     'executable': {
         'icon': 'exe',
-        'opener': function( path ) {
-        },
     },
     'computer': {
         'icon': 'computer',
-        'opener': function( path ) {
-            loadExe( 'c:/windows/explorer.js', path );
-        }
+        'exec': 'c:/windows/explorer.js',
     },
     'drive': {
         'icon': 'drive',
-        'opener': function( path ) {
-            loadExe( 'c:/windows/explorer.js', path );
-        }
+        'exec': 'c:/windows/explorer.js',
     },
     'folder': {
         'icon': 'folder',
-        'opener': function( path ) {
-            loadExe( 'c:/windows/explorer.js', path );
-        }
+        'exec': 'c:/windows/explorer.js',
     },
     'notepad': {
         'icon': 'notepad',
         'docIcon': 'txt',
-        'opener': function( path ) {
-            loadExe( 'c:/windows/notepad.js', path );
-        }
+        'exec': 'c:/windows/notepad.js',
     },
     'wordpad': {
         'icon': 'wordpad',
         'docIcon': 'rtf',
-        'opener': function( path ) {
-            loadExe( 'c:/windows/wordpad.js', path );
-        }
+        'exec': 'c:/windows/wordpad.js',
     },
     'prompt': {
         'icon': 'prompt',
-        'opener': function( path ) {
-            loadExe( 'c:/windows/command.js', path );
-        }
+        'exec': 'c:/windows/command.js',
     },
     'browser': {
         'icon': 'browser',
-        'opener': function( path ) {
-            loadExe( 'c:/windows/browser.js', path );
-        }
+        'exec': 'c:/windows/browser.js',
     },
     'cdplayer': {
         'icon': 'cdplayer',
-        'opener': function( path ) {
-            loadExe( 'c:/windows/cdplayer.js', path );
-        }
+        'exec': 'c:/windows/cdplayer.js',
     },
     'video': {
         'icon': 'avi',
         'docIcon': 'avi',
-        'opener': function( path ) {
-            loadExe( 'c:/windows/mpvideo.js', path );
-        }
+        'exec': 'c:/windows/mpvideo.js',
     }
 };
 
@@ -440,8 +420,10 @@ function createAssocIcon( itemName, itemPath ) {
         return { 'caption': itemName,
             'icon': iconName,
             'x': itemData.iconX, 'y': itemData.iconY,
-            'callback': associations[itemData.type].opener,
-            'cbData': itemPath };
+            'callback': function() {
+                loadExe( associations[itemData.type].exec, itemPath );
+            },
+        };
     }
 }
 
