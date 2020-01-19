@@ -105,6 +105,51 @@
     -webkit-mask-image: url( icons-w95-32x32.png );
 }
 
+.icon-info-32 {
+    background: url( icons-w95-32x32.png ) 128px 736px;
+    -webkit-mask-position-x: 128px;
+    -webkit-mask-position-y: 736px;
+}
+
+.icon-warning-32 {
+    background: url( icons-w95-32x32.png ) 512px 192px;
+    -webkit-mask-position-x: 512px;
+    -webkit-mask-position-y: 192px;
+}
+
+.icon-html-32 {
+    background: url( icons-w95-32x32.png ) 384px 192px;
+    -webkit-mask-position-x: 384px;
+    -webkit-mask-position-y: 192px;
+}
+
+.desktop-icon-selected .icon-html-32 {
+    background: linear-gradient(to bottom, rgba(0, 0, 127, 0.3), rgba(0, 0, 127, 0.3)),
+        url( icons-w95-32x32.png ) 384px 192px;
+}
+
+.icon-url-32 {
+    background: url( icons-w95-32x32.png ) 320px 192px;
+    -webkit-mask-position-x: 320px;
+    -webkit-mask-position-y: 192px;
+}
+
+.desktop-icon-selected .icon-url-32 {
+    background: linear-gradient(to bottom, rgba(0, 0, 127, 0.3), rgba(0, 0, 127, 0.3)),
+        url( icons-w95-32x32.png ) 320px 192px;
+}
+
+.icon-generic-32 {
+    background: url( icons-w95-32x32.png ) 704px 160px;
+    -webkit-mask-position-x: 704px;
+    -webkit-mask-position-y: 160px;
+}
+
+.desktop-icon-selected .icon-generic-32 {
+    background: linear-gradient(to bottom, rgba(0, 0, 127, 0.3), rgba(0, 0, 127, 0.3)),
+        url( icons-w95-32x32.png ) 704px 160px;
+}
+
 .icon-exe-32 {
     background: url( icons-w95-32x32.png ) 896px 416px;
     -webkit-mask-position-x: 896px;

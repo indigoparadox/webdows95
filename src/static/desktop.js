@@ -480,6 +480,8 @@ $(document).ready( function() {
 
     $('#desktop').desktop95( 'enable' );
 
+    //$('#desktop').window95( 'dialog', {'icon': 'info', 'caption': 'Test Message', 'message': 'This is a test.'});
+
     $('.button-start').startmenu95( 'enable' );
     $('.button-start').on( 'menu', function( e, menuElement, settings ) { 
         if( !settings.path.startsWith( '/Programs' ) ) {
