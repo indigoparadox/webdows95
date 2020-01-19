@@ -414,7 +414,9 @@ function createAssocIcon( itemName, itemPath ) {
     var iconName = '';
     if(
         itemData.type in associations &&
-        ('args' in itemData) &&
+        ('args' in itemData &&
+            ('url' in itemData.args ||
+            'contents' in itemData.args)) &&
         'docIcon' in associations[itemData.type]
     ) {
         // This is a document, so use the doc icon.
