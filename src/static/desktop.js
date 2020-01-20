@@ -37,6 +37,13 @@ var skel = {
                             }
                         }
                     },
+                    'mousetray.js': {
+                        'type': desktop95Types.EXECUTABLE,
+                        'src': 'src/static/desktop-1995/apps/mousetray.js',
+                        'entry': 'mousetray95',
+                        'onOpen': function( winFolder, shortcut ) {
+                        }
+                    },
                     'browser.js': {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'src/static/desktop-1995/apps/browser.js',
@@ -588,6 +595,13 @@ $(document).ready( function() {
         }
         populateFolder( this, desktop95DesktopFolder );
     } );
+
+    var mouseCaller = {
+        'type': 'shortcut',
+        'exec': 'c:\\windows\\mousetray.js',
+        'icon': 'mouse',
+    };
+    loadExe( 'c:\\windows\\mousetray.js', '', mouseCaller );
 
     //$('#desktop').window95( 'dialog', {'icon': 'info', 'caption': 'Test Message', 'message': 'This is a test.'});
 

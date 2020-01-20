@@ -99,6 +99,14 @@
     background: url( icons-w95-16x16.png ) right 96px bottom 128px;
 }
 
+.icon-mouse-16 {
+    background: url( icons-w95-16x16.png ) right 432px bottom 432px;
+}
+
+.icon-mouse-right-16 {
+    background: url( icons-w95-16x16.png ) right 400px bottom 432px;
+}
+
 /* 32x32 */
 
 .desktop-icon-img {
