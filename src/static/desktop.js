@@ -350,16 +350,20 @@ function handlePromptLine( data, text, winPrompt ) {
 
 var associations = {
     'executable': {
+        'name': 'Executable',
         'icon': 'exe',
     },
     'shortcut': {
+        'name': 'Shortcut',
         'icon': 'lnk',
     },
     'computer': {
+        'name': 'Computer',
         'icon': 'computer',
         'exec': 'c:/windows/explorer.js',
     },
     'drive': {
+        'name': 'Drive',
         'icon': 'drive',
         'exec': 'c:/windows/explorer.js',
         'context': {
@@ -388,33 +392,41 @@ var associations = {
         }
     },
     'folder': {
+        'name': 'Folder',
         'icon': 'folder',
         'exec': 'c:/windows/explorer.js',
     },
     'notepad': {
+        'name': 'Text Document',
         'icon': 'notepad',
         'docIcon': 'txt',
         'exec': 'c:/windows/notepad.js',
     },
     'wordpad': {
+        'name': 'Rich Text Document',
         'icon': 'wordpad',
         'docIcon': 'rtf',
         'exec': 'c:/windows/wordpad.js',
     },
     'prompt': {
+        'name': 'Prompt',
         'icon': 'prompt',
         'exec': 'c:/windows/command.js',
     },
     'browser': {
+        'name': 'Internet Shortcut',
         'icon': 'browser',
+        'docIcon': 'url',
         'exec': 'c:/windows/browser.js',
     },
     'cdplayer': {
+        'name': 'Music CD',
         'icon': 'cdplayer',
         'docIcon': 'cda',
         'exec': 'c:/windows/cdplayer.js',
     },
     'video': {
+        'name': 'Video File',
         'icon': 'avi',
         'docIcon': 'avi',
         'exec': 'c:/windows/mpvideo.js',
@@ -446,6 +458,16 @@ function getNextIconPosition( container, reset=false ) {
     return [iconX, iconY];
 }
 
+function _iconPropertiesCallback( e ) {
+    $('#desktop').properties95( 'file', {
+        'fileIcon': e.data.icon.icon,
+        'fileName': e.data.icon.caption,
+        'fileType': e.data.icon.description,
+        'fileLocation': e.data.path,
+        'caption': e.data.caption,
+    } );
+}
+
 function populateFolder( container, folderPath ) {
 
     // Clear out containers before we start.
@@ -475,7 +497,10 @@ function populateFolder( container, folderPath ) {
         var icon = createAssocIcon( itemName, itemPath );
         icon.x = iconPos[0];
         icon.y = iconPos[1];
-        $(container).desktop95( 'icon', icon );
+        var iconWrapper = $(container).desktop95( 'icon', icon );
+
+        // Add a level of indirection or else icon will stay in scope and change.
+        iconWrapper.on( 'properties', {'path': folderPath, 'icon': icon}, _iconPropertiesCallback );
     }
 }
 
@@ -527,6 +552,7 @@ function createAssocIcon( itemName, itemPath ) {
             'icon': iconName,
             'x': itemData.iconX, 'y': itemData.iconY,
             'target': itemPath,
+            'description': associations[itemData.type].name,
             'context': contextMenu,
             'callback': function() {
                 loadExe( exec, itemPath );

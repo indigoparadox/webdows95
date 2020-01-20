@@ -105,6 +105,17 @@
     -webkit-mask-image: url( icons-w95-32x32.png );
 }
 
+.icon-shortcut-32 {
+    background: url( icons-w95-32x32.png ) 128px 320px;
+    -webkit-mask-position-x: 128px;
+    -webkit-mask-position-y: 320px;
+}
+
+.desktop-icon-selected .icon-shortcut-32 {
+    background: linear-gradient(to bottom, rgba(0, 0, 127, 0.3), rgba(0, 0, 127, 0.3)),
+        url( icons-w95-32x32.png ) 128px 320px;
+}
+
 .icon-info-32 {
     background: url( icons-w95-32x32.png ) 128px 736px;
     -webkit-mask-position-x: 128px;
