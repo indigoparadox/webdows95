@@ -11,6 +11,8 @@ const desktop95FileException = {
     'FILEEXISTS': 'fileexists',
 };
 
+const desktop95DesktopFolder = 'c:\\windows\\desktop';
+
 var fs = null;
 
 var skel = {
@@ -87,6 +89,8 @@ var skel = {
                         'src': 'src/static/desktop-1995/apps/wordpad.js',
                         'args': {
                             'id': null, // Always allow new windows.
+                            'w': 600,
+                            'h': 400,
                         }
                     },
                     'mpvideo.js': {
@@ -446,7 +450,6 @@ function populateFolder( container, folderPath ) {
         var icon = createAssocIcon( itemName, itemPath );
         icon.x = iconPos[0];
         icon.y = iconPos[1];
-        console.log( icon );
         $(container).desktop95( 'icon', icon );
     }
 }
@@ -507,12 +510,25 @@ $(document).ready( function() {
         fs = skel;
     }
 
-    populateFolder( '#desktop', 'c:/windows/desktop' );
+    populateFolder( '#desktop', desktop95DesktopFolder );
 
     $('#desktop').desktop95( 'enable' );
     $('#desktop').on( 'new-folder', function( e ) {
-        newFolder( resolvePath( 'c:\\windows\\desktop' ), 'New Folder' );
-        populateFolder( this, 'c:\\windows\\desktop' );
+        newFolder( resolvePath( desktop95DesktopFolder ), 'New Folder' );
+        populateFolder( this, desktop95DesktopFolder );
+    } );
+    $('#desktop').on( 'arrange-icons', function( e, data ) {
+        desktopFolder = resolvePath( desktop95DesktopFolder );
+        switch( data.criteria ) {
+        case 'name':
+            desktopItemsNew = {};
+            Object.keys( desktopFolder.children ).sort().forEach( function( key ) {
+                desktopItemsNew[key] = desktopFolder.children[key];
+            } );
+            desktopFolder.children = desktopItemsNew;
+            break;
+        }
+        populateFolder( this, desktop95DesktopFolder );
     } );
 
     //$('#desktop').window95( 'dialog', {'icon': 'info', 'caption': 'Test Message', 'message': 'This is a test.'});
