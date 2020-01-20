@@ -259,13 +259,14 @@ function loadExe( pathString, callerPath='', caller=null ) {
             $.extend( caller.args, exec.args );
         }
         
-        console.log( caller.type );
         if(
             !(desktop95Types.EXECUTABLE == caller.type || desktop95Types.SHORTCUT == caller.type) ||
             !('id' in caller.args)
         ) {
             caller.args.id = 'w-' + _htmlStrToClass( callerPath );
         }
+
+        caller.args.target = callerPath;
 
         if( !('entry' in exec) ) {
             exec.entry = exec.name.split( '.' )[0] + '95';
@@ -361,6 +362,30 @@ var associations = {
     'drive': {
         'icon': 'drive',
         'exec': 'c:/windows/explorer.js',
+        'context': {
+            'items': [
+                {'caption': 'Format', 'callback': function( m ) {
+                    var formatDialog = {
+                        'caption': 'Format Session',
+                        'icon': 'warning',
+                        'message': 'This will erase all persistant data from your session. Continue?',
+                        'buttons': {
+                            'Yes': function() {
+
+                            },
+                            'No': function() {
+
+                            }
+                        }
+                    };
+                    $('#desktop').window95( 'dialog', formatDialog );
+                }},
+                {'type': menu95Type.DIVIDER},
+                {'caption': 'Properties', 'callback': function( m ) {
+                    console.log( m );
+                }}
+            ]
+        }
     },
     'folder': {
         'icon': 'folder',
@@ -491,11 +516,18 @@ function createAssocIcon( itemName, itemPath ) {
         exec = itemData.exec;
     }
 
+    var contextMenu = null;
+    if( 'context' in associations[itemData.type] ) {
+        contextMenu = associations[itemData.type].context;
+    }
+
     // Create the icon settings pack.
     if( itemData.type in associations ) {
         return { 'caption': itemName,
             'icon': iconName,
             'x': itemData.iconX, 'y': itemData.iconY,
+            'target': itemPath,
+            'context': contextMenu,
             'callback': function() {
                 loadExe( exec, itemPath );
             },
