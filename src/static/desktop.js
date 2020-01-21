@@ -514,11 +514,7 @@ function populateFolder( container, folderPath ) {
             $(this).desktop95( 'select' );
         } );
 
-        iconWrapper.on( 'desktop-double-click', function( e ) {
-            $(this).desktop95( 'select' );
-        } );
-
-        iconWrapper.on( 'desktop-double-click', {'callback': icon.callback, 'cbData': null }, _iconDoubleClickCallback );
+        //iconWrapper.on( 'desktop-double-click', {'callback': icon.callback, 'cbData': null }, _iconDoubleClickCallback );
 
         // Add a level of indirection or else icon will stay in scope and change.
         iconWrapper.on( 'properties', {'path': folderPath, 'icon': icon}, _iconPropertiesCallback );
