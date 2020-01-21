@@ -475,6 +475,10 @@ function _iconPropertiesCallback( e ) {
     } );
 }
 
+function _iconDoubleClickCallback( e ) {
+    e.data.callback( e.data.cbData );
+}
+
 function populateFolder( container, folderPath ) {
 
     // Clear out containers before we start.
@@ -487,7 +491,7 @@ function populateFolder( container, folderPath ) {
 
     // Get a list of icons in the requested folder.
     for( var itemName in folder.children ) {
-        itemData = folder.children[itemName];
+        let itemData = folder.children[itemName];
 
         var iconPos = [];
         if( !('iconX' in itemData) ) {
@@ -505,6 +509,16 @@ function populateFolder( container, folderPath ) {
         icon.x = iconPos[0];
         icon.y = iconPos[1];
         var iconWrapper = $(container).desktop95( 'icon', icon );
+
+        iconWrapper.mousedown( function( e ) {
+            $(this).desktop95( 'select' );
+        } );
+
+        iconWrapper.on( 'desktop-double-click', function( e ) {
+            $(this).desktop95( 'select' );
+        } );
+
+        iconWrapper.on( 'desktop-double-click', {'callback': icon.callback, 'cbData': null }, _iconDoubleClickCallback );
 
         // Add a level of indirection or else icon will stay in scope and change.
         iconWrapper.on( 'properties', {'path': folderPath, 'icon': icon}, _iconPropertiesCallback );
