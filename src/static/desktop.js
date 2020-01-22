@@ -34,6 +34,23 @@ var skel = {
                                 populateFolder( winFolder.find( '.container' ), '' );
                             } else {
                                 populateFolder( winFolder.find( '.container' ), shortcut.path );
+
+                                winFolder.find( '.container' ).on( 'icon-drop', function( e, d ) {
+                                    incomingFile = resolvePath( d.incoming.data( 'path' ) );
+                                    incomingFilename = d.incoming.data( 'filename' );
+                                    destDir = resolvePath( d.target.data( 'path' ) );
+                                    sourceDir = resolvePath( d.source.data( 'path' ) );
+
+                                    // Move the file to the destination folder.
+                                    destDir.children[incomingFilename] = incomingFile;
+                                    sourceDir.children[incomingFilename] = null;
+
+                                    localStorage.setItem( 'fs', JSON.stringify( fs ) );
+
+                                    // Refresh the folder views.
+                                    populateFolder( d.source );
+                                    populateFolder( d.target );
+                                } );
                             }
                         }
                     },
@@ -479,7 +496,11 @@ function _iconDoubleClickCallback( e ) {
     e.data.callback( e.data.cbData );
 }
 
-function populateFolder( container, folderPath ) {
+function populateFolder( container, folderPath=null ) {
+
+    if( null === folderPath ) {
+        folderPath = $(container).data( 'path' );
+    }
 
     // Clear out containers before we start.
     $(container).children( '.desktop-icon' ).remove();
@@ -489,9 +510,16 @@ function populateFolder( container, folderPath ) {
     $(container).data( 'default-icon-x', 20 );
     $(container).data( 'default-icon-y', 20 );
 
+    $(container).data( 'path', folderPath );
+
     // Get a list of icons in the requested folder.
     for( var itemName in folder.children ) {
         let itemData = folder.children[itemName];
+
+        if( null == itemData ) {
+            // Item was deleted.
+            continue;
+        }
 
         var iconPos = [];
         if( !('iconX' in itemData) ) {
@@ -500,7 +528,7 @@ function populateFolder( container, folderPath ) {
             iconPos = [itemData.iconX, itemData.iconY];
         }
 
-        var itemPath = folderPath + '/' + itemName;
+        var itemPath = folderPath + '\\' + itemName;
         if( null == folderPath || 0 == folderPath.length ) {
             itemPath = itemName;
         }
@@ -510,11 +538,14 @@ function populateFolder( container, folderPath ) {
         icon.y = iconPos[1];
         var iconWrapper = $(container).desktop95( 'icon', icon );
 
-        iconWrapper.mousedown( function( e ) {
-            $(this).desktop95( 'select' );
-        } );
+        iconWrapper.data( 'path', itemPath );
+        iconWrapper.data( 'filename', itemName );
 
-        //iconWrapper.on( 'desktop-double-click', {'callback': icon.callback, 'cbData': null }, _iconDoubleClickCallback );
+        /* iconWrapper.mousedown( function( e ) {
+            $(this).desktop95( 'select' );
+        } ); */
+
+        iconWrapper.on( 'desktop-double-click', {'callback': icon.callback, 'cbData': null }, _iconDoubleClickCallback );
 
         // Add a level of indirection or else icon will stay in scope and change.
         iconWrapper.on( 'properties', {'path': folderPath, 'icon': icon}, _iconPropertiesCallback );
@@ -581,9 +612,11 @@ function createAssocIcon( itemName, itemPath ) {
 $(document).ready( function() {
     
     fs = JSON.parse( localStorage.getItem( 'fs' ) );
+    //fs = null;
     if( null == fs ) {
         fs = skel;
     }
+    console.log( fs );
 
     populateFolder( '#desktop', desktop95DesktopFolder );
 
@@ -604,6 +637,10 @@ $(document).ready( function() {
             break;
         }
         populateFolder( this, desktop95DesktopFolder );
+    } );
+
+    $('#desktop').on( 'icon-drag', function( e, icon ) {
+        //console.log( icon.source.data( 'path' ) + ' to ' + icon.target.data( 'path' ) );
     } );
 
     var mouseCaller = {
