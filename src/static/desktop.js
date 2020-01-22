@@ -353,6 +353,11 @@ function handlePromptLine( data, text, winPrompt ) {
         let folder = resolvePath( winPrompt.data( 'folder-path' ) );
         for( filename in folder.children ) {
             var filedata = folder.children[filename];
+
+            if( null == filedata ) {
+                continue;
+            }
+
             if( desktop95Types.FOLDER == filedata.type ) {
                 winPrompt.command95( 'enter', {'text': filename.toUpperCase() + '\t' + '&lt;DIR&gt;\t01-01-95\t04:20a'} );
             } else {
