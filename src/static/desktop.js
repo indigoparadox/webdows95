@@ -29,37 +29,11 @@ var skel = {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'src/static/desktop-1995/apps/explorer.js',
                         'entry': 'explorer95',
-                        'onOpen': function( winFolder, shortcut ) {            
-                            if( desktop95Types.COMPUTER == shortcut.type ) {
-                                populateFolder( winFolder.find( '.container' ), '' );
-                            } else {
-                                populateFolder( winFolder.find( '.container' ), shortcut.path );
-
-                                winFolder.find( '.container' ).on( 'icon-drop', function( e, d ) {
-                                    incomingFile = resolvePath( d.incoming.data( 'path' ) );
-                                    incomingFilename = d.incoming.data( 'filename' );
-                                    destDir = resolvePath( d.target.data( 'path' ) );
-                                    sourceDir = resolvePath( d.source.data( 'path' ) );
-
-                                    // Move the file to the destination folder.
-                                    destDir.children[incomingFilename] = incomingFile;
-                                    sourceDir.children[incomingFilename] = null;
-
-                                    localStorage.setItem( 'fs', JSON.stringify( fs ) );
-
-                                    // Refresh the folder views.
-                                    populateFolder( d.source );
-                                    populateFolder( d.target );
-                                } );
-                            }
-                        }
                     },
                     'mousetray.js': {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'src/static/desktop-1995/apps/mousetray.js',
                         'entry': 'mousetray95',
-                        'onOpen': function( winFolder, shortcut ) {
-                        }
                     },
                     'browser.js': {
                         'type': desktop95Types.EXECUTABLE,
@@ -90,15 +64,13 @@ var skel = {
                     'command.js': {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'src/static/desktop-1995/apps/command.js',
-                        'onOpen': function( winCommand, shortcut ) {
-                            winCommand.data( 'folder', fs.children['c:'] );
-                            winCommand.data( 'folder-path', 'c:' );
-                            winCommand.data( 'folder-parent', fs.children['c:'] );
-                            winCommand.data( 'folder-parent-path', 'c:' );
-                        },
                         'args': {
                             'id': null, // Always allow new windows.
-                            'lineHandler': handlePromptLine,
+                            'lineHandler': 'handlePromptLine',
+                            'data': {
+                                'folder-path': 'c:',
+                                'folder-parent-path': 'c:'
+                            }
                         }
                     },
                     'notepad.js': {
@@ -226,6 +198,28 @@ var skel = {
     }
 } };
 
+function _handleContainerDrop( e, d ) {
+    incomingFile = resolvePath( d.incoming.data( 'path' ) );
+    incomingFilename = d.incoming.data( 'filename' );
+
+    if( d.target.data( 'path' ) == d.source.data( 'path' ) ) {
+        return; // Or else we'll just delete the object below!
+    }
+
+    destDir = resolvePath( d.target.data( 'path' ) );
+    sourceDir = resolvePath( d.source.data( 'path' ) );
+
+    // Move the file to the destination folder.
+    destDir.children[incomingFilename] = incomingFile;
+    sourceDir.children[incomingFilename] = null;
+
+    localStorage.setItem( 'fs', JSON.stringify( fs ) );
+
+    // Refresh the folder views.
+    populateFolder( d.source );
+    populateFolder( d.target );
+}
+
 function newFolder( parent, name ) {
     if( name in parent.children ) {
         throw { 'type': desktop95FileException.FILEEXISTS };
@@ -292,13 +286,26 @@ function loadExe( pathString, callerPath='', caller=null ) {
 
         caller.args.target = callerPath;
 
+        // Figure out the entrypoint. Use <script name>95 if none provided.
         if( !('entry' in exec) ) {
             exec.entry = exec.name.split( '.' )[0] + '95';
         }
         var winHandle = $('#desktop')[exec.entry]( 'open', caller.args );
-        if( 'onOpen' in exec ) {
-            exec.onOpen( winHandle, caller );
+
+        // Workaround for loading folders using generalized explorer.
+        if( null != winHandle ) {
+            switch( caller.type ) {
+            case desktop95Types.COMPUTER:
+                winHandle.attr( 'data-caller-path', '' );
+                break;
+            default:
+                winHandle.attr( 'data-caller-path', callerPath );
+                break;
+            }
+            winHandle.find( '.container' ).on( 'icon-drop', _handleContainerDrop );
+            winHandle.find( '.container' ).trigger( 'desktop-populate' );
         }
+
         def.resolve();
     }
 
@@ -324,13 +331,11 @@ function handlePromptLine( data, text, winPrompt ) {
     var cMatch;
     if( null != (cMatch = text.match( /^cd (.*)/i )) ) {
         // CD command
+        let folder = resolvePath( winPrompt.data( 'folder-path' ) );
         if( 
-            'children' in winPrompt.data( 'folder' ) &&
-            cMatch[1] in winPrompt.data( 'folder' ).children
+            'children' in folder && cMatch[1] in folder.children
         ) {
-            winPrompt.data( 'folder-parent', winPrompt.data( 'folder' ) );
             winPrompt.data( 'folder-parent-path', winPrompt.data( 'folder-path' ) );
-            winPrompt.data( 'folder', winPrompt.data( 'folder' ).children[cMatch[1]] );
             winPrompt.data( 'folder-path',  winPrompt.data( 'folder-path' ) + '\\' + cMatch[1] );
             winPrompt.command95( 'setPrompt', {'promptText': winPrompt.data( 'folder-path' ).toUpperCase() + '>'})
         } else {
@@ -344,8 +349,10 @@ function handlePromptLine( data, text, winPrompt ) {
         winPrompt.command95( 'enter', {'text': 'Directory of ' + winPrompt.data( 'folder-path' )} );
         winPrompt.command95( 'enter', {'text': ''} );
         var fileCt = 0;
-        for( filename in winPrompt.data( 'folder' ).children ) {
-            var filedata = winPrompt.data( 'folder' ).children[filename];
+        // XXX Resolve folder at command time.
+        let folder = resolvePath( winPrompt.data( 'folder-path' ) );
+        for( filename in folder.children ) {
+            var filedata = folder.children[filename];
             if( desktop95Types.FOLDER == filedata.type ) {
                 winPrompt.command95( 'enter', {'text': filename.toUpperCase() + '\t' + '&lt;DIR&gt;\t01-01-95\t04:20a'} );
             } else {
@@ -357,7 +364,7 @@ function handlePromptLine( data, text, winPrompt ) {
         winPrompt.command95( 'enter', {'text': '0 bytes free'} );
         winPrompt.command95( 'enter', {'text': ''} );
     } else if(
-        text in winPrompt.data( 'folder' ).children &&
+        text in resolvePath( winPrompt.data( 'folder-path' ) ).children &&
         resolvePath( winPrompt.data( 'folder-path' ) + '\\' + text ).type == desktop95Types.EXECUTABLE
     ) {
         // Open the specified executable with a fake shortcut.
@@ -393,20 +400,24 @@ var associations = {
         'context': {
             'items': [
                 {'caption': 'Format', 'callback': function( m ) {
-                    var formatDialog = {
+                    var formatDialog = null;
+                    var formatDialogOptions = {
                         'caption': 'Format Session',
                         'icon': 'warning',
                         'message': 'This will erase all persistant data from your session. Continue?',
                         'buttons': {
-                            'Yes': function() {
-
-                            },
-                            'No': function() {
-
-                            }
+                            'Yes': 'yes',
+                            'No': 'no',
                         }
                     };
-                    $('#desktop').window95( 'dialog', formatDialog );
+                    formatDialog = $('#desktop').window95( 'dialog', formatDialogOptions );
+                    formatDialog.on( 'button-no', function() {
+                        formatDialog.window95( 'close' );
+                    } );
+                    formatDialog.on( 'button-yes', function() {
+                        localStorage.setItem( 'fs', JSON.stringify( skel ) );
+                        document.location.reload( true );
+                    } );
                 }},
                 {'type': menu95Type.DIVIDER},
                 {'caption': 'Properties', 'callback': function( m ) {
@@ -538,12 +549,9 @@ function populateFolder( container, folderPath=null ) {
         icon.y = iconPos[1];
         var iconWrapper = $(container).desktop95( 'icon', icon );
 
+        // Set these up so _handleContainerDrop works.
         iconWrapper.data( 'path', itemPath );
         iconWrapper.data( 'filename', itemName );
-
-        /* iconWrapper.mousedown( function( e ) {
-            $(this).desktop95( 'select' );
-        } ); */
 
         iconWrapper.on( 'desktop-double-click', {'callback': icon.callback, 'cbData': null }, _iconDoubleClickCallback );
 
@@ -611,16 +619,27 @@ function createAssocIcon( itemName, itemPath ) {
 
 $(document).ready( function() {
     
+    //localStorage.setItem( 'fs', JSON.stringify( skel ) );
     fs = JSON.parse( localStorage.getItem( 'fs' ) );
     //fs = null;
     if( null == fs ) {
         fs = skel;
     }
-    console.log( fs );
+    
+    // Setup events delegated down from desktop.
+    $('#desktop').on( 'desktop-populate', '.container', function( e ) {
+        populateFolder( this, $(this).parents( '.window' ).attr( 'data-caller-path' ) );
+        e.stopPropagation();
+    } );
 
-    populateFolder( '#desktop', desktop95DesktopFolder );
-
+    // Setup root desktop events.
+    $('#desktop').on( 'desktop-populate', function() {
+        populateFolder( this, $(this).data( 'caller-path' ) );
+    } );
     $('#desktop').desktop95( 'enable' );
+    $('#desktop').attr( 'data-caller-path', 'c:\\windows\\desktop' );
+    $('#desktop').on( 'icon-drop', _handleContainerDrop );
+    $('#desktop').trigger( 'desktop-populate' );
     $('#desktop').on( 'new-folder', function( e ) {
         newFolder( resolvePath( desktop95DesktopFolder ), 'New Folder' );
         populateFolder( this, desktop95DesktopFolder );
@@ -643,6 +662,8 @@ $(document).ready( function() {
         //console.log( icon.source.data( 'path' ) + ' to ' + icon.target.data( 'path' ) );
     } );
 
+    // Load up the mouse/tray icon tester (optional).
+    // TODO: Put this in startup folder.
     var mouseCaller = {
         'type': 'shortcut',
         'exec': 'c:\\windows\\mousetray.js',
