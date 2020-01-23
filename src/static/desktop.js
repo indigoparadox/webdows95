@@ -46,6 +46,13 @@ var skel = {
                             'id': null, // Always allow new windows.
                         },
                     },
+                    'paint.js': {
+                        'type': desktop95Types.EXECUTABLE,
+                        'src': 'src/static/desktop-1995/apps/paint.js',
+                        'args': {
+                            'id': 'w-paint',
+                        },
+                    },
                     'cdplayer.js': {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'src/static/desktop-1995/apps/cdplayer.js',
@@ -130,6 +137,11 @@ var skel = {
                                                 'exec': 'c:\\windows\\notepad.js',
                                                 'icon': 'notepad',
                                             },
+                                            'Paint':{
+                                                'type': 'shortcut',
+                                                'exec': 'c:\\windows\\paint.js',
+                                                'icon': 'paint',
+                                            },
                                             'WordPad':{
                                                 'type': 'shortcut',
                                                 'exec': 'c:\\windows\\wordpad.js',
@@ -175,6 +187,11 @@ var skel = {
                                 'type': 'shortcut',
                                 'exec': 'c:\\windows\\cdplayer.js',
                                 'icon': 'cdplayer',
+                            },
+                            'Paint':{
+                                'type': 'shortcut',
+                                'exec': 'c:\\windows\\paint.js',
+                                'icon': 'paint',
                             },
                             'VGuide.avi':{
                                 'args': {
