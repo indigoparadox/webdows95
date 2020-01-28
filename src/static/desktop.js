@@ -684,6 +684,45 @@ $(document).ready( function() {
         //console.log( icon.source.data( 'path' ) + ' to ' + icon.target.data( 'path' ) );
     } );
 
+    // Setup window icon menus.
+    var _handleWindowMenu = ( e ) => {
+        var winHandle = $(e.target).parents( '.window' );
+        var titlebar = $(e.target).parents( '.titlebar' );
+        var windowMenu = {
+            'type': menu95Type.SUBMENU,
+            'caller': titlebar,
+            'container': winHandle,
+            'location': menu95Location.BOTTOM,
+            'items': [
+                {'caption': 'Restore', 'callback': function( m ) {
+                    $(winHandle).window95( 'restore' );
+                }},
+                {'caption': 'Move', 'callback': function( m ) {
+                    
+                }},
+                {'caption': 'Size', 'callback': function( m ) {
+                    
+                }},
+                {'caption': 'Minimize', 'callback': function( m ) {
+                    $(winHandle).window95( 'minimize' );
+                }},
+                {'caption': 'Maximize', 'callback': function( m ) {
+                    $(winHandle).window95( 'maximize' );
+                }},
+                {'caption': 'Close', 'callback': function( m ) {
+                    $(winHandle).window95( 'close' );
+                }}
+            ]
+        };
+        winHandle.menu95( 'close' );
+        winHandle.menu95( 'open', windowMenu );
+    };
+
+    $('#desktop').on( 'click', '.window > .titlebar > .titlebar-icon', _handleWindowMenu );
+    $('#desktop').on( 'contextmenu', '.window > .titlebar > .titlebar-icon', _handleWindowMenu );
+    $('#desktop').on( 'click', '.window > .titlebar', function( e ) { $(e.target).parents( '.window' ).menu95( 'close' ); } );
+    $('#desktop').on( 'contextmenu', '.window > .titlebar', _handleWindowMenu );
+
     // Load up the mouse/tray icon tester (optional).
     // TODO: Put this in startup folder.
     var mouseCaller = {
