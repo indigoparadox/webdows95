@@ -7,6 +7,26 @@ const desktop95Types = {
     'SHORTCUT': 'shortcut',
 };
 
+const platforms = {
+    'system7': {
+        'decorations': [
+            window95Decorations.CLOSE,
+            window95Decorations.TITLE,
+            window95Decorations.RESTORE,
+        ],
+    },
+    'win95': {
+        'decorations': [
+            window95Decorations.ICON,
+            window95Decorations.TITLE,
+            window95Decorations.MIN,
+            window95Decorations.MAX,
+            window95Decorations.RESTORE,
+            window95Decorations.CLOSE
+        ],
+    }
+};
+
 const desktop95FileException = {
     'FILEEXISTS': 'fileexists',
 };
@@ -309,6 +329,7 @@ function loadExe( pathString, callerPath='', caller=null ) {
         }
 
         caller.args.target = callerPath;
+        caller.args.decorations = platforms[platform_name].decorations;
 
         // Figure out the entrypoint. Use <script name>95 if none provided.
         if( !('entry' in exec) ) {
