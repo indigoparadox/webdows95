@@ -58,6 +58,7 @@ var skel = {
                     'browser.js': {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'src/static/desktop-1995/apps/browser.js',
+                        'stylesrc': 'src/static/desktop-1995/apps/browser.css',
                         'entry': 'browser95',
                         'args': {
                             'archiveEnd':'19991200000000',
@@ -76,6 +77,7 @@ var skel = {
                     'props.js': {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'src/static/desktop-1995/apps/props.js',
+                        'stylesrc': 'src/static/desktop-1995/apps/props.css',
                         'args': {
                             'id': 'w-props',
                         },
@@ -83,6 +85,7 @@ var skel = {
                     'cdplayer.js': {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'src/static/desktop-1995/apps/cdplayer.js',
+                        'stylesrc': 'src/static/desktop-1995/apps/cdplayer.css',
                         'args': {
                             'playlist': [
                                 {
@@ -98,6 +101,7 @@ var skel = {
                     'command.js': {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'src/static/desktop-1995/apps/command.js',
+                        'stylesrc': 'src/static/desktop-1995/apps/command.css',
                         'args': {
                             'id': null, // Always allow new windows.
                             'lineHandler': 'handlePromptLine',
@@ -117,6 +121,7 @@ var skel = {
                     'wordpad.js': {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'src/static/desktop-1995/apps/wordpad.js',
+                        'stylesrc': 'src/static/desktop-1995/apps/wordpad.css',
                         'args': {
                             'id': null, // Always allow new windows.
                             'w': 600,
@@ -365,8 +370,17 @@ function loadExe( pathString, callerPath='', caller=null ) {
     $.get( exec.src, function( data ) {
         var scriptElement = $('<script id="exe-' + _htmlStrToClass( exec.src ) + '" type="text/javascript">' + data + '</script>');
         $('head').append( scriptElement );
-        $('#desktop').css( 'cursor', 'auto' );
-        _exeRunAfterLoad();
+        if( 'stylesrc' in exec ) {
+            $.get( exec.stylesrc, function( data ) {
+                var cssElement = $('<style id="exe-' + _htmlStrToClass( exec.stylesrc ) + '" type="text/css">' + data + '</style>');
+                $('head').append( cssElement );
+                $('#desktop').css( 'cursor', 'auto' );
+                _exeRunAfterLoad();
+            } );
+        } else {
+            $('#desktop').css( 'cursor', 'auto' );
+            _exeRunAfterLoad();
+        }
     } );
 
     return def.promise(); // Hang tight until we're loaded.
