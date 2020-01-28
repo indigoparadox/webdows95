@@ -53,6 +53,13 @@ var skel = {
                             'id': 'w-paint',
                         },
                     },
+                    'props.js': {
+                        'type': desktop95Types.EXECUTABLE,
+                        'src': 'src/static/desktop-1995/apps/props.js',
+                        'args': {
+                            'id': 'w-props',
+                        },
+                    },
                     'cdplayer.js': {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'src/static/desktop-1995/apps/cdplayer.js',
@@ -516,13 +523,20 @@ function getNextIconPosition( container, reset=false ) {
 }
 
 function _iconPropertiesCallback( e ) {
-    $('#desktop').properties95( 'file', {
-        'fileIcon': e.data.icon.icon,
-        'fileName': e.data.icon.caption,
-        'fileType': e.data.icon.description,
-        'fileLocation': e.data.path,
-        'caption': e.data.caption,
-    } );
+    var propsCaller = {
+        'type': 'shortcut',
+        'exec': 'c:\\windows\\props.js',
+        'icon': 'mouse',
+        'args': {
+            'panel': 'file',
+            'fileIcon': e.data.icon.icon,
+            'fileName': e.data.icon.caption,
+            'fileType': e.data.icon.description,
+            'fileLocation': e.data.path,
+            'caption': e.data.caption,
+        }
+    };
+    loadExe( 'c:\\windows\\props.js', '', propsCaller );
 }
 
 function _iconDoubleClickCallback( e ) {
@@ -678,6 +692,18 @@ $(document).ready( function() {
             break;
         }
         populateFolder( this, desktop95DesktopFolder );
+    } );
+    $('#desktop').on( 'properties', function( e ) {
+        var propsCaller = {
+            'type': 'shortcut',
+            'exec': 'c:\\windows\\props.js',
+            'icon': 'mouse',
+            'args': {
+                'panel': 'display',
+                'caption': 'Display Properties',
+            }
+        };
+        loadExe( 'c:\\windows\\props.js', '', propsCaller );
     } );
 
     $('#desktop').on( 'icon-drag', function( e, icon ) {
