@@ -1,0 +1,75 @@
+{
+    "executable": {
+        "name": "Executable",
+        "icon": "exe"
+    },
+    "shortcut": {
+        "name": "Shortcut",
+        "icon": "lnk"
+    },
+    "computer": {
+        "name": "Computer",
+        "icon": "computer",
+        "exec": "c:/windows/explorer.js"
+    },
+    "drive": {
+        "name": "Drive",
+        "icon": "drive",
+        "exec": "c:/windows/explorer.js",
+        "context": {
+            "items": [
+                {
+                    "caption": "Format",
+                    "callback": "formatFS"
+                },
+                {
+                    "type": "divider"
+                },
+                {
+                    "caption": "Properties",
+                    "callback": ""
+                }
+            ]
+        }
+    },
+    "folder": {
+        "name": "Folder",
+        "icon": "folder",
+        "exec": "c:/windows/explorer.js"
+    },
+    "notepad": {
+        "name": "Text Document",
+        "icon": "notepad",
+        "docIcon": "txt",
+        "exec": "c:/windows/notepad.js"
+    },
+    "wordpad": {
+        "name": "Rich Text Document",
+        "icon": "wordpad",
+        "docIcon": "rtf",
+        "exec": "c:/windows/wordpad.js"
+    },
+    "prompt": {
+        "name": "Prompt",
+        "icon": "prompt",
+        "exec": "c:/windows/command.js"
+    },
+    "browser": {
+        "name": "Internet Shortcut",
+        "icon": "browser",
+        "docIcon": "url",
+        "exec": "c:/windows/browser.js"
+    },
+    "cdplayer": {
+        "name": "Music CD",
+        "icon": "cdplayer",
+        "docIcon": "cda",
+        "exec": "c:/windows/cdplayer.js"
+    },
+    "video": {
+        "name": "Video File",
+        "icon": "avi",
+        "docIcon": "avi",
+        "exec": "c:/windows/mpvideo.js"
+    }
+}

@@ -34,220 +34,7 @@ const desktop95FileException = {
 const desktop95DesktopFolder = 'c:\\windows\\desktop';
 
 var fs = null;
-
-var skel = {
-'type': desktop95Types.COMPUTER,
-'children':{
-    'c:': {
-        'type': desktop95Types.DRIVE,
-        'overlay': null,
-        'children': {
-            'windows': {
-                'type': desktop95Types.FOLDER,
-                'children': {
-                    'explorer.js': {
-                        'type': desktop95Types.EXECUTABLE,
-                        'src': 'apps/explorer.js',
-                        'stylesrc': 'apps/explorer.css',
-                        'entry': 'explorer95',
-                    },
-                    'mousetray.js': {
-                        'type': desktop95Types.EXECUTABLE,
-                        'src': 'apps/mousetray.js',
-                        'entry': 'mousetray95',
-                    },
-                    'browser.js': {
-                        'type': desktop95Types.EXECUTABLE,
-                        'src': 'apps/browser.js',
-                        'stylesrc': 'apps/browser.css',
-                        'entry': 'browser95',
-                        'args': {
-                            'archiveEnd':'19991200000000',
-                            'archiveStart':'19990100000000',
-                            'url': 'http://google.com',
-                            'id': null, // Always allow new windows.
-                        },
-                    },
-                    'paint.js': {
-                        'type': desktop95Types.EXECUTABLE,
-                        'src': 'apps/paint.js',
-                        'args': {
-                            'id': 'w-paint',
-                        },
-                    },
-                    'props.js': {
-                        'type': desktop95Types.EXECUTABLE,
-                        'src': 'apps/props.js',
-                        'stylesrc': 'apps/props.css',
-                        'args': {
-                            'id': 'w-props',
-                        },
-                    },
-                    'cdplayer.js': {
-                        'type': desktop95Types.EXECUTABLE,
-                        'src': 'apps/cdplayer.js',
-                        'stylesrc': 'apps/cdplayer.css',
-                        'args': {
-                            'playlist': [
-                                {
-                                    'url': 'finalizing.mp3',
-                                    'artist': '</body>',
-                                    'album': 'Initializing...',
-                                    'title': 'Finalizing...'
-                                }
-                            ],
-                            'id': 'w-cdplayer',
-                        },
-                    },
-                    'command.js': {
-                        'type': desktop95Types.EXECUTABLE,
-                        'src': 'apps/command.js',
-                        'stylesrc': 'apps/command.css',
-                        'args': {
-                            'id': null, // Always allow new windows.
-                            'lineHandler': 'handlePromptLine',
-                            'data': {
-                                'folder-path': 'c:',
-                                'folder-parent-path': 'c:'
-                            }
-                        }
-                    },
-                    'notepad.js': {
-                        'type': desktop95Types.EXECUTABLE,
-                        'src': 'apps/notepad.js',
-                        'args': {
-                            'id': null, // Always allow new windows.
-                        }
-                    },
-                    'wordpad.js': {
-                        'type': desktop95Types.EXECUTABLE,
-                        'src': 'apps/wordpad.js',
-                        'stylesrc': 'apps/wordpad.css',
-                        'args': {
-                            'id': null, // Always allow new windows.
-                            'w': 600,
-                            'h': 400,
-                        }
-                    },
-                    'mpvideo.js': {
-                        'type': desktop95Types.EXECUTABLE,
-                        'src': 'apps/mpvideo.js',
-                        'stylesrc': 'apps/mpvideo.css',
-                        'args': {
-                            'id': 'w-mpvideo',
-                        }
-                    },
-                    'start menu': {
-                        'type': desktop95Types.FOLDER,
-                        'children': {
-                            'programs': {
-                                'type': desktop95Types.FOLDER,
-                                'children': {
-                                    'Accessories': {
-                                        'type': desktop95Types.FOLDER,
-                                        'children': {
-                                            'Internet Tools': {
-                                                'type': desktop95Types.FOLDER,
-                                                'children': {
-                                                    'Browser': {
-                                                        'type': 'shortcut',
-                                                        'exec': 'c:\\windows\\browser.js',
-                                                        'icon': 'browser',
-                                                    },
-                                                }
-                                            },
-                                            'Multimedia': {
-                                                'type': desktop95Types.FOLDER,
-                                                'children': {
-                                                    'CD Player': {
-                                                        'type': 'shortcut',
-                                                        'exec': 'c:\\windows\\cdplayer.js',
-                                                        'icon': 'cdplayer',
-                                                    },
-                                                }
-                                            },
-                                            'Notepad':{
-                                                'type': 'shortcut',
-                                                'exec': 'c:\\windows\\notepad.js',
-                                                'icon': 'notepad',
-                                            },
-                                            'Paint':{
-                                                'type': 'shortcut',
-                                                'exec': 'c:\\windows\\paint.js',
-                                                'icon': 'paint',
-                                            },
-                                            'WordPad':{
-                                                'type': 'shortcut',
-                                                'exec': 'c:\\windows\\wordpad.js',
-                                                'icon': 'wordpad',
-                                            },
-                                        }
-                                    },
-                                    'Prompt': {
-                                        'type': 'shortcut',
-                                        'exec': 'c:\\windows\\command.js',
-                                        'icon': 'prompt',
-                                    },
-                                },
-                            }
-                        },
-                    },
-                    'desktop': {
-                        'type': desktop95Types.FOLDER,
-                        'children': {
-                            'My Computer':{
-                                'type':'computer',
-                            },
-                            'A Folder':{
-                                'children':{
-                                    'A Text File':{
-                                        'args': {
-                                            'contents':'This is a text file.',
-                                        },
-                                        'type':'notepad'}
-                                    },
-                                'type':desktop95Types.FOLDER},
-                            'Browser':{
-                                'exec': 'c:\\windows\\browser.js',
-                                'icon': 'browser',
-                                'type': 'shortcut'
-                            },
-                            'Prompt':{
-                                'type': 'shortcut',
-                                'exec': 'c:\\windows\\command.js',
-                                'icon': 'prompt',
-                            },
-                            'CD Player':{
-                                'type': 'shortcut',
-                                'exec': 'c:\\windows\\cdplayer.js',
-                                'icon': 'cdplayer',
-                            },
-                            'Paint':{
-                                'type': 'shortcut',
-                                'exec': 'c:\\windows\\paint.js',
-                                'icon': 'paint',
-                            },
-                            'VGuide.avi':{
-                                'args': {
-                                    'ytube': 'fXpfdq3WYu4',
-                                    'w': 300, 'h': 275
-                                },
-                                'type':'video'
-                            },
-                            'ReadMe.rtf':{
-                                'args': {
-                                    'url':'README.md',
-                                },
-                                'type':'wordpad'
-                            },
-                        },
-                    }
-                
-                }
-            }
-        }
-    }
-} };
+var associations = null;
 
 function _handleContainerDrop( e, d ) {
     incomingFile = resolvePath( d.incoming.data( 'path' ) );
@@ -445,94 +232,28 @@ function handlePromptLine( data, text, winPrompt ) {
     }
 }
 
-var associations = {
-    'executable': {
-        'name': 'Executable',
-        'icon': 'exe',
-    },
-    'shortcut': {
-        'name': 'Shortcut',
-        'icon': 'lnk',
-    },
-    'computer': {
-        'name': 'Computer',
-        'icon': 'computer',
-        'exec': 'c:/windows/explorer.js',
-    },
-    'drive': {
-        'name': 'Drive',
-        'icon': 'drive',
-        'exec': 'c:/windows/explorer.js',
-        'context': {
-            'items': [
-                {'caption': 'Format', 'callback': function( m ) {
-                    var formatDialog = null;
-                    var formatDialogOptions = {
-                        'caption': 'Format Session',
-                        'icon': 'warning',
-                        'message': 'This will erase all persistant data from your session. Continue?',
-                        'buttons': {
-                            'Yes': 'yes',
-                            'No': 'no',
-                        }
-                    };
-                    formatDialog = $('#desktop').window95( 'dialog', formatDialogOptions );
-                    formatDialog.on( 'button-no', function() {
-                        formatDialog.window95( 'close' );
-                    } );
-                    formatDialog.on( 'button-yes', function() {
-                        localStorage.setItem( 'fs', JSON.stringify( skel ) );
-                        document.location.reload( true );
-                    } );
-                }},
-                {'type': menu95Type.DIVIDER},
-                {'caption': 'Properties', 'callback': function( m ) {
-                    console.log( m );
-                }}
-            ]
+function formatFS() {
+    var formatDialog = null;
+    var formatDialogOptions = {
+        "caption": "Format Session",
+        "icon": "warning",
+        "message": "This will erase all persistant data from your session. Continue?",
+        "buttons": {
+            "Yes": "yes",
+            "No": "no",
         }
-    },
-    'folder': {
-        'name': 'Folder',
-        'icon': 'folder',
-        'exec': 'c:/windows/explorer.js',
-    },
-    'notepad': {
-        'name': 'Text Document',
-        'icon': 'notepad',
-        'docIcon': 'txt',
-        'exec': 'c:/windows/notepad.js',
-    },
-    'wordpad': {
-        'name': 'Rich Text Document',
-        'icon': 'wordpad',
-        'docIcon': 'rtf',
-        'exec': 'c:/windows/wordpad.js',
-    },
-    'prompt': {
-        'name': 'Prompt',
-        'icon': 'prompt',
-        'exec': 'c:/windows/command.js',
-    },
-    'browser': {
-        'name': 'Internet Shortcut',
-        'icon': 'browser',
-        'docIcon': 'url',
-        'exec': 'c:/windows/browser.js',
-    },
-    'cdplayer': {
-        'name': 'Music CD',
-        'icon': 'cdplayer',
-        'docIcon': 'cda',
-        'exec': 'c:/windows/cdplayer.js',
-    },
-    'video': {
-        'name': 'Video File',
-        'icon': 'avi',
-        'docIcon': 'avi',
-        'exec': 'c:/windows/mpvideo.js',
-    }
-};
+    };
+    formatDialog = $("#desktop").window95( "dialog", formatDialogOptions );
+    formatDialog.on( "button-no", function() {
+        formatDialog.window95( "close" );
+    } );
+    formatDialog.on( "button-yes", function() {
+        $.get( 'json/' + platform_name + '-fs.json', function( data ) {
+            localStorage.setItem( "fs", JSON.stringify( data ) );
+            document.location.reload( true );
+        } );
+    } );
+}
 
 function getNextIconPosition( container, reset=false ) {
     if( reset || undefined == $(container).data( 'default-icon-x' ) ) {
@@ -691,150 +412,24 @@ function createAssocIcon( itemName, itemPath ) {
 }
 
 $(document).ready( function() {
-    
-    //localStorage.setItem( 'fs', JSON.stringify( skel ) );
-    fs = JSON.parse( localStorage.getItem( 'fs' ) );
-    //fs = null;
-    if( null == fs ) {
-        fs = skel;
-    }
-    
-    // Setup events delegated down from desktop.
-    $('#desktop').on( 'desktop-populate', '.container', function( e ) {
-        populateFolder( this, $(this).parents( '.window' ).attr( 'data-caller-path' ) );
-        e.stopPropagation();
-    } );
+    console.log( 'Loading associations...' );
+    $.get( 'json/' + platform_name + '-assoc.json', function( data ) {
 
-    // Setup root desktop events.
-    $('#desktop').on( 'desktop-populate', function() {
-        populateFolder( this, $(this).data( 'caller-path' ) );
-    } );
-    $('#desktop').desktop95( 'enable' );
-    $('#desktop').attr( 'data-caller-path', 'c:\\windows\\desktop' );
-    $('#desktop').on( 'icon-drop', _handleContainerDrop );
-    $('#desktop').trigger( 'desktop-populate' );
-    $('#desktop').on( 'new-folder', function( e ) {
-        newFolder( resolvePath( desktop95DesktopFolder ), 'New Folder' );
-        populateFolder( this, desktop95DesktopFolder );
-    } );
-    $('#desktop').on( 'arrange-icons', function( e, data ) {
-        desktopFolder = resolvePath( desktop95DesktopFolder );
-        switch( data.criteria ) {
-        case 'name':
-            desktopItemsNew = {};
-            Object.keys( desktopFolder.children ).sort().forEach( function( key ) {
-                desktopItemsNew[key] = desktopFolder.children[key];
-            } );
-            desktopFolder.children = desktopItemsNew;
-            break;
-        }
-        populateFolder( this, desktop95DesktopFolder );
-    } );
-    $('#desktop').on( 'properties', function( e ) {
-        var propsCaller = {
-            'type': 'shortcut',
-            'exec': 'c:\\windows\\props.js',
-            'icon': 'mouse',
-            'args': {
-                'panel': 'display',
-                'caption': 'Display Properties',
-            }
-        };
-        loadExe( 'c:\\windows\\props.js', '', propsCaller );
-    } );
-
-    $('#desktop').on( 'icon-drag', function( e, icon ) {
-        //console.log( icon.source.data( 'path' ) + ' to ' + icon.target.data( 'path' ) );
-    } );
-
-    // Setup window icon menus.
-    var _handleWindowMenu = ( e ) => {
-        var winHandle = $(e.target).parents( '.window' );
-        var titlebar = $(e.target).parents( '.titlebar' );
-        var windowMenu = {
-            'type': menu95Type.SUBMENU,
-            'caller': titlebar,
-            'container': winHandle,
-            'location': menu95Location.BOTTOM,
-            'items': [
-                {'caption': 'Restore', 'callback': function( m ) {
-                    $(winHandle).window95( 'restore' );
-                }},
-                {'caption': 'Move', 'callback': function( m ) {
-                    
-                }},
-                {'caption': 'Size', 'callback': function( m ) {
-                    
-                }},
-                {'caption': 'Minimize', 'callback': function( m ) {
-                    $(winHandle).window95( 'minimize' );
-                }},
-                {'caption': 'Maximize', 'callback': function( m ) {
-                    $(winHandle).window95( 'maximize' );
-                }},
-                {'caption': 'Close', 'callback': function( m ) {
-                    $(winHandle).window95( 'close' );
-                }}
-            ]
-        };
-        winHandle.menu95( 'close' );
-        winHandle.menu95( 'open', windowMenu );
-    };
-
-    $('#desktop').on( 'click', '.window > .titlebar > .titlebar-icon', _handleWindowMenu );
-    $('#desktop').on( 'contextmenu', '.window > .titlebar > .titlebar-icon', _handleWindowMenu );
-    $('#desktop').on( 'click', '.window > .titlebar', function( e ) { $(e.target).parents( '.window' ).menu95( 'close' ); } );
-    $('#desktop').on( 'contextmenu', '.window > .titlebar', _handleWindowMenu );
-
-    // Load up the mouse/tray icon tester (optional).
-    // TODO: Put this in startup folder.
-    /* var mouseCaller = {
-        'type': 'shortcut',
-        'exec': 'c:\\windows\\mousetray.js',
-        'icon': 'mouse',
-    };
-    loadExe( 'c:\\windows\\mousetray.js', '', mouseCaller ); */
-
-    var smCaller = {
-        'type': 'shortcut',
-        'exec': 'c:\\windows\\explorer.js',
-        'icon': 'start',
-    };
-    loadExe( 'c:\\windows\\explorer.js', '', smCaller );
-
-    //$('#desktop').window95( 'dialog', {'icon': 'info', 'caption': 'Test Message', 'message': 'This is a test.'});
-
-    $('body').on( 'menu', '.button-start', function( e, menuElement, settings ) { 
-        if( !settings.path.startsWith( '/Programs' ) ) {
-            return;
-        }
-
-        var menuPath = settings.path.split( '/' );
-        menuPath.shift(); // Remove root.
-        menuPath.shift(); // Remove Programs.
-        if( 0 == menuPath.length ) {
-            menuPath = 'c:/windows/start menu/programs';
-        } else {
-            menuPath = 'c:/windows/start menu/programs/' + menuPath.join( '/' );
-        }
-
-        // Drill down to the submenu subfolder.
-        var start_menu_progs = resolvePath(  menuPath );
+        associations = data;
+        console.log( 'Associations loaded.' );
         
-        // Build the menu from items in the folder.
-        settings.items = [];
-        for( itemName in start_menu_progs.children ) {
-            var itemPath = menuPath + '/' + itemName;
-            var itemData = start_menu_progs.children[itemName];
-            if( desktop95Types.FOLDER == itemData.type ) {
-                settings.items.push( {'caption': itemName, 'type': menu95Type.EVENTMENU, 'icon': 'programs'} );
-            } else {
-                var icon = createAssocIcon( itemName, itemPath );
-                icon.type = menu95Type.ITEM;
-                settings.items.push( icon );
-            }
+        //localStorage.setItem( 'fs', JSON.stringify( skel ) );
+        fs = JSON.parse( localStorage.getItem( 'fs' ) );
+        //fs = null;
+        if( null == fs ) {
+            $.get( 'json/' + platform_name + '-fs.json', ( data ) => {
+                fs = data;
+                console.log( 'Filesystem retrieved, booting...' );
+                boot();
+            } );
+        } else {
+            console.log( 'Booting...' );
+            boot();
         }
-
-        $('#desktop').menu95( 'open', settings );
     } );
 } );
