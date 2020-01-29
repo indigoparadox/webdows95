@@ -1,0 +1,40 @@
+{
+    "executable": {
+        "name": "Executable",
+        "icon": "exe"
+    },
+    "shortcut": {
+        "name": "Shortcut",
+        "icon": "lnk"
+    },
+    "computer": {
+        "name": "Computer",
+        "icon": "computer",
+        "exec": "macintosh hd/system folder/finder.js"
+    },
+    "drive": {
+        "name": "Drive",
+        "icon": "drive",
+        "exec": "macintosh hd/system folder/finder.js",
+        "context": {
+            "items": [
+                {
+                    "caption": "Format",
+                    "callback": "formatFS"
+                },
+                {
+                    "type": "divider"
+                },
+                {
+                    "caption": "Properties",
+                    "callback": ""
+                }
+            ]
+        }
+    },
+    "folder": {
+        "name": "Folder",
+        "icon": "folder",
+        "exec": "macintosh hd/system folder/finder.js"
+    }
+}

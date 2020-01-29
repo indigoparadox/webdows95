@@ -1,0 +1,22 @@
+{
+    "type": "computer",
+    "children":{
+        "macintosh hd": {
+            "type": "drive",
+            "overlay": null,
+            "children": {
+                "system folder": {
+                    "type": "folder",
+                    "children": {
+                        "finder.js": {
+                            "type": "executable",
+                            "src": "apps/finder.js",
+                            "stylesrc": "apps/finder.css",
+                            "entry": "finder95"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -51,7 +51,7 @@ function _handleContainerDrop( e, d ) {
     destDir.children[incomingFilename] = incomingFile;
     sourceDir.children[incomingFilename] = null;
 
-    localStorage.setItem( 'fs', JSON.stringify( fs ) );
+    localStorage.setItem( 'fs-' + platform_name, JSON.stringify( fs ) );
 
     // Refresh the folder views.
     populateFolder( d.source );
@@ -419,7 +419,9 @@ $(document).ready( function() {
         console.log( 'Associations loaded.' );
         
         //localStorage.setItem( 'fs', JSON.stringify( skel ) );
-        fs = JSON.parse( localStorage.getItem( 'fs' ) );
+        if( null != localStorage.getItem( 'fs-' + platform_name ) ) {
+            fs = JSON.parse( localStorage.getItem( 'fs-' + platform_name ) );
+        }
         //fs = null;
         if( null == fs ) {
             $.get( 'json/' + platform_name + '-fs.json', ( data ) => {
