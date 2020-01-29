@@ -39,15 +39,15 @@ var associations = null;
 function _handleContainerDrop( e, d ) {
     'use strict';
 
-    incomingFile = resolvePath( d.incoming.data( 'path' ) );
-    incomingFilename = d.incoming.data( 'filename' );
+    var incomingFile = resolvePath( d.incoming.data( 'path' ) );
+    var incomingFilename = d.incoming.data( 'filename' );
 
     if( d.target.data( 'path' ) == d.source.data( 'path' ) ) {
         return; // Or else we'll just delete the object below!
     }
 
-    destDir = resolvePath( d.target.data( 'path' ) );
-    sourceDir = resolvePath( d.source.data( 'path' ) );
+    var destDir = resolvePath( d.target.data( 'path' ) );
+    var sourceDir = resolvePath( d.source.data( 'path' ) );
 
     // Move the file to the destination folder.
     destDir.children[incomingFilename] = incomingFile;
@@ -140,10 +140,10 @@ function loadExe( pathString, callerPath='', caller=null ) {
         if( null != winHandle ) {
             switch( caller.type ) {
             case desktop95Types.COMPUTER:
-                winHandle.attr( 'data-caller-path', '' );
+                winHandle.find( '.container' ).attr( 'data-caller-path', '' );
                 break;
             default:
-                winHandle.attr( 'data-caller-path', callerPath );
+                winHandle.find( '.container' ).attr( 'data-caller-path', callerPath );
                 break;
             }
             winHandle.find( '.container' ).on( 'icon-drop', _handleContainerDrop );
@@ -290,24 +290,6 @@ function getNextIconPosition( container, reset=false ) {
     return [iconX, iconY];
 }
 
-function _iconPropertiesCallback( e ) {
-    'use strict';
-    var propsCaller = {
-        'type': 'shortcut',
-        'exec': 'c:\\windows\\props.js',
-        'icon': 'mouse',
-        'args': {
-            'panel': 'file',
-            'fileIcon': e.data.icon.icon,
-            'fileName': e.data.icon.caption,
-            'fileType': e.data.icon.description,
-            'fileLocation': e.data.path,
-            'caption': e.data.caption,
-        }
-    };
-    loadExe( 'c:\\windows\\props.js', '', propsCaller );
-}
-
 function _iconDoubleClickCallback( e ) {
     'use strict';
     e.data.callback( e.data.cbData );
@@ -358,11 +340,9 @@ function populateFolder( container, folderPath=null ) {
         // Set these up so _handleContainerDrop works.
         iconWrapper.data( 'path', itemPath );
         iconWrapper.data( 'filename', itemName );
+        iconWrapper.data( 'icon', icon );
 
         iconWrapper.on( 'desktop-double-click', {'callback': icon.callback, 'cbData': null }, _iconDoubleClickCallback );
-
-        // Add a level of indirection or else icon will stay in scope and change.
-        iconWrapper.on( 'properties', {'path': folderPath, 'icon': icon}, _iconPropertiesCallback );
     }
 }
 
@@ -405,11 +385,6 @@ function createAssocIcon( itemName, itemPath ) {
         exec = itemData.exec;
     }
 
-    var contextMenu = null;
-    if( 'context' in associations[itemData.type] ) {
-        contextMenu = associations[itemData.type].context;
-    }
-
     // Create the icon settings pack.
     if( itemData.type in associations ) {
         return { 'caption': itemName,
@@ -417,12 +392,18 @@ function createAssocIcon( itemName, itemPath ) {
             'x': itemData.iconX, 'y': itemData.iconY,
             'target': itemPath,
             'description': associations[itemData.type].name,
-            'context': contextMenu,
+            'classes': ['icon-' + itemData.type],
+            //'context': contextMenu,
             'callback': function() {
                 loadExe( exec, itemPath );
             },
         };
     }
+}
+
+function genericBoot() {
+    'use strict';
+
 }
 
 $(document).ready( function() {
@@ -441,10 +422,12 @@ $(document).ready( function() {
             $.get( 'json/' + platform_name + '-fs.json', ( data ) => {
                 fs = data;
                 console.log( 'Filesystem retrieved, booting...' );
+                genericBoot();
                 boot();
             } );
         } else {
             console.log( 'Booting...' );
+            genericBoot();
             boot();
         }
     } );

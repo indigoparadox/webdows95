@@ -1,39 +1,133 @@
 
 function boot() {
     'use strict';
-    
-    // Setup events delegated down from desktop.
-    $('#desktop').on( 'desktop-populate', '.container', function( e ) {
-        populateFolder( this, $(this).parents( '.window' ).attr( 'data-caller-path' ) );
+
+    // Setup file icon population.
+    $('body').on( 'desktop-populate', '.container', function( e ) {
+        populateFolder( this, $(this).attr( 'data-caller-path' ) );
         e.stopPropagation();
     } );
 
-    // Setup root desktop events.
-    $('#desktop').on( 'desktop-populate', function() {
-        populateFolder( this, $(this).data( 'caller-path' ) );
+    $('body').on( 'properties', '.desktop-icon', function( e ) {
+        var icon = $(e.target).data( 'icon' );
+        var propsCaller = {
+            'type': 'shortcut',
+            'exec': 'c:\\windows\\props.js',
+            'args': {
+                'panel': 'file',
+                'fileIcon': icon.icon,
+                'fileName': icon.caption,
+                'fileType': icon.description,
+                'fileLocation': $(e.target).data( 'path' ),
+                'caption': icon.caption,
+            }
+        };
+        loadExe( 'c:\\windows\\props.js', '', propsCaller );
+        e.stopPropagation();
     } );
+
+    $('body').on( 'contextmenu', '.container', function( e ) {
+        e.preventDefault();
+
+        if( !$(e.target).hasClass( 'container' ) ) {
+            return;
+        }
+
+        var desktopMenu = {
+            'type': menu95Type.SUBMENU,
+            //'caller': $(e.target),
+            'container': '#desktop',
+            'location': {'x': e.pageX, 'y': e.pageY},
+            'items': [
+                {'caption': 'Arrange Icons', 'type': menu95Type.SUBMENU, 'items': [
+                    {'caption': 'By Name', 'callback': function( m ) {
+                        $(e.target).trigger( 'arrange-icons', [{'criteria': 'name'}] );
+                    }},
+                    {'caption': 'By Type', 'callback': function( m ) {
+                        $(e.target).trigger( 'arrange-icons', [{'criteria': 'type'}] );
+                    }},
+                    {'caption': 'By Size', 'callback': function( m ) {
+                        $(e.target).trigger( 'arrange-icons', [{'criteria': 'size'}] );
+                    }},
+                    {'caption': 'By Date', 'callback': function( m ) {
+                        $(e.target).trigger( 'arrange-icons', [{'criteria': 'date'}] );
+                    }},
+                    {'type': menu95Type.DIVIDER},
+                    {'caption': 'Auto Arrange', 'callback': function( m ) {
+                        $(e.target).trigger( 'arrange-icons', [{'criteria': 'auto'}] );
+                    }}
+                ]},
+                {'caption': 'Line up Icons', 'callback': function( m ) {
+                    $(e.target).trigger( 'line-up-icons' );
+                }},
+                {'type': menu95Type.DIVIDER},
+                {'caption': 'Paste', 'callback': function( m ) {
+                    $(e.target).trigger( 'paste', [{'reference': 'shortcut'}] );
+                }},
+                {'caption': 'Paste Shortcut', 'callback': function( m ) {
+                    $(e.target).trigger( 'paste', [{'reference': 'shortcut'}] );
+                }},
+                {'type': menu95Type.DIVIDER},
+                {'caption': 'New', 'type': menu95Type.SUBMENU, 'items': [
+                    {'caption': 'Folder', 'icon': 'folder', 'callback': function( m ) {
+                        $(e.target).trigger( 'new-folder' );
+                    }}
+                ]},
+                {'type': menu95Type.DIVIDER},
+                {'caption': 'Properties', 'callback': function( m ) {
+                    $(e.target).trigger( 'properties' );
+                }}
+            ]
+        };
+        
+        $(e.target).menu95( 'open', desktopMenu );
+
+        e.stopPropagation();
+    } );
+
+    for( var typeIter in associations ) {
+        var contextMenu = {
+            'items': [
+                {
+                    // Just a caption should send an appropriately-named event to the target.
+                    'caption': 'Properties'
+                }
+            ]
+        };
+        if( 'context' in associations[typeIter] ) {
+            contextMenu = associations[typeIter].context;
+        }
+        $('body').on( 'contextmenu', '.icon-' + typeIter, function( e ) {
+            e.preventDefault();
+            contextMenu.caller = $(e.target).parents( '.desktop-icon' );
+            contextMenu.container = '#desktop';
+            contextMenu.location = {'x': e.pageX, 'y': e.pageY};
+            $(this).menu95( 'open', contextMenu );
+        } );
+    }
+
+    // Setup root desktop events.
     $('#desktop').desktop95( 'enable' );
     $('#desktop').attr( 'data-caller-path', 'c:\\windows\\desktop' );
     $('#desktop').on( 'icon-drop', _handleContainerDrop );
-    $('#desktop').trigger( 'desktop-populate' );
     $('#desktop').on( 'new-folder', function( e ) {
         newFolder( resolvePath( desktop95DesktopFolder ), 'New Folder' );
-        populateFolder( this, desktop95DesktopFolder );
+        $(this).trigger( 'populate-folder' );
     } );
     $('#desktop').on( 'arrange-icons', function( e, data ) {
-        desktopFolder = resolvePath( desktop95DesktopFolder );
+        var desktopFolder = resolvePath( desktop95DesktopFolder );
         switch( data.criteria ) {
         case 'name':
-            desktopItemsNew = {};
+            var desktopItemsNew = {};
             Object.keys( desktopFolder.children ).sort().forEach( function( key ) {
                 desktopItemsNew[key] = desktopFolder.children[key];
             } );
             desktopFolder.children = desktopItemsNew;
             break;
         }
-        populateFolder( this, desktop95DesktopFolder );
+        $(this).trigger( 'populate-folder' );
     } );
-    $('#desktop').on( 'properties', function( e ) {
+    $('body').on( 'properties', '#desktop', function( e ) {
         var propsCaller = {
             'type': 'shortcut',
             'exec': 'c:\\windows\\props.js',
@@ -52,6 +146,7 @@ function boot() {
 
     // Setup window icon menus.
     var _handleWindowMenu = ( e ) => {
+        e.preventDefault();
         var winHandle = $(e.target).parents( '.window' );
         var titlebar = $(e.target).parents( '.titlebar' );
         var windowMenu = {
@@ -80,7 +175,7 @@ function boot() {
                 }}
             ]
         };
-        winHandle.menu95( 'close' );
+        //winHandle.menu95( 'close' );
         winHandle.menu95( 'open', windowMenu );
     };
 

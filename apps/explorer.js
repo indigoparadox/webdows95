@@ -112,6 +112,8 @@ case 'open-taskbar':
 
     $(notificationArea).explorer95( 'start-clock' );
 
+    this.trigger( 'desktop-populate' );
+
     return null;
 
 case 'open-folder':

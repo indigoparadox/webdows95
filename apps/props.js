@@ -23,8 +23,6 @@ var settings = $.extend( {
     }
 }, options );
 
-$('head').append( '<link rel="stylesheet" href="src/static/desktop-1995/apps/props.css" />'  )
-
 switch( settings.panel ) {
 
 case 'display': // Display Settings
