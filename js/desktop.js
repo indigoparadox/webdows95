@@ -48,17 +48,13 @@ var skel = {
                     'explorer.js': {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'apps/explorer.js',
+                        'stylesrc': 'apps/explorer.css',
                         'entry': 'explorer95',
                     },
                     'mousetray.js': {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'apps/mousetray.js',
                         'entry': 'mousetray95',
-                    },
-                    'startmenu.js': {
-                        'type': desktop95Types.EXECUTABLE,
-                        'src': 'apps/startmenu.js',
-                        'entry': 'startmenu95',
                     },
                     'browser.js': {
                         'type': desktop95Types.EXECUTABLE,
@@ -136,6 +132,7 @@ var skel = {
                     'mpvideo.js': {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'apps/mpvideo.js',
+                        'stylesrc': 'apps/mpvideo.css',
                         'args': {
                             'id': 'w-mpvideo',
                         }
@@ -800,10 +797,10 @@ $(document).ready( function() {
 
     var smCaller = {
         'type': 'shortcut',
-        'exec': 'c:\\windows\\startmenu.js',
+        'exec': 'c:\\windows\\explorer.js',
         'icon': 'start',
     };
-    loadExe( 'c:\\windows\\startmenu.js', '', smCaller );
+    loadExe( 'c:\\windows\\explorer.js', '', smCaller );
 
     //$('#desktop').window95( 'dialog', {'icon': 'info', 'caption': 'Test Message', 'message': 'This is a test.'});
 
