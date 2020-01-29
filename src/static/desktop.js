@@ -55,6 +55,11 @@ var skel = {
                         'src': 'src/static/desktop-1995/apps/mousetray.js',
                         'entry': 'mousetray95',
                     },
+                    'startmenu.js': {
+                        'type': desktop95Types.EXECUTABLE,
+                        'src': 'src/static/desktop-1995/apps/startmenu.js',
+                        'entry': 'startmenu95',
+                    },
                     'browser.js': {
                         'type': desktop95Types.EXECUTABLE,
                         'src': 'src/static/desktop-1995/apps/browser.js',
@@ -786,17 +791,23 @@ $(document).ready( function() {
 
     // Load up the mouse/tray icon tester (optional).
     // TODO: Put this in startup folder.
-    var mouseCaller = {
+    /* var mouseCaller = {
         'type': 'shortcut',
         'exec': 'c:\\windows\\mousetray.js',
         'icon': 'mouse',
     };
-    loadExe( 'c:\\windows\\mousetray.js', '', mouseCaller );
+    loadExe( 'c:\\windows\\mousetray.js', '', mouseCaller ); */
+
+    var smCaller = {
+        'type': 'shortcut',
+        'exec': 'c:\\windows\\startmenu.js',
+        'icon': 'start',
+    };
+    loadExe( 'c:\\windows\\startmenu.js', '', smCaller );
 
     //$('#desktop').window95( 'dialog', {'icon': 'info', 'caption': 'Test Message', 'message': 'This is a test.'});
 
-    $('.button-start').startmenu95( 'enable' );
-    $('.button-start').on( 'menu', function( e, menuElement, settings ) { 
+    $('body').on( 'menu', '.button-start', function( e, menuElement, settings ) { 
         if( !settings.path.startsWith( '/Programs' ) ) {
             return;
         }
@@ -829,6 +840,4 @@ $(document).ready( function() {
 
         $('#desktop').menu95( 'open', settings );
     } );
-
-    $('.tray.notification-area').systray95( 'enable' );
 } );
