@@ -47,23 +47,23 @@ var skel = {
                 'children': {
                     'explorer.js': {
                         'type': desktop95Types.EXECUTABLE,
-                        'src': 'src/static/desktop-1995/apps/explorer.js',
+                        'src': 'apps/explorer.js',
                         'entry': 'explorer95',
                     },
                     'mousetray.js': {
                         'type': desktop95Types.EXECUTABLE,
-                        'src': 'src/static/desktop-1995/apps/mousetray.js',
+                        'src': 'apps/mousetray.js',
                         'entry': 'mousetray95',
                     },
                     'startmenu.js': {
                         'type': desktop95Types.EXECUTABLE,
-                        'src': 'src/static/desktop-1995/apps/startmenu.js',
+                        'src': 'apps/startmenu.js',
                         'entry': 'startmenu95',
                     },
                     'browser.js': {
                         'type': desktop95Types.EXECUTABLE,
-                        'src': 'src/static/desktop-1995/apps/browser.js',
-                        'stylesrc': 'src/static/desktop-1995/apps/browser.css',
+                        'src': 'apps/browser.js',
+                        'stylesrc': 'apps/browser.css',
                         'entry': 'browser95',
                         'args': {
                             'archiveEnd':'19991200000000',
@@ -74,23 +74,23 @@ var skel = {
                     },
                     'paint.js': {
                         'type': desktop95Types.EXECUTABLE,
-                        'src': 'src/static/desktop-1995/apps/paint.js',
+                        'src': 'apps/paint.js',
                         'args': {
                             'id': 'w-paint',
                         },
                     },
                     'props.js': {
                         'type': desktop95Types.EXECUTABLE,
-                        'src': 'src/static/desktop-1995/apps/props.js',
-                        'stylesrc': 'src/static/desktop-1995/apps/props.css',
+                        'src': 'apps/props.js',
+                        'stylesrc': 'apps/props.css',
                         'args': {
                             'id': 'w-props',
                         },
                     },
                     'cdplayer.js': {
                         'type': desktop95Types.EXECUTABLE,
-                        'src': 'src/static/desktop-1995/apps/cdplayer.js',
-                        'stylesrc': 'src/static/desktop-1995/apps/cdplayer.css',
+                        'src': 'apps/cdplayer.js',
+                        'stylesrc': 'apps/cdplayer.css',
                         'args': {
                             'playlist': [
                                 {
@@ -105,8 +105,8 @@ var skel = {
                     },
                     'command.js': {
                         'type': desktop95Types.EXECUTABLE,
-                        'src': 'src/static/desktop-1995/apps/command.js',
-                        'stylesrc': 'src/static/desktop-1995/apps/command.css',
+                        'src': 'apps/command.js',
+                        'stylesrc': 'apps/command.css',
                         'args': {
                             'id': null, // Always allow new windows.
                             'lineHandler': 'handlePromptLine',
@@ -118,15 +118,15 @@ var skel = {
                     },
                     'notepad.js': {
                         'type': desktop95Types.EXECUTABLE,
-                        'src': 'src/static/desktop-1995/apps/notepad.js',
+                        'src': 'apps/notepad.js',
                         'args': {
                             'id': null, // Always allow new windows.
                         }
                     },
                     'wordpad.js': {
                         'type': desktop95Types.EXECUTABLE,
-                        'src': 'src/static/desktop-1995/apps/wordpad.js',
-                        'stylesrc': 'src/static/desktop-1995/apps/wordpad.css',
+                        'src': 'apps/wordpad.js',
+                        'stylesrc': 'apps/wordpad.css',
                         'args': {
                             'id': null, // Always allow new windows.
                             'w': 600,
@@ -135,7 +135,7 @@ var skel = {
                     },
                     'mpvideo.js': {
                         'type': desktop95Types.EXECUTABLE,
-                        'src': 'src/static/desktop-1995/apps/mpvideo.js',
+                        'src': 'apps/mpvideo.js',
                         'args': {
                             'id': 'w-mpvideo',
                         }
