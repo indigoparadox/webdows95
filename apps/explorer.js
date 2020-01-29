@@ -1,6 +1,7 @@
 
 (function( $ ) {
 $.fn.explorer95 = function( action, options ) {
+    'use strict';
 
 var settings = $.extend( {
     'caption': 'Explorer',

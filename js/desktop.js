@@ -37,6 +37,8 @@ var fs = null;
 var associations = null;
 
 function _handleContainerDrop( e, d ) {
+    'use strict';
+
     incomingFile = resolvePath( d.incoming.data( 'path' ) );
     incomingFilename = d.incoming.data( 'filename' );
 
@@ -59,6 +61,8 @@ function _handleContainerDrop( e, d ) {
 }
 
 function newFolder( parent, name ) {
+    'use strict';
+
     if( name in parent.children ) {
         throw { 'type': desktop95FileException.FILEEXISTS };
     }
@@ -72,6 +76,7 @@ function newFolder( parent, name ) {
 }
 
 function resolvePath( pathString=null ) {
+
     if( null == pathString || '' == pathString ) {
         return fs;
     }
@@ -176,6 +181,8 @@ function loadExe( pathString, callerPath='', caller=null ) {
 }
 
 function handlePromptLine( data, text, winPrompt ) {
+    'use strict';
+
     var cMatch;
     if( null != (cMatch = text.match( /^cd (.*)/i )) ) {
         // CD command
@@ -233,6 +240,8 @@ function handlePromptLine( data, text, winPrompt ) {
 }
 
 function formatFS() {
+    'use strict';
+
     var formatDialog = null;
     var formatDialogOptions = {
         "caption": "Format Session",
@@ -256,6 +265,7 @@ function formatFS() {
 }
 
 function getNextIconPosition( container, reset=false ) {
+
     if( reset || undefined == $(container).data( 'default-icon-x' ) ) {
         $(container).data( 'default-icon-x', 20 );
     }
@@ -281,6 +291,7 @@ function getNextIconPosition( container, reset=false ) {
 }
 
 function _iconPropertiesCallback( e ) {
+    'use strict';
     var propsCaller = {
         'type': 'shortcut',
         'exec': 'c:\\windows\\props.js',
@@ -298,6 +309,7 @@ function _iconPropertiesCallback( e ) {
 }
 
 function _iconDoubleClickCallback( e ) {
+    'use strict';
     e.data.callback( e.data.cbData );
 }
 
@@ -355,6 +367,8 @@ function populateFolder( container, folderPath=null ) {
 }
 
 function createAssocIcon( itemName, itemPath ) {
+    'use strict';
+
     var itemData = resolvePath( itemPath );
 
     // Setup the icon image.

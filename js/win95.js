@@ -1,5 +1,7 @@
 
 function boot() {
+    'use strict';
+    
     // Setup events delegated down from desktop.
     $('#desktop').on( 'desktop-populate', '.container', function( e ) {
         populateFolder( this, $(this).parents( '.window' ).attr( 'data-caller-path' ) );
