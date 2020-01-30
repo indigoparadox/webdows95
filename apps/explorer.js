@@ -11,10 +11,10 @@ var settings = $.extend( {
     'y': 10,
     'w': 320,
     'h': 260,
+    'data': {},
     'callback': null,
     'cbData': null,
-    'menuContainer': '#desktop',
-    'dataPath': 'c:\\windows\\desktop'
+    'menuContainer': '#desktop'
 }, options );
 
 switch( action.toLowerCase() ) {
@@ -101,9 +101,13 @@ case 'open-taskbar':
 
     var desktop = null;
     if( 0 >= $('#desktop').length ) {
-        desktop = $('<div id="desktop" class="container" data-path="' + settings.dataPath + '"></div>');
+        desktop = $('<div id="desktop" class="container"></div>');
         this.append( desktop );
         desktop.desktop95( 'enable' );
+
+        for( var key in settings.data ) {
+            desktop.attr( 'data-' + key, settings.data[key] );
+        }
     }
 
     var taskbar = $('<div id="taskbar" class="taskbar"><div id="tasks" class="tasks"></div></div>');
@@ -146,8 +150,12 @@ case 'open-folder':
 
     winHandle.control95( 'statusbar' );
 
-    var container = $('<div class="window-folder-container container" data-path="' + settings.dataPath + '"></div>');
+    var container = $('<div class="window-folder-container container"></div>');
     winHandle.find( '.window-form' ).append( container );
+
+    for( var key in settings.data ) {
+        container.attr( 'data-' + key, settings.data[key] );
+    }
 
     // Mousedown/Mousemove are handled by desktop events.
 

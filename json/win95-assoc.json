@@ -1,22 +1,22 @@
 {
     "executable": {
-        "name": "Executable",
+        "description": "Executable",
         "icon": "exe"
     },
     "shortcut": {
-        "name": "Shortcut",
+        "description": "Shortcut",
         "icon": "lnk"
     },
     "computer": {
-        "name": "Computer",
+        "description": "Computer",
         "icon": "computer",
-        "exec": "c:/windows/explorer.js"
+        "exec": "c:\\windows\\explorer.js"
     },
     "drive": {
-        "name": "Drive",
+        "description": "Drive",
         "icon": "drive",
-        "exec": "c:/windows/explorer.js",
-        "context": {
+        "exec": "c:\\windows\\explorer.js",
+        "contextMenu": {
             "items": [
                 {
                     "caption": "Format",
@@ -33,43 +33,38 @@
         }
     },
     "folder": {
-        "name": "Folder",
+        "description": "Folder",
         "icon": "folder",
-        "exec": "c:/windows/explorer.js"
+        "exec": "c:\\windows\\explorer.js"
     },
     "notepad": {
-        "name": "Text Document",
-        "icon": "notepad",
-        "docIcon": "txt",
-        "exec": "c:/windows/notepad.js"
+        "description": "Text Document",
+        "icon": "txt",
+        "exec": "c:\\windows\\notepad.js"
     },
     "wordpad": {
-        "name": "Rich Text Document",
-        "icon": "wordpad",
-        "docIcon": "rtf",
-        "exec": "c:/windows/wordpad.js"
+        "description": "Rich Text Document",
+        "icon": "rtf",
+        "exec": "c:\\windows\\wordpad.js"
     },
     "prompt": {
-        "name": "Prompt",
+        "description": "Prompt",
         "icon": "prompt",
-        "exec": "c:/windows/command.js"
+        "exec": "c:\\windows\\command.js"
     },
     "browser": {
-        "name": "Internet Shortcut",
-        "icon": "browser",
-        "docIcon": "url",
-        "exec": "c:/windows/browser.js"
+        "description": "Internet Shortcut",
+        "icon": "url",
+        "exec": "c:\\windows\\browser.js"
     },
     "cdplayer": {
-        "name": "Music CD",
-        "icon": "cdplayer",
-        "docIcon": "cda",
-        "exec": "c:/windows/cdplayer.js"
+        "description": "Music CD",
+        "icon": "cda",
+        "exec": "c:\\windows\\cdplayer.js"
     },
     "video": {
-        "name": "Video File",
+        "description": "Video File",
         "icon": "avi",
-        "docIcon": "avi",
-        "exec": "c:/windows/mpvideo.js"
+        "exec": "c:\\windows\\mpvideo.js"
     }
 }

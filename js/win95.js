@@ -2,30 +2,27 @@
 function boot() {
     'use strict';
 
-    // Setup file icon population.
-    $('body').on( 'desktop-populate', '.container', function( e ) {
-        populateFolder( this, $(this).attr( 'data-path' ) );
-        e.stopPropagation();
-    } );
-
+    // Handle: Icon Properties
     $('body').on( 'properties', '.desktop-icon', function( e ) {
-        var icon = $(e.target).data( 'icon' );
-        var propsCaller = {
-            'type': 'shortcut',
-            'exec': 'c:\\windows\\props.js',
-            'args': {
-                'panel': 'file',
-                'fileIcon': icon.icon,
-                'fileName': icon.caption,
-                'fileType': icon.description,
-                'fileLocation': $(e.target).data( 'path' ),
-                'caption': icon.caption,
-            }
-        };
-        loadExe( 'c:\\windows\\props.js', '', propsCaller );
+        var iconPath = $(e.target).closest( '.desktop-icon' ).attr( 'data-item-path' );
+        var iconData = resolvePath( iconPath );
+
+        if( iconData.type in associations ) {
+            iconData = $.extend( {}, associations[iconData.type], iconData );
+        }
+
+        execV( 'c:\\windows\\props.js', {
+            'panel': 'file',
+            'fileIcon': iconData.icon,
+            'fileName': iconData.name,
+            'fileType': iconData.description,
+            'fileLocation': iconPath,
+            'caption': iconData.name,
+        } );
         e.stopPropagation();
     } );
 
+    // Handle: Folder Context Menu
     $('body').on( 'contextmenu', '.container', function( e ) {
         e.preventDefault();
 
@@ -85,7 +82,8 @@ function boot() {
         e.stopPropagation();
     } );
 
-    for( var typeIter in associations ) {
+    // Handle: Icon Context Menus
+    $.each( associations, function( typeIter ) {
         var contextMenu = {
             'items': [
                 {
@@ -94,17 +92,18 @@ function boot() {
                 }
             ]
         };
-        if( 'context' in associations[typeIter] ) {
-            contextMenu = associations[typeIter].context;
+        if( 'contextMenu' in associations[typeIter] ) {
+            contextMenu = associations[typeIter].contextMenu;
         }
-        $('body').on( 'contextmenu', '.icon-' + typeIter, function( e ) {
+        $('body').on( 'contextmenu', '[data-item-type="' + typeIter + '"]', function( e ) {
             e.preventDefault();
             contextMenu.caller = $(e.target).parents( '.desktop-icon' );
             contextMenu.container = '#desktop';
             contextMenu.location = {'x': e.pageX, 'y': e.pageY};
+            $('#desktop').menu95( 'close' );
             $(this).menu95( 'open', contextMenu );
         } );
-    }
+    } );
 
     // Setup root desktop events.
     $('body').on( 'icon-drop', '.container', _handleContainerDrop );
@@ -132,16 +131,7 @@ function boot() {
         e.stopPropagation();
     } );
     $('body').on( 'properties', '#desktop', function( e ) {
-        var propsCaller = {
-            'type': 'shortcut',
-            'exec': 'c:\\windows\\props.js',
-            'icon': 'mouse',
-            'args': {
-                'panel': 'display',
-                'caption': 'Display Properties',
-            }
-        };
-        loadExe( 'c:\\windows\\props.js', '', propsCaller );
+        execV( 'c:\\windows\\props.js', {'panel': 'display', 'caption': 'Display Properties'} );
     } );
 
     /* $('#desktop').on( 'icon-drag', function( e, icon ) {
@@ -197,7 +187,7 @@ function boot() {
     };
     loadExe( 'c:\\windows\\mousetray.js', '', mouseCaller ); */
 
-    loadExe( 'c:\\windows\\explorer.js' );
+    execV( 'c:\\windows\\explorer.js', {'data': {'path': 'c:\\windows\\desktop'}} );
 
     //$('#desktop').window95( 'dialog', {'icon': 'info', 'caption': 'Test Message', 'message': 'This is a test.'});
 
@@ -220,17 +210,26 @@ function boot() {
         
         // Build the menu from items in the folder.
         settings.items = [];
-        for( var itemName in start_menu_progs.children ) {
-            var itemPath = menuPath + '/' + itemName;
-            var itemData = start_menu_progs.children[itemName];
-            if( desktop95Types.FOLDER == itemData.type ) {
-                settings.items.push( {'caption': itemName, 'type': menu95Type.EVENTMENU, 'icon': 'programs'} );
+        let listing = listFolder( menuPath );
+        listing.forEach( function( iter ) {
+            if( desktop95Types.FOLDER == iter.type ) {
+                settings.items.push( {
+                    'caption': iter.name,
+                    'type': menu95Type.EVENTMENU,
+                    'icon': 'programs'
+                } );
             } else {
-                var icon = createAssocIcon( itemName, itemPath );
-                icon.type = menu95Type.ITEM;
-                settings.items.push( icon );
+                settings.items.push( {
+                    'caption': iter.caption,
+                    'type': menu95Type.ITEM,
+                    'icon': iter.icon,
+                    'callback': function() {
+                        let itemPath = menuPath + '\\' + iter.caption;
+                        resolveExec( itemPath );
+                    }
+                } );
             }
-        }
+        } );
 
         $('#desktop').menu95( 'open', settings );
     } );
