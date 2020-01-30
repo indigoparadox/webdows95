@@ -96,7 +96,34 @@
         break;
     
     case 'open-taskbar':
+
+        var windowMenu = {
+            'type': menu95Type.MENUBAR,
+            'caller': $('#desktop'),
+            'container': $('#desktop'),
+            'location': menu95Location.BOTTOM,
+            'items': [
+                {
+                    'caption': 'File', 
+                    'type': menu95Type.SUBMENU,
+                    'items': [
+                        {'caption': 'New Folder'}
+                    ]
+                },
+                {
+                    'caption': 'Special',
+                    'type': menu95Type.SUBMENU,
+                    'items': [
+                        {'caption': 'Shut Down'}
+                    ]   
+                },
+            ]
+        };
+        var menu = $('#desktop').menu95( 'open', windowMenu );
+
+        console.log( menu );
     
+        /*
         var taskbar = $('<div id="taskbar" class="taskbar"><div id="tasks" class="tasks"></div></div>');
         $('body').append( taskbar );
     
@@ -105,12 +132,15 @@
         startButton.on( 'click', function( e ) {
             startButton.finder95( 'show-menu' );
         } );
+    */
+
+        menu.append( '<div class="menu-spacer"></div>' );
     
         var notificationArea = $('<div class="tray notification-area"></div>');
-        taskbar.append( notificationArea );
+        menu.append( notificationArea );
     
         $(notificationArea).finder95( 'start-clock' );
-    
+
         return null;
     
     case 'open-folder':

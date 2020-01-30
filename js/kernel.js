@@ -93,62 +93,50 @@ function resolvePath( pathString=null ) {
     return file;
 }
 
-function loadExe( pathString, callerPath='', caller=null ) {
+function loadExe( pathString ) {
+    'use strict';
+
+    return loadExeV( pathString, {} );
+}
+
+function loadExeV( pathString, args ) {
+    'use strict';
 
     // This will resolve once the exe is loaded.
-    def = new $.Deferred();
-
-    // This is the beginning of stuff that runs at call time (not define time),
-    // so we can start resolving things from keys to dicts.
-    if( null == caller ) {
-        caller = resolvePath( callerPath );
-        caller.path = callerPath;
-    }
+    var def = new $.Deferred();
 
     // Drill down to the executable.
     var exec = resolvePath( pathString );
 
     var _exeRunAfterLoad = function() {
-    
-        // Always have an args object.
-        if( !('args' in caller) ) {
-            caller.args = {};
-        }
 
         // Use default args baked into exec.
         if( 'args' in exec ) {
-            $.extend( caller.args, exec.args );
+            $.extend( args, exec.args );
         }
         
-        if(
-            !(desktop95Types.EXECUTABLE == caller.type || desktop95Types.SHORTCUT == caller.type) ||
-            !('id' in caller.args)
-        ) {
-            caller.args.id = 'w-' + _htmlStrToClass( callerPath );
+        if( 'target' in args && !('id' in args) ) {
+            args.id = 'w-' + _htmlStrToClass( args.target );
+        } else if( !('target' in args) && !('id' in args) ) {
+            args.id = 'w-' + _htmlStrToClass( pathString );
         }
 
-        caller.args.target = callerPath;
-        caller.args.decorations = platforms[platform_name].decorations;
+        //args.target = callerPath;
+        args.decorations = platforms[platform_name].decorations;
+
+        // Load the doc if one was specified and grab the args from there.
+        if( 'target' in args ) {
+            let target = resolvePath( args.target );
+            $.extend( args, target.args );
+        }
+
+        console.log( args );
 
         // Figure out the entrypoint. Use <script name>95 if none provided.
         if( !('entry' in exec) ) {
             exec.entry = exec.name.split( '.' )[0] + '95';
         }
-        var winHandle = $('#desktop')[exec.entry]( 'open', caller.args );
-
-        // Workaround for loading folders using generalized explorer.
-        if( null != winHandle ) {
-            switch( caller.type ) {
-            case desktop95Types.COMPUTER:
-                winHandle.find( '.container' ).attr( 'data-caller-path', '' );
-                break;
-            default:
-                winHandle.find( '.container' ).attr( 'data-caller-path', callerPath );
-                break;
-            }
-            winHandle.find( '.container' ).on( 'icon-drop', _handleContainerDrop );
-            winHandle.find( '.container' ).trigger( 'desktop-populate' );
-        }
+        var winHandle = $('#desktop')[exec.entry]( 'open', args );
 
         def.resolve();
     }
@@ -227,13 +215,8 @@ function handlePromptLine( data, text, winPrompt ) {
         text in resolvePath( winPrompt.data( 'folder-path' ) ).children &&
         resolvePath( winPrompt.data( 'folder-path' ) + '\\' + text ).type == desktop95Types.EXECUTABLE
     ) {
-        // Open the specified executable with a fake shortcut.
-        caller = {
-            'type': 'shortcut',
-            'exec': winPrompt.data( 'folder-path' ) + '\\' + text,
-            'icon': 'prompt',
-        };
-        loadExe( winPrompt.data( 'folder-path' ) + '\\' + text, '', caller );
+        // TODO: Handle args.
+        loadExe( winPrompt.data( 'folder-path' ) + '\\' + text );
     } else {
         winPrompt.command95( 'enter', {'text': 'Sad command or file name'} )
     }
@@ -293,6 +276,7 @@ function getNextIconPosition( container, reset=false ) {
 function _iconDoubleClickCallback( e ) {
     'use strict';
     e.data.callback( e.data.cbData );
+    e.stopPropagation();
 }
 
 function populateFolder( container, folderPath=null ) {
@@ -378,24 +362,37 @@ function createAssocIcon( itemName, itemPath ) {
         iconName = 'generic';
     }
 
-    var exec = '';
+    var execPath = '';
+    var args = {'type': itemData.type};
     if( 'exec' in associations[itemData.type] ) {
-        exec = associations[itemData.type].exec;
+        execPath = associations[itemData.type].exec;
+
+        // Just keep the target path for now and resolve it at call time.
+        args.target = itemPath;
     } else if( 'exec' in itemData ) {
-        exec = itemData.exec;
+        execPath = itemData.exec;
+    }
+
+    if(
+        'folder' == itemData.type ||
+        'drive' == itemData.type
+    ) {
+        args.dataPath = itemPath;
+    } else if( 'computer' == itemData.type ) {
+        args.dataPath = '';
     }
 
     // Create the icon settings pack.
     if( itemData.type in associations ) {
-        return { 'caption': itemName,
+        return {
+            'caption': itemName,
             'icon': iconName,
             'x': itemData.iconX, 'y': itemData.iconY,
-            'target': itemPath,
             'description': associations[itemData.type].name,
             'classes': ['icon-' + itemData.type],
             //'context': contextMenu,
             'callback': function() {
-                loadExe( exec, itemPath );
+                loadExeV( execPath, args );
             },
         };
     }

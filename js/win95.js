@@ -4,7 +4,7 @@ function boot() {
 
     // Setup file icon population.
     $('body').on( 'desktop-populate', '.container', function( e ) {
-        populateFolder( this, $(this).attr( 'data-caller-path' ) );
+        populateFolder( this, $(this).attr( 'data-path' ) );
         e.stopPropagation();
     } );
 
@@ -107,15 +107,17 @@ function boot() {
     }
 
     // Setup root desktop events.
-    $('#desktop').desktop95( 'enable' );
-    $('#desktop').attr( 'data-caller-path', 'c:\\windows\\desktop' );
-    $('#desktop').on( 'icon-drop', _handleContainerDrop );
-    $('#desktop').on( 'new-folder', function( e ) {
-        newFolder( resolvePath( desktop95DesktopFolder ), 'New Folder' );
+    $('body').on( 'icon-drop', '.container', _handleContainerDrop );
+    $('body').on( 'new-folder', '.container', function( e ) {
+        newFolder( resolvePath( $(this).attr( 'data-path' ) ), 'New Folder' );
         $(this).trigger( 'populate-folder' );
+
+        // Or else we'll make a folder on the desktop, too...
+        e.stopPropagation();
     } );
-    $('#desktop').on( 'arrange-icons', function( e, data ) {
-        var desktopFolder = resolvePath( desktop95DesktopFolder );
+    $('body').on( 'arrange-icons', '.container', function( e, data ) {
+        //var desktopFolder = resolvePath( desktop95DesktopFolder );
+        var desktopFolder = resolvePath( $(this).attr( 'data-path' ) );
         switch( data.criteria ) {
         case 'name':
             var desktopItemsNew = {};
@@ -126,6 +128,8 @@ function boot() {
             break;
         }
         $(this).trigger( 'populate-folder' );
+
+        e.stopPropagation();
     } );
     $('body').on( 'properties', '#desktop', function( e ) {
         var propsCaller = {
@@ -140,9 +144,9 @@ function boot() {
         loadExe( 'c:\\windows\\props.js', '', propsCaller );
     } );
 
-    $('#desktop').on( 'icon-drag', function( e, icon ) {
+    /* $('#desktop').on( 'icon-drag', function( e, icon ) {
         //console.log( icon.source.data( 'path' ) + ' to ' + icon.target.data( 'path' ) );
-    } );
+    } ); */
 
     // Setup window icon menus.
     var _handleWindowMenu = ( e ) => {
@@ -179,10 +183,10 @@ function boot() {
         winHandle.menu95( 'open', windowMenu );
     };
 
-    $('#desktop').on( 'click', '.window > .titlebar > .titlebar-icon', _handleWindowMenu );
-    $('#desktop').on( 'contextmenu', '.window > .titlebar > .titlebar-icon', _handleWindowMenu );
-    $('#desktop').on( 'click', '.window > .titlebar', function( e ) { $(e.target).parents( '.window' ).menu95( 'close' ); } );
-    $('#desktop').on( 'contextmenu', '.window > .titlebar', _handleWindowMenu );
+    $('body').on( 'click', '.window > .titlebar > .titlebar-icon', _handleWindowMenu );
+    $('body').on( 'contextmenu', '.window > .titlebar > .titlebar-icon', _handleWindowMenu );
+    $('body').on( 'click', '.window > .titlebar', function( e ) { $(e.target).parents( '.window' ).menu95( 'close' ); } );
+    $('body').on( 'contextmenu', '.window > .titlebar', _handleWindowMenu );
 
     // Load up the mouse/tray icon tester (optional).
     // TODO: Put this in startup folder.
@@ -193,12 +197,7 @@ function boot() {
     };
     loadExe( 'c:\\windows\\mousetray.js', '', mouseCaller ); */
 
-    var smCaller = {
-        'type': 'shortcut',
-        'exec': 'c:\\windows\\explorer.js',
-        'icon': 'start',
-    };
-    loadExe( 'c:\\windows\\explorer.js', '', smCaller );
+    loadExe( 'c:\\windows\\explorer.js' );
 
     //$('#desktop').window95( 'dialog', {'icon': 'info', 'caption': 'Test Message', 'message': 'This is a test.'});
 
@@ -221,7 +220,7 @@ function boot() {
         
         // Build the menu from items in the folder.
         settings.items = [];
-        for( itemName in start_menu_progs.children ) {
+        for( var itemName in start_menu_progs.children ) {
             var itemPath = menuPath + '/' + itemName;
             var itemData = start_menu_progs.children[itemName];
             if( desktop95Types.FOLDER == itemData.type ) {

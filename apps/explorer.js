@@ -14,6 +14,7 @@ var settings = $.extend( {
     'callback': null,
     'cbData': null,
     'menuContainer': '#desktop',
+    'dataPath': 'c:\\windows\\desktop'
 }, options );
 
 switch( action.toLowerCase() ) {
@@ -98,8 +99,15 @@ case 'show-menu':
 
 case 'open-taskbar':
 
+    var desktop = null;
+    if( 0 >= $('#desktop').length ) {
+        desktop = $('<div id="desktop" class="container" data-path="' + settings.dataPath + '"></div>');
+        this.append( desktop );
+        desktop.desktop95( 'enable' );
+    }
+
     var taskbar = $('<div id="taskbar" class="taskbar"><div id="tasks" class="tasks"></div></div>');
-    $('body').append( taskbar );
+    this.append( taskbar );
 
     var startButton = $('<button class="button-start"><span class="icon-start"></span>Start</button>');
     taskbar.prepend( startButton );
@@ -112,7 +120,7 @@ case 'open-taskbar':
 
     $(notificationArea).explorer95( 'start-clock' );
 
-    this.trigger( 'desktop-populate' );
+    desktop.trigger( 'desktop-populate' );
 
     return null;
 
@@ -138,7 +146,7 @@ case 'open-folder':
 
     winHandle.control95( 'statusbar' );
 
-    var container = $('<div class="window-folder-container container"></div>');
+    var container = $('<div class="window-folder-container container" data-path="' + settings.dataPath + '"></div>');
     winHandle.find( '.window-form' ).append( container );
 
     // Mousedown/Mousemove are handled by desktop events.
@@ -223,6 +231,8 @@ case 'open-folder':
 
     winHandle.removeClass( 'window-hidden' );
 
+    container.trigger( 'desktop-populate' );
+
     console.assert( 1 == winHandle.length );
 
     return winHandle;
@@ -230,9 +240,9 @@ case 'open-folder':
 case 'open':
 
     if( 0 < $('#taskbar').length ) {
-        return this.explorer95( 'open-folder', settings );
+        return $('body').explorer95( 'open-folder', settings );
     } else {
-        return this.explorer95( 'open-taskbar', settings );
+        return $('body').explorer95( 'open-taskbar', settings );
     }
 
 }; }; }( jQuery ) );
