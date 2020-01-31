@@ -2,6 +2,8 @@
 function handlePromptLine( data, text, winPrompt ) {
     'use strict';
 
+    console.log( text );
+
     var cMatch;
     if( null != (cMatch = text.match( /^cd (.*)/i )) ) {
         // CD command
@@ -11,17 +13,16 @@ function handlePromptLine( data, text, winPrompt ) {
         ) {
             winPrompt.data( 'folder-parent-path', winPrompt.data( 'folder-path' ) );
             winPrompt.data( 'folder-path',  winPrompt.data( 'folder-path' ) + '\\' + cMatch[1] );
-            winPrompt.command95( 'setPrompt', {'promptText': winPrompt.data( 'folder-path' ).toUpperCase() + '>'})
+            winPrompt.command95( 'set-prompt', {'promptText': winPrompt.data( 'folder-path' ).toUpperCase() + '>'})
         } else {
             winPrompt.command95( 'enter', {'text': 'Invalid directory'} );
         }
     } else if( null != (cMatch = text.match( /^dir ?(.*)?/i )) ) {
         // DIR command
         // TODO: Targeted DIR
-        winPrompt.command95( 'enter', {'text': 'Volume in drive C is WEBDOWS95'} );
-        winPrompt.command95( 'enter', {'text': 'Volume Serial Number is DEAD-BEEF'} );
-        winPrompt.command95( 'enter', {'text': 'Directory of ' + winPrompt.data( 'folder-path' )} );
-        winPrompt.command95( 'enter', {'text': ''} );
+        winPrompt.command95( 'puts', {'text': 'Volume in drive C is WEBDOWS95\n'} );
+        winPrompt.command95( 'puts', {'text': 'Volume Serial Number is DEAD-BEEF\n'} );
+        winPrompt.command95( 'puts', {'text': 'Directory of ' + winPrompt.data( 'folder-path' ) + '\n\n'} );
         var fileCt = 0;
         // XXX Resolve folder at command time.
         let folder = resolvePath( winPrompt.data( 'folder-path' ) );
@@ -33,15 +34,14 @@ function handlePromptLine( data, text, winPrompt ) {
             }
 
             if( desktop95Types.FOLDER == filedata.type ) {
-                winPrompt.command95( 'enter', {'text': filename.toUpperCase() + '\t' + '&lt;DIR&gt;\t01-01-95\t04:20a'} );
+                winPrompt.command95( 'puts', {'text': filename.toUpperCase() + '\t' + '<DIR>\t01-01-95\t04:20a\n'} );
             } else {
-                winPrompt.command95( 'enter', {'text': filename.toUpperCase()} );
+                winPrompt.command95( 'puts', {'text': filename.toUpperCase() + '\n'} );
             }
             fileCt += 1;
         }
-        winPrompt.command95( 'enter', {'text': fileCt.toString() + ' file(s)\t0 bytes'} );
-        winPrompt.command95( 'enter', {'text': '0 bytes free'} );
-        winPrompt.command95( 'enter', {'text': ''} );
+        winPrompt.command95( 'puts', {'text': fileCt.toString() + ' file(s)\t0 bytes\n'} );
+        winPrompt.command95( 'puts', {'text': '0 bytes free\n\n'} );
     } else if(
         text in resolvePath( winPrompt.data( 'folder-path' ) ).children &&
         resolvePath( winPrompt.data( 'folder-path' ) + '\\' + text ).type == desktop95Types.EXECUTABLE
@@ -49,7 +49,7 @@ function handlePromptLine( data, text, winPrompt ) {
         // TODO: Handle args.
         exec( winPrompt.data( 'folder-path' ) + '\\' + text );
     } else {
-        winPrompt.command95( 'enter', {'text': 'Sad command or file name'} )
+        winPrompt.command95( 'puts', {'text': 'Sad command or file name\n'} )
     }
 }
 

@@ -1,18 +1,41 @@
 
 .window-command .input-prompt {
+    border-spacing: 0;
     font-family: fixedsys, 'Courier New', Courier, monospace;
     font-size: 12px;
     font-weight: bold;
-    position: absolute;
-    top: 2px;
+    position: relative;
+    /* top: 2px;
     right: 2px;
     bottom: 2px;
-    left: 2px;
-    padding: 1px 0;
-    overflow-x: hidden;
-    overflow-y: scroll;
+    left: 2px; */
+    padding: 0;
 }
 
+.window-command .input-prompt {
+    border: none;
+}
+
+.window-command .input-prompt tbody {
+    display: block;
+    padding: 2px;
+}
+
+.prompt-row {
+    margin: 0;
+    padding: 0;
+}
+
+.prompt-char {
+    /* border-right: 1px solid white;
+    border-bottom: 1px solid white; */
+    margin: 0;
+    padding: 0;
+    width: 4px;
+    height: 12px;
+}
+
+/*
 .window-command .backbuffer {
     padding-left: 3px;
     white-space: pre;
@@ -26,6 +49,7 @@
     float: left;
     white-space: pre;
 }
+*/
 
 @keyframes caret-blink {
     50% { opacity: 0; }
@@ -44,3 +68,16 @@
     height: 0;
     opacity: 0;
 }
+
+.window-command .window-form {
+    position: relative;
+    margin-top: 1px;
+    margin-right: 4px;
+    margin-left: 2px;
+    margin-bottom: 6px;
+}
+
+.prompt-char-empty {
+    color: black;
+}
+
