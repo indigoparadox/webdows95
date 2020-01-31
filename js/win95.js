@@ -188,6 +188,7 @@ function boot() {
     loadExe( 'c:\\windows\\mousetray.js', '', mouseCaller ); */
 
     execV( 'c:\\windows\\explorer.js', {'data': {'path': 'c:\\windows\\desktop'}} );
+    //execV( 'c:\\windows\\command.js', {'data': {'path': 'c:\\windows\\desktop'}} );
 
     //$('#desktop').window95( 'dialog', {'icon': 'info', 'caption': 'Test Message', 'message': 'This is a test.'});
 

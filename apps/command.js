@@ -15,7 +15,8 @@ var settings = $.extend( {
     'data': {},
     'lineHandler': null,
     'lineHandlerData': null,
-    'text': ''
+    'text': '',
+    'fullScreen': false,
 }, options );
 
 switch( action.toLowerCase() ) {
@@ -41,25 +42,33 @@ case 'enter':
 
 case 'open':
 
-    settings.icon = 'prompt';
-
-    var winHandle = this.window95( 'open', settings );
-
+    // Create the command prompt.
     var cmd = $('<div class="input-prompt"><div class="backbuffer"></div>' +
         '<div class="input-line-caret">' +
         '<span class="input-line"></span><div class="input-caret"></div></div></div>');
 
+    // Hidden text field to gather input.
+    var cmdInput = $('<input type="text" class="input-textarea" />');
+
+    // Create the window or go full-screen.
+    settings.icon = 'prompt';
+    var winHandle = null;
+    if( 0 < $('#desktop').length || true == settings.fullScreen ) {
+        winHandle = this.window95( 'open', settings );
+    } else {
+        winHandle = $('body');
+        winHandle.append( '<form class="window-form"></form>' );
+    }
+
+    winHandle.children( '.window-form' ).append( cmd );
+    winHandle.children( '.window-form' ).append( cmdInput );
+    
     // Add prompt text if one was provided.
     if( null != settings.promptText ) {
         cmd.children( '.input-line-caret' ).prepend(
             '<span class="prompt-text">' + settings.promptText + '</span>' );
         cmd.children( '.input-line-caret' ).data( 'prompt-text', settings.promptText );
     }
-
-    var cmdInput = $('<input type="text" class="input-textarea" />');
-
-    winHandle.children( '.window-form' ).append( cmd );
-    winHandle.children( '.window-form' ).append( cmdInput );
 
     winHandle.click( function() {
         $(cmdInput).focus();

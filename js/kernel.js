@@ -333,8 +333,11 @@ function execVE( execPath, args, env ) {
 
     // Callback to start the executable once its code is loaded.
     var onExec = function() {
+        console.log( 'Launching executable:' );
+        console.log( execObject );
+
         var entryPoint = execObject.name.split( '.' )[0] + '95';
-        var winHandle = $('#desktop')[entryPoint]( 'open', args );
+        var winHandle = $('#desktop')[entryPoint]( 'open', execObject.args );
 
         // Exectuable is loaded and started; resolve the promise.
         deferred.resolve();
