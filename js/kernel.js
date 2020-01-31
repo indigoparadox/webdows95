@@ -351,6 +351,8 @@ function genericBoot() {
         // Get rid of existing icons.
         $(this).children( '.desktop-icon' ).remove();
 
+        console.log( listing );
+
         for( var idx in listing ) {
             // Setup the icon position if none is set.
             if( !('x' in listing[idx] ) && !('y' in listing[idx]) ) {
