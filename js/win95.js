@@ -1,4 +1,58 @@
 
+function handlePromptLine( data, text, winPrompt ) {
+    'use strict';
+
+    var cMatch;
+    if( null != (cMatch = text.match( /^cd (.*)/i )) ) {
+        // CD command
+        let folder = resolvePath( winPrompt.data( 'folder-path' ) );
+        if( 
+            'children' in folder && cMatch[1] in folder.children
+        ) {
+            winPrompt.data( 'folder-parent-path', winPrompt.data( 'folder-path' ) );
+            winPrompt.data( 'folder-path',  winPrompt.data( 'folder-path' ) + '\\' + cMatch[1] );
+            winPrompt.command95( 'setPrompt', {'promptText': winPrompt.data( 'folder-path' ).toUpperCase() + '>'})
+        } else {
+            winPrompt.command95( 'enter', {'text': 'Invalid directory'} );
+        }
+    } else if( null != (cMatch = text.match( /^dir ?(.*)?/i )) ) {
+        // DIR command
+        // TODO: Targeted DIR
+        winPrompt.command95( 'enter', {'text': 'Volume in drive C is WEBDOWS95'} );
+        winPrompt.command95( 'enter', {'text': 'Volume Serial Number is DEAD-BEEF'} );
+        winPrompt.command95( 'enter', {'text': 'Directory of ' + winPrompt.data( 'folder-path' )} );
+        winPrompt.command95( 'enter', {'text': ''} );
+        var fileCt = 0;
+        // XXX Resolve folder at command time.
+        let folder = resolvePath( winPrompt.data( 'folder-path' ) );
+        for( var filename in folder.children ) {
+            var filedata = folder.children[filename];
+
+            if( null == filedata ) {
+                continue;
+            }
+
+            if( desktop95Types.FOLDER == filedata.type ) {
+                winPrompt.command95( 'enter', {'text': filename.toUpperCase() + '\t' + '&lt;DIR&gt;\t01-01-95\t04:20a'} );
+            } else {
+                winPrompt.command95( 'enter', {'text': filename.toUpperCase()} );
+            }
+            fileCt += 1;
+        }
+        winPrompt.command95( 'enter', {'text': fileCt.toString() + ' file(s)\t0 bytes'} );
+        winPrompt.command95( 'enter', {'text': '0 bytes free'} );
+        winPrompt.command95( 'enter', {'text': ''} );
+    } else if(
+        text in resolvePath( winPrompt.data( 'folder-path' ) ).children &&
+        resolvePath( winPrompt.data( 'folder-path' ) + '\\' + text ).type == desktop95Types.EXECUTABLE
+    ) {
+        // TODO: Handle args.
+        exec( winPrompt.data( 'folder-path' ) + '\\' + text );
+    } else {
+        winPrompt.command95( 'enter', {'text': 'Sad command or file name'} )
+    }
+}
+
 function boot() {
     'use strict';
 
