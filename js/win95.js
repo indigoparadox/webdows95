@@ -1,31 +1,38 @@
 
-function handlePromptLine( data, text, winPrompt ) {
+function handlePromptLine( text, env, winPrompt ) {
     'use strict';
 
     console.log( text );
+    var workingPath = winPrompt.env95( 'get', 'working-path' );
 
     var cMatch;
     if( null != (cMatch = text.match( /^cd (.*)/i )) ) {
         // CD command
-        let folder = resolvePath( winPrompt.data( 'folder-path' ) );
-        if( 
+        let folder = resolvePath( workingPath );
+        if( '..' == cMatch[1] ) {
+            var parentPath = dirName( workingPath );
+            if( '' != parentPath ) {
+                winPrompt.env95( 'set', 'working-path', parentPath );
+                winPrompt.env95( 'set', 'prompt-text'. parentPath.toUpperCase() + '>' );
+            }
+        } else if( 
             'children' in folder && cMatch[1] in folder.children
         ) {
-            winPrompt.data( 'folder-parent-path', winPrompt.data( 'folder-path' ) );
-            winPrompt.data( 'folder-path',  winPrompt.data( 'folder-path' ) + '\\' + cMatch[1] );
-            winPrompt.command95( 'set-prompt', {'promptText': winPrompt.data( 'folder-path' ).toUpperCase() + '>'})
+            let newDir = workingPath + '\\' + cMatch[1];
+            winPrompt.env95( 'set', 'working-path',  newDir );
+            winPrompt.env95( 'set', 'prompt-text', newDir.toUpperCase() + '>' );
         } else {
-            winPrompt.command95( 'enter', {'text': 'Invalid directory'} );
+            winPrompt.command95( 'enter', {'text': 'Invalid directory'}, env );
         }
     } else if( null != (cMatch = text.match( /^dir ?(.*)?/i )) ) {
         // DIR command
         // TODO: Targeted DIR
         winPrompt.command95( 'puts', {'text': 'Volume in drive C is WEBDOWS95\n'} );
         winPrompt.command95( 'puts', {'text': 'Volume Serial Number is DEAD-BEEF\n'} );
-        winPrompt.command95( 'puts', {'text': 'Directory of ' + winPrompt.data( 'folder-path' ) + '\n\n'} );
+        winPrompt.command95( 'puts', {'text': 'Directory of ' + workingPath + '\n\n'} );
         var fileCt = 0;
         // XXX Resolve folder at command time.
-        let folder = resolvePath( winPrompt.data( 'folder-path' ) );
+        let folder = resolvePath( workingPath );
         for( var filename in folder.children ) {
             var filedata = folder.children[filename];
 
@@ -43,11 +50,11 @@ function handlePromptLine( data, text, winPrompt ) {
         winPrompt.command95( 'puts', {'text': fileCt.toString() + ' file(s)\t0 bytes\n'} );
         winPrompt.command95( 'puts', {'text': '0 bytes free\n\n'} );
     } else if(
-        text in resolvePath( winPrompt.data( 'folder-path' ) ).children &&
-        resolvePath( winPrompt.data( 'folder-path' ) + '\\' + text ).type == desktop95Types.EXECUTABLE
+        text in resolvePath( workingPath ).children &&
+        resolvePath( workingPath + '\\' + text ).type == desktop95Types.EXECUTABLE
     ) {
         // TODO: Handle args.
-        exec( winPrompt.data( 'folder-path' ) + '\\' + text );
+        exec( workingPath + '\\' + text );
     } else {
         winPrompt.command95( 'puts', {'text': 'Sad command or file name\n'} )
     }
@@ -241,7 +248,7 @@ function boot() {
     };
     loadExe( 'c:\\windows\\mousetray.js', '', mouseCaller ); */
 
-    execV( 'c:\\windows\\explorer.js', {'data': {'path': 'c:\\windows\\desktop'}} );
+    execVE( 'c:\\windows\\explorer.js', {}, {'working-path': 'c:\\windows\\desktop'} );
     //execV( 'c:\\windows\\command.js', {'data': {'path': 'c:\\windows\\desktop'}} );
 
     //$('#desktop').window95( 'dialog', {'icon': 'info', 'caption': 'Test Message', 'message': 'This is a test.'});

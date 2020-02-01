@@ -1,6 +1,6 @@
 
 (function( $ ) {
-$.fn.command95 = function( action, options ) {
+$.fn.command95 = function( action, options, env ) {
 'use strict';
 
 var settings = $.extend( {
@@ -8,33 +8,18 @@ var settings = $.extend( {
     'id': null,
     'resizable': true,
     'menu': null,
-    'promptText': 'C:\\>',
     'x': 10,
     'y': 10,
     'w': 480,
     'h': 260,
-    'data': {},
     'lineHandler': null,
-    'lineHandlerData': null,
     'text': '',
-    'fullScreen': false,
-    'columns': 80,
-    'rows': 20,
     'curX': null,
     'curY': null,
     'addToLine': true,
-    'tabWidth': 8,
 }, options );
 
 switch( action.toLowerCase() ) {
-
-case 'set-prompt':
-    this
-        .children( '.window-form' )
-        .children( '.input-prompt' )
-        .children( '.input-line-caret' )
-        .data( 'prompt-text', settings.promptText );
-    return this;
 
 case 'getwidth':
 
@@ -47,7 +32,9 @@ case 'drawpx':
 case 'reset':
     var cmdTable = this.find( 'tbody' );
     cmdTable.empty();
-    for( var y = 0 ; settings.rows > y ; y++ ) {
+    var rows = this.env95( 'get-int', 'rows' );
+    console.assert( NaN != rows );
+    for( var y = 0 ; rows > y ; y++ ) {
         settings.curY = y;
         this.command95( 'add-row', settings );
     }
@@ -57,7 +44,7 @@ case 'add-row':
     var cmdTable = this.find( 'tbody' );
     var curY = this.find( '.prompt-row' ).length;
     var row = $('<tr class="prompt-row" data-text=""></tr>');
-    for( var x = 0 ; settings.columns > x ; x++ ) {
+    for( var x = 0 ; this.env95( 'get-int', 'columns' ) > x ; x++ ) {
         var td = $('<td class="prompt-char prompt-char-empty">X</td>');
         td.attr( 'data-coord-x-y', x.toString() + ',' + curY.toString() );
         row.append( td );
@@ -77,9 +64,10 @@ case 'putc':
     } else if( '\t' == settings.text ) {
         var curX = this.command95( 'cursor-x' );
 
-        var nearestX = (Math.ceil(curX / settings.tabWidth) * settings.tabWidth);
+        var tabWidth = this.env95( 'get-int', 'tab-width' );
+        var nearestX = (Math.ceil(curX / tabWidth) * tabWidth);
         if( nearestX < curX + 1 ) {
-            nearestX += settings.tabWidth;
+            nearestX += tabWidth;
         }
 
         console.assert( nearestX > curX );
@@ -93,8 +81,11 @@ case 'putc':
             curCell.parent().attr( 'data-text',
                 curCell.parent().attr( 'data-text' ) + settings.text );
         }
+        curCell.removeClass( '.input-caret' );
         settings.curX = curX + 1;
         this.command95( 'cursor-x', settings );
+        curCell = this.command95( 'cursor-cell' );
+        curCell.addClass( '.input-caret' );
     }
     return this;
 
@@ -180,11 +171,15 @@ case 'open':
     settings.w = null;
     settings.h = null;
     var winHandle = null;
-    if( 0 < $('#desktop').length || true == settings.fullScreen ) {
+    if( 0 < $('#desktop').length || true == this.env95( 'get-bool', 'full-screen' ) ) {
         winHandle = this.window95( 'open', settings );
     } else {
         winHandle = $('body');
         winHandle.append( '<form class="window-form"></form>' );
+    }
+
+    for( var key in env ) {
+        winHandle.env95( 'set', key, env[key] );
     }
 
     winHandle.children( '.window-form' ).append( cmdWrapper );
@@ -192,12 +187,12 @@ case 'open':
     winHandle.children( '.window-form' ).attr( 'data-cursor-pos-x', 0 );
     winHandle.children( '.window-form' ).attr( 'data-cursor-pos-y', 0 );
 
-    this.command95( 'reset', settings );
+    winHandle.command95( 'reset', settings );
 
     // Setup/display prompt.
-    if( null != settings.promptText ) {
-        winHandle.children( '.window-form' ).attr( 'prompt-text', settings.promptText );
-        winHandle.command95( 'puts', {'text': settings.promptText, 'addToLine': false} );
+    // TODO: Get rid of this and have handler launch once, probably...
+    if( null != winHandle.env95( 'get', 'prompt-text' ) ) {
+        winHandle.command95( 'puts', {'text': winHandle.env95( 'get', 'prompt-text' ), 'addToLine': false} );
     }
 
     winHandle.click( function() {
@@ -215,11 +210,11 @@ case 'open':
             var lineText = curCell.parent().attr( 'data-text' );
             winHandle.command95( 'newline' );
             if( null != settings.lineHandler ) {
-                window[settings.lineHandler]( settings.lineHandlerData, lineText, winHandle );
+                window[settings.lineHandler]( lineText, env, winHandle );
             }
 
             // Print the prompt.
-            var promptText = winHandle.children( '.window-form' ).attr( 'prompt-text' );
+            var promptText = winHandle.env95( 'get', 'prompt-text' );
             if( null != promptText ) {
                 winHandle.command95( 'puts', {'text': promptText, 'addToLine': false} );
             }
@@ -260,10 +255,6 @@ case 'open':
     winHandle.on( 'activate', function( e ) {
         $(cmdInput).focus();
     } );
-
-    for( var datum in settings.data ) {
-        winHandle.data( datum, settings.data[datum] );
-    }
 
     winHandle.addClass( 'window-command' );
     winHandle.removeClass( 'window-hidden' );

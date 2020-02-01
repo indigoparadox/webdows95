@@ -40,6 +40,32 @@ const desktop95DesktopFolder = 'c:\\windows\\desktop';
 var fs = null;
 var associations = null;
 
+(function( $ ) {
+    $.fn.env95 = function( action, key, value ) {
+    'use strict';
+    
+    switch( action.toLowerCase() ) {
+
+    case 'set':
+        this.attr( 'data-' + key, value );
+        return this;
+        
+    case 'get':
+        if( null != key ) {
+            return this.attr( 'data-' + key );
+        } else {
+            return {}; // XXX
+        }
+
+    case 'get-int':
+        if( null != key ) {
+            return parseInt( this.attr( 'data-' + key ) );
+        } else {
+            return {}; // XXX
+        }
+    
+    }; }; }( jQuery ) );
+
 function _handleContainerDrop( e, d ) {
     'use strict';
 
@@ -100,14 +126,14 @@ function resolvePath( pathString ) {
         }
     }
 
-    if( !('data' in file) ) {
-        file.data = {};
+    if( !('env' in file) ) {
+        file.env = {};
     }
 
-    if( !('working-path' in file.data) && kernel95FolderTypes.includes( file.type ) ) {
-        file.data['working-path'] = pathString;
-    } else if( !('working-path' in file.data) && !kernel95FolderTypes.includes( file.type ) ) {
-        file.data['working-path'] = dirName( pathString );
+    if( !('working-path' in file.env) && kernel95FolderTypes.includes( file.type ) ) {
+        file.env['working-path'] = pathString;
+    } else if( !('working-path' in file.env) && !kernel95FolderTypes.includes( file.type ) ) {
+        file.env['working-path'] = dirName( pathString );
     }
 
     return file;
@@ -226,7 +252,12 @@ function resolveItem( itemPath ) {
     // Package the filename inside of the data.
     itemData.caption = baseName( itemPath );
 
-    // Package the path to the file inside of the data.
+    if( !('data' in itemData) ) {
+        itemData.data = {};
+    }
+
+    // Package the path to the file inside of the data for resolving the icon
+    // later.
     itemData.data['item-path'] = itemPath;
     itemData.data['item-type'] = origType;
 
@@ -234,15 +265,16 @@ function resolveItem( itemPath ) {
         itemData.type = 'generic';
     }
 
+    // Package the working path for running the process the icon points to.
     switch( itemData.type ) {
     case 'folder':
     case 'drive':
-        itemData.args.data = {};
-        itemData.args.data['path'] = itemPath;
+        itemData.env = {};
+        itemData.env['working-path'] = itemPath;
         break;
     case 'computer':
-        itemData.args.data = {};
-        itemData.args.data['path'] = '';
+        itemData.env = {};
+        itemData.env['working-path'] = '';
         break;
     }
 
@@ -256,7 +288,7 @@ function resolveItem( itemPath ) {
 
 function resolveExec( itemPath ) {
     var itemObject = resolveItem( itemPath );
-    execV( itemObject.exec, itemObject.args );
+    execVE( itemObject.exec, itemObject.args, itemObject.env );
 }
 
 function exec( execPath ) {
@@ -276,6 +308,7 @@ function execVE( execPath, args, env ) {
 
     // Add specified args to exec args.
     execObject.args = $.extend( {}, execObject.args, args );
+    execObject.env = $.extend( {}, execObject.env, env );
 
     // Callback to start the executable once its code is loaded.
     var onExec = function() {
@@ -283,7 +316,15 @@ function execVE( execPath, args, env ) {
         console.log( execObject );
 
         var entryPoint = execObject.name.split( '.' )[0] + '95';
-        var winHandle = $('#desktop')[entryPoint]( 'open', execObject.args );
+        var winHandle = $('#desktop')[entryPoint]( 'open', execObject.args, execObject.env );
+
+        // Env is both passed to the entrypoint and set on the window handle
+        // (if one is returned) as a convenience to the called program.
+        if( null != winHandle ) {
+            for( var key in execObject.env ) {
+                winHandle.attr( 'data-' + key, execObject.env[key] );
+            }
+        }
 
         // Exectuable is loaded and started; resolve the promise.
         deferred.resolve();
@@ -335,7 +376,8 @@ function listFolder( path ) {
             itemsList.push( itemData );
         }
         return itemsList;
-    } catch {
+    } catch( e ) {
+        console.warn( e );
         return null;
     }
 }
@@ -345,7 +387,7 @@ function genericBoot() {
 
     // Handle populating icon containers.
     $('body').on( 'desktop-populate', '.container', function( e ) {
-        let listing = listFolder( $(this).attr( 'data-path' ) );
+        let listing = listFolder( $(this).attr( 'data-working-path' ) );
         let nextPos = getNextIconPosition( $(this), true );
 
         // Get rid of existing icons.

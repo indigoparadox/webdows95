@@ -56,10 +56,7 @@
 }
 
 .window-command .input-caret {
-    margin-top: 10px;
-    width: 5px;
-    height: 1px;
-    float: left;
+    border-bottom: 2px solid white;
     animation: caret-blink 1s step-start infinite;
 }
 

@@ -8,6 +8,10 @@
                 "windows": {
                     "type": "folder",
                     "children": {
+                        "edit.js": {
+                            "type": "executable",
+                            "src": "apps/edit.js"
+                        },
                         "explorer.js": {
                             "type": "executable",
                             "src": "apps/explorer.js",
@@ -58,11 +62,15 @@
                             "styleSrc": "apps/command.css",
                             "args": {
                                 "id": null,
-                                "lineHandler": "handlePromptLine",
-                                "data": {
-                                    "folder-path": "c:",
-                                    "folder-parent-path": "c:"
-                                }
+                                "lineHandler": "handlePromptLine"
+                            },
+                            "env": {
+                                "folder-path": "c:",
+                                "prompt-text": "C:\\>",
+                                "columns": 80,
+                                "rows": 20,
+                                "tab-width": 8,
+                                "full-screen": false
                             }
                         },
                         "notepad.js": {

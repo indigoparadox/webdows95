@@ -1,6 +1,6 @@
 
 (function( $ ) {
-$.fn.explorer95 = function( action, options ) {
+$.fn.explorer95 = function( action, options, enviro ) {
     'use strict';
 
 var settings = $.extend( {
@@ -11,11 +11,14 @@ var settings = $.extend( {
     'y': 10,
     'w': 320,
     'h': 260,
-    'data': {},
     'callback': null,
     'cbData': null,
     'menuContainer': '#desktop'
 }, options );
+
+var env = $.extend( {
+    'working-path': ''
+}, enviro );
 
 switch( action.toLowerCase() ) {
 
@@ -105,8 +108,8 @@ case 'open-taskbar':
         this.append( desktop );
         desktop.desktop95( 'enable' );
 
-        for( var key in settings.data ) {
-            desktop.attr( 'data-' + key, settings.data[key] );
+        for( var key in env ) {
+            desktop.attr( 'data-' + key, env[key] );
         }
     }
 
@@ -126,7 +129,7 @@ case 'open-taskbar':
 
     desktop.trigger( 'desktop-populate' );
 
-    return null;
+    return desktop;
 
 case 'open-folder':
 
@@ -153,8 +156,8 @@ case 'open-folder':
     var container = $('<div class="window-folder-container container"></div>');
     winHandle.find( '.window-form' ).append( container );
 
-    for( var key in settings.data ) {
-        container.attr( 'data-' + key, settings.data[key] );
+    for( var key in env ) {
+        container.attr( 'data-' + key, env[key] );
     }
 
     container.desktop95( 'enable' );
@@ -185,9 +188,9 @@ case 'open-folder':
 case 'open':
 
     if( 0 < $('#taskbar').length ) {
-        return $('body').explorer95( 'open-folder', settings );
+        return $('body').explorer95( 'open-folder', settings, env );
     } else {
-        return $('body').explorer95( 'open-taskbar', settings );
+        return $('body').explorer95( 'open-taskbar', settings, env );
     }
 
 }; }; }( jQuery ) );
