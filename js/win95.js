@@ -5,6 +5,8 @@ function handlePromptLine( text, winPrompt ) {
     var workingPath = winPrompt.env95( 'get', 'working-path' );
     var env = winPrompt.env95( 'get' );
 
+    winPrompt.command95( 'newline' );
+
     var cMatch;
     if( null != (cMatch = text.match( /^cd (.*)/i )) ) {
         // CD command
@@ -60,6 +62,9 @@ function handlePromptLine( text, winPrompt ) {
     } else {
         winPrompt.command95( 'puts', {'text': 'Sad command or file name\n'} )
     }
+    
+    // Print the prompt.
+    winPrompt.command95( 'puts', {'text': winPrompt.env95( 'get', 'prompt-text' ), 'addToLine': false} );
 }
 
 function boot() {

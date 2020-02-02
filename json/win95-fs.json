@@ -62,8 +62,7 @@
                             "styleSrc": "apps/command.css",
                             "generateId": true,
                             "args": {
-                                "id": null,
-                                "lineHandler": "handlePromptLine"
+                                "id": null
                             },
                             "env": {
                                 "working-path": "c:\\windows",
@@ -71,7 +70,8 @@
                                 "columns": 80,
                                 "rows": 20,
                                 "tab-width": 8,
-                                "full-screen": false
+                                "full-screen": false,
+                                "line-handler": "handlePromptLine"
                             }
                         },
                         "notepad.js": {

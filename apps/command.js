@@ -38,6 +38,10 @@ case 'reset':
         settings.curY = y;
         this.command95( 'add-row', settings );
     }
+    /* this.children( '.window-form' ).attr( 'data-cursor-pos-x', 0 );
+    this.children( '.window-form' ).attr( 'data-cursor-pos-y', 0 ); */
+    this.command95( 'cursor-x', {'curX': 0, 'curY': 0} );
+    this.command95( 'cursor-y', {'curX': 0, 'curY': 0} );
     return this;
 
 case 'add-row':
@@ -55,9 +59,17 @@ case 'add-row':
 case 'cell-at':
     return this.find( '[data-coord-x-y="' + settings.curX.toString() + ',' + settings.curY.toString() + '"]' );
 
+case 'putc-at':
+    // Note that we do NOT add the char to the line's text attribute.
+    var curCell = this.command95( 'cell-at', settings );
+    curCell.text( settings.text );
+    curCell.removeClass( 'prompt-char-empty' );
+    return this;
+
 case 'putc':
     console.assert( 1 == settings.text.length );
     var curCell = this.command95( 'cursor-cell' );
+    console.log( curCell );
     curCell.removeClass( 'input-caret' );
 
     if( '\n' == settings.text ) {
@@ -71,14 +83,13 @@ case 'putc':
         if( nearestX < curX + 1 ) {
             nearestX += tabWidth;
         }
-
         console.assert( nearestX > curX );
 
         this.command95( 'cursor-x', {'curX': nearestX} );
     } else {
         var curX = this.command95( 'cursor-x' );
-        curCell.text( settings.text );
-        curCell.removeClass( 'prompt-char-empty' );
+        var curY = this.command95( 'cursor-y' );
+        this.command95( 'putc-at', {'curX': curX, 'curY': curY, 'text': settings.text} );
         if( settings.addToLine ) {
             curCell.parent().attr( 'data-text',
                 curCell.parent().attr( 'data-text' ) + settings.text );
@@ -192,17 +203,12 @@ case 'open':
 
     winHandle.children( '.window-form' ).append( cmdWrapper );
     winHandle.children( '.window-form' ).append( cmdInput );
-    winHandle.children( '.window-form' ).attr( 'data-cursor-pos-x', 0 );
-    winHandle.children( '.window-form' ).attr( 'data-cursor-pos-y', 0 );
 
     winHandle.command95( 'reset', settings );
 
     // Setup/display prompt.
-    // TODO: Get rid of this and have handler launch once, probably...
-    if( null != winHandle.env95( 'get', 'prompt-text' ) ) {
-        winHandle.command95( 'puts', {'text': winHandle.env95( 'get', 'prompt-text' ), 'addToLine': false} );
-    }
-
+    winHandle.command95( 'puts', {'text': winHandle.env95( 'get', 'prompt-text' ), 'addToLine': false} );
+    
     winHandle.click( function() {
         $(cmdInput).focus();
     } );
@@ -216,21 +222,22 @@ case 'open':
             // Process line input.
             var curCell = winHandle.command95( 'cursor-cell', settings );
             var lineText = curCell.parent().attr( 'data-text' );
-            winHandle.command95( 'newline' );
-            if( null != settings.lineHandler ) {
-                window[settings.lineHandler]( lineText, winHandle );
-            }
-
-            // Print the prompt.
-            var promptText = winHandle.env95( 'get', 'prompt-text' );
-            if( null != promptText ) {
-                winHandle.command95( 'puts', {'text': promptText, 'addToLine': false} );
+            var handlerName = winHandle.env95( 'get', 'line-handler' );
+            if( handlerName in window ) {
+                window[handlerName]( lineText, winHandle );
             }
 
         } else {
-            var keyIn = String.fromCharCode( e.keyCode );
-            var curX = winHandle.command95( 'cursor-x' );
-            winHandle.command95( 'putc', {'text': keyIn} );
+            var processCharHere = true;
+            var charHandler = winHandle.env95( 'get', 'char-handler' );
+            if( null != charHandler ) {
+                processCharHere = window[charHandler]( lineText, winHandle );
+            } 
+            
+            if( processCharHere ) {
+                var keyIn = String.fromCharCode( e.keyCode );
+                winHandle.command95( 'putc', {'text': keyIn} );
+            }
             $(this).val( '' );
             
         }
@@ -243,7 +250,13 @@ case 'open':
             var curCell = winHandle.command95( 'cursor-cell' );
             var lineText = curCell.parent().attr( 'data-text' );
 
-            if( 0 < lineText.length ) {
+            var processCharHere = true;
+            var charHandler = winHandle.env95( 'get', 'char-handler' );
+            if( null != charHandler ) {
+                processCharHere = window[charHandler]( lineText, winHandle );
+            } 
+            
+            if( processCharHere && 0 < lineText.length ) {
                 curCell.removeClass( 'input-caret' );
 
                 var curX = winHandle.command95( 'cursor-x' ) - 1;

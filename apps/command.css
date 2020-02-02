@@ -78,3 +78,6 @@
     color: black;
 }
 
+.input-prompt .scrollable-pane {
+    padding-right: 20px !important; /* For scrollbar vs table contents. */
+}
