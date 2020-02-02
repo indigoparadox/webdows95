@@ -35,8 +35,6 @@ const desktop95FileException = {
     'FILEEXISTS': 'fileexists',
 };
 
-const desktop95DesktopFolder = 'c:\\windows\\desktop';
-
 var fs = null;
 var associations = null;
 
@@ -383,6 +381,7 @@ function listFolder( path ) {
         }
         return itemsList;
     } catch( e ) {
+        console.warn( 'While listing path: ' + path );
         console.warn( e );
         return null;
     }

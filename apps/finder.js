@@ -1,6 +1,6 @@
 
 (function( $ ) {
-    $.fn.finder95 = function( action, options ) {
+    $.fn.finder95 = function( action, options, enviro ) {
     
     var settings = $.extend( {
         'caption': 'Explorer',
@@ -14,6 +14,10 @@
         'cbData': null,
         'menuContainer': '#desktop',
     }, options );
+
+    var env = $.extend( {
+        'working-path': ''
+    }, enviro );
     
     switch( action.toLowerCase() ) {
     
@@ -174,6 +178,10 @@
     
         var container = $('<div class="window-folder-container container"></div>');
         winHandle.find( '.window-form' ).append( container );
+
+        for( var key in env ) {
+            container.attr( 'data-' + key, env[key] );
+        }
     
         // Mousedown/Mousemove are handled by desktop events.
     
