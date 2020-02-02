@@ -1,9 +1,9 @@
 
-function handlePromptLine( text, env, winPrompt ) {
+function handlePromptLine( text, winPrompt ) {
     'use strict';
 
-    console.log( text );
     var workingPath = winPrompt.env95( 'get', 'working-path' );
+    var env = winPrompt.env95( 'get' );
 
     var cMatch;
     if( null != (cMatch = text.match( /^cd (.*)/i )) ) {
@@ -13,7 +13,7 @@ function handlePromptLine( text, env, winPrompt ) {
             var parentPath = dirName( workingPath );
             if( '' != parentPath ) {
                 winPrompt.env95( 'set', 'working-path', parentPath );
-                winPrompt.env95( 'set', 'prompt-text'. parentPath.toUpperCase() + '>' );
+                winPrompt.env95( 'set', 'prompt-text', parentPath.toUpperCase() + '>' );
             }
         } else if( 
             'children' in folder && cMatch[1] in folder.children
@@ -54,7 +54,9 @@ function handlePromptLine( text, env, winPrompt ) {
         resolvePath( workingPath + '\\' + text ).type == desktop95Types.EXECUTABLE
     ) {
         // TODO: Handle args.
-        exec( workingPath + '\\' + text );
+        // TODO: Use ID for winPrompt.
+        env['window-parent'] = winPrompt;
+        execVE( workingPath + '\\' + text, {}, env );
     } else {
         winPrompt.command95( 'puts', {'text': 'Sad command or file name\n'} )
     }

@@ -45,7 +45,7 @@ case 'add-row':
     var curY = this.find( '.prompt-row' ).length;
     var row = $('<tr class="prompt-row" data-text=""></tr>');
     for( var x = 0 ; this.env95( 'get-int', 'columns' ) > x ; x++ ) {
-        var td = $('<td class="prompt-char prompt-char-empty">X</td>');
+        var td = $('<td class="prompt-char prompt-char-empty">&nbsp;</td>');
         td.attr( 'data-coord-x-y', x.toString() + ',' + curY.toString() );
         row.append( td );
     }
@@ -58,10 +58,12 @@ case 'cell-at':
 case 'putc':
     console.assert( 1 == settings.text.length );
     var curCell = this.command95( 'cursor-cell' );
+    curCell.removeClass( 'input-caret' );
 
     if( '\n' == settings.text ) {
         this.command95( 'newline' );
     } else if( '\t' == settings.text ) {
+
         var curX = this.command95( 'cursor-x' );
 
         var tabWidth = this.env95( 'get-int', 'tab-width' );
@@ -81,12 +83,13 @@ case 'putc':
             curCell.parent().attr( 'data-text',
                 curCell.parent().attr( 'data-text' ) + settings.text );
         }
-        curCell.removeClass( '.input-caret' );
         settings.curX = curX + 1;
         this.command95( 'cursor-x', settings );
-        curCell = this.command95( 'cursor-cell' );
-        curCell.addClass( '.input-caret' );
     }
+
+    curCell = this.command95( 'cursor-cell' );
+    curCell.addClass( 'input-caret' );
+
     return this;
 
 case 'puts':
@@ -121,6 +124,8 @@ case 'newline':
         cmd.scrollTop( cmd[0].scrollHeight );
     } );
     */
+    var curCell = this.command95( 'cursor-cell' );
+    curCell.removeClass( 'input-caret' );
 
     var curY = this.command95( 'cursor-y' ) + 1;
 
@@ -132,6 +137,9 @@ case 'newline':
     settings.curY = curY;
     this.command95( 'cursor-x', settings );
     this.command95( 'cursor-y', settings );
+
+    var curCell = this.command95( 'cursor-cell' );
+    curCell.addClass( 'input-caret' );
 
     this.find( 'tbody' ).scrollTop( this.find( 'tbody' )[0].scrollHeight );
 
@@ -210,7 +218,7 @@ case 'open':
             var lineText = curCell.parent().attr( 'data-text' );
             winHandle.command95( 'newline' );
             if( null != settings.lineHandler ) {
-                window[settings.lineHandler]( lineText, env, winHandle );
+                window[settings.lineHandler]( lineText, winHandle );
             }
 
             // Print the prompt.
@@ -236,13 +244,17 @@ case 'open':
             var lineText = curCell.parent().attr( 'data-text' );
 
             if( 0 < lineText.length ) {
+                curCell.removeClass( 'input-caret' );
+
                 var curX = winHandle.command95( 'cursor-x' ) - 1;
                 var curY = winHandle.command95( 'cursor-y' );
                 curCell = winHandle.command95( 'cell-at', {'curX': curX, 'curY': curY} );
 
                 // Mark the current cell empty.
-                curCell.text( 'X' );
+                curCell.html( '&nbsp;' );
                 curCell.addClass( 'prompt-char-empty' );
+
+                curCell.addClass( 'input-caret' );
 
                 winHandle.command95( 'cursor-x', {'curX': curX} );
                     

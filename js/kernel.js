@@ -54,7 +54,13 @@ var associations = null;
         if( null != key ) {
             return this.attr( 'data-' + key );
         } else {
-            return {}; // XXX
+            var out = {};
+            $.each( this[0].attributes, function() {
+                if( this.name.startsWith( 'data-' ) ) {
+                    out[this.name] = this.value;
+                }
+            } );
+            return out;
         }
 
     case 'get-int':

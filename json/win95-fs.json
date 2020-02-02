@@ -60,13 +60,14 @@
                             "type": "executable",
                             "src": "apps/command.js",
                             "styleSrc": "apps/command.css",
+                            "generateId": true,
                             "args": {
                                 "id": null,
                                 "lineHandler": "handlePromptLine"
                             },
                             "env": {
-                                "folder-path": "c:",
-                                "prompt-text": "C:\\>",
+                                "working-path": "c:\\windows",
+                                "prompt-text": "C:\\WINDOWS>",
                                 "columns": 80,
                                 "rows": 20,
                                 "tab-width": 8,
