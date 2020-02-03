@@ -17,6 +17,7 @@ var settings = $.extend( {
     'curX': null,
     'curY': null,
     'addToLine': true,
+    'scrollbackEnabled': false,
 }, options );
 
 switch( action.toLowerCase() ) {
@@ -69,7 +70,6 @@ case 'putc-at':
 case 'putc':
     console.assert( 1 == settings.text.length );
     var curCell = this.command95( 'cursor-cell' );
-    console.log( curCell );
     curCell.removeClass( 'input-caret' );
 
     if( '\n' == settings.text ) {
@@ -124,26 +124,49 @@ case 'printf':
     return this;
 
 case 'newline':
-    /*
-    return this.each( function( idx, winHandle ) {
-        // Put the old line in the backbuffer.
-        var line = $('<span class="input-line">' + settings.text + '</span>');
-        var cmd = $(winHandle).children( '.window-form' );
-        cmd = cmd.children( '.input-prompt' );
-        cmd.children( '.backbuffer' ).append( line );
-        cmd.children( '.backbuffer' ).append( '<br />' );
-        cmd.scrollTop( cmd[0].scrollHeight );
-    } );
-    */
+    // Remove the caret from the current cell.
     var curCell = this.command95( 'cursor-cell' );
     curCell.removeClass( 'input-caret' );
 
-    var curY = this.command95( 'cursor-y' ) + 1;
+    var curY = this.command95( 'cursor-y' );
 
-    if( this.find( '.prompt-row' ).length <= curY ) {
+    if( 
+        this.hasClass( 'window-scroll-contents' ) &&
+        this.find( '.prompt-row' ).length <= curY
+    ) {
+        // Add a new row and scroll down to it.
+        curY += 1;
         this.command95( 'add-row', settings );
+        this.find( 'tbody' ).scrollTop( this.find( 'tbody' )[0].scrollHeight );
+
+    } else if( this.find( '.prompt-row' ).length <= curY ) {
+        // Move all of the previous rows up.
+
+        var columns = this.find( '.prompt-row' ).first().children( '.prompt-char' ).length;
+        var rows = this.find( '.prompt-row' ).length;
+        var winHandle = this;
+        $(this.find( '.prompt-row' ).get().reverse()).each( function() {
+            var iterY = parseInt( $(this).children( 'td' ).first().attr( 'data-coord-x-y' ).split( ',' )[1] );
+
+            // Nothing below the bottom row.
+            if( rows - 1 == iterY ) {
+                return;
+            }
+
+            for( var x = 0 ; columns > x ; x++ ) {
+                var cellBelow = winHandle.command95( 'cell-at', {'curX': x, 'curY': iterY + 1 } );
+                var cellIter = winHandle.command95( 'cell-at', {'curX': x, 'curY': iterY } );
+
+                cellIter.text( cellBelow.text() );
+                cellIter.attr( 'class', cellBelow.attr( 'class' ) );
+            }
+
+        } );
+    } else {
+        curY += 1;
     }
 
+    // Enact the new cursor coordinates decided above.
     settings.curX = 0;
     settings.curY = curY;
     this.command95( 'cursor-x', settings );
@@ -151,8 +174,6 @@ case 'newline':
 
     var curCell = this.command95( 'cursor-cell' );
     curCell.addClass( 'input-caret' );
-
-    this.find( 'tbody' ).scrollTop( this.find( 'tbody' )[0].scrollHeight );
 
     return this;
 
@@ -290,7 +311,10 @@ case 'open':
     var cHeight = cmd.height();
     cmd.css( 'width', cWidth.toString() + 'px' );
     cmd.css( 'height', cHeight.toString() + 'px' );
-    winHandle.control95( 'scrollable', 'create', {'pane': cmd})
+
+    if( settings.scrollbackEnabled ) {
+        winHandle.control95( 'scrollable', 'create', {'pane': cmd})
+    }
 
     return winHandle;
 }; }; }( jQuery ) );

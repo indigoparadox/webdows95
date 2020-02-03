@@ -5,10 +5,14 @@ function handlePromptLine( text, winPrompt ) {
     var workingPath = winPrompt.env95( 'get', 'working-path' );
     var env = winPrompt.env95( 'get' );
 
+    var cMatch;
+
     winPrompt.command95( 'newline' );
 
-    var cMatch;
-    if( null != (cMatch = text.match( /^cd (.*)/i )) ) {
+    if( '' == text ) {
+        // Do nothing.
+            
+    } else if( null != (cMatch = text.match( /^cd (.*)/i )) ) {
         // CD command
         let folder = resolvePath( workingPath );
         if( '..' == cMatch[1] ) {
