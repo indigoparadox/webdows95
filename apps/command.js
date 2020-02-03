@@ -49,16 +49,18 @@ case 'add-row':
     var cmdTable = this.find( 'tbody' );
     var curY = this.find( '.prompt-row' ).length;
     var row = $('<tr class="prompt-row" data-text=""></tr>');
+    row.attr( 'data-coord-y', curY.toString() );
     for( var x = 0 ; this.env95( 'get-int', 'columns' ) > x ; x++ ) {
         var td = $('<td class="prompt-char prompt-char-empty">&nbsp;</td>');
-        td.attr( 'data-coord-x-y', x.toString() + ',' + curY.toString() );
+        td.attr( 'data-coord-x', x.toString() );
         row.append( td );
     }
     cmdTable.append( row );
     return this;
 
 case 'cell-at':
-    return this.find( '[data-coord-x-y="' + settings.curX.toString() + ',' + settings.curY.toString() + '"]' );
+    return this.find( '[data-coord-y="' + settings.curY.toString() + '"] > ' +
+        '[data-coord-x="'+ settings.curX.toString() + '"]' );
 
 case 'putc-at':
     // Note that we do NOT add the char to the line's text attribute.
@@ -130,38 +132,22 @@ case 'newline':
 
     var curY = this.command95( 'cursor-y' );
 
-    if( 
-        this.hasClass( 'window-scroll-contents' ) &&
-        this.find( '.prompt-row' ).length <= curY
-    ) {
+    if( this.find( '.prompt-row' ).length - 1 <= curY ) {
         // Add a new row and scroll down to it.
-        curY += 1;
         this.command95( 'add-row', settings );
         this.find( 'tbody' ).scrollTop( this.find( 'tbody' )[0].scrollHeight );
 
-    } else if( this.find( '.prompt-row' ).length <= curY ) {
-        // Move all of the previous rows up.
+        if( !this.hasClass( 'window-scroll-contents' ) ) {
+            // Roll the top rows out of the table and renumber remaining rows.
+            this.find( '.prompt-row' ).first().remove();
+            this.find( '.prompt-row' ).each( function() {
+                var iterY = parseInt( $(this).attr( 'data-coord-y' ) ) - 1;
+                $(this).attr( 'data-coord-y', iterY.toString() )
+            } );
 
-        var columns = this.find( '.prompt-row' ).first().children( '.prompt-char' ).length;
-        var rows = this.find( '.prompt-row' ).length;
-        var winHandle = this;
-        $(this.find( '.prompt-row' ).get().reverse()).each( function() {
-            var iterY = parseInt( $(this).children( 'td' ).first().attr( 'data-coord-x-y' ).split( ',' )[1] );
-
-            // Nothing below the bottom row.
-            if( rows - 1 == iterY ) {
-                return;
-            }
-
-            for( var x = 0 ; columns > x ; x++ ) {
-                var cellBelow = winHandle.command95( 'cell-at', {'curX': x, 'curY': iterY + 1 } );
-                var cellIter = winHandle.command95( 'cell-at', {'curX': x, 'curY': iterY } );
-
-                cellIter.text( cellBelow.text() );
-                cellIter.attr( 'class', cellBelow.attr( 'class' ) );
-            }
-
-        } );
+        } else {
+            curY += 1;
+        }
     } else {
         curY += 1;
     }
@@ -313,7 +299,7 @@ case 'open':
     cmd.css( 'height', cHeight.toString() + 'px' );
 
     if( settings.scrollbackEnabled ) {
-        winHandle.control95( 'scrollable', 'create', {'pane': cmd})
+        winHandle.control95( 'scrollable', 'create', {'pane': cmd});
     }
 
     return winHandle;
