@@ -81,3 +81,13 @@
 .input-prompt .scrollable-pane {
     padding-right: 20px !important; /* For scrollbar vs table contents. */
 }
+
+body.window-command .window-form {
+    top: 0;
+    left: 0;
+    margin: 0;
+}
+
+body.window-command tbody {
+    border: none;
+}

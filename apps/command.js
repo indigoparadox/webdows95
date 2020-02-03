@@ -3,6 +3,9 @@
 $.fn.command95 = function( action, options, env ) {
 'use strict';
 
+const CHAR_WIDTH = 8;
+const CHAR_HEIGHT = 14;
+
 var settings = $.extend( {
     'caption': 'Prompt',
     'id': null,
@@ -18,6 +21,10 @@ var settings = $.extend( {
     'curY': null,
     'addToLine': true,
     'scrollbackEnabled': false,
+    'fullScreen': false,
+    'columns': 80,
+    'rows': 20,
+    'allowHTML': false,
 }, options );
 
 switch( action.toLowerCase() ) {
@@ -26,9 +33,33 @@ case 'getwidth':
 
     return this.width();
 
-case 'drawpx':
+case 'draw-box':
+    var rows = settings.h;
+    var columns = settings.w;
+    var left = settings.x;
+    var top = settings.y;
+    var right = columns + left - 1
+    var bottom = rows + top - 1;
 
-    return;
+    for( var y = top ; top + rows > y ; y++ ) {
+        for( var x = left ; left + columns > x ; x++ ) {
+            if( top == y && left == x ) {
+                this.command95( 'putc-at', {'curX': x, 'curY': y, 'text': '&#x2554;', 'allowHTML': true} );
+            } else if( top == y && right == x ) {
+                this.command95( 'putc-at', {'curX': x, 'curY': y, 'text': '&#x2557;', 'allowHTML': true} );
+            } else if( bottom == y && right == x ) {
+                this.command95( 'putc-at', {'curX': x, 'curY': y, 'text': '&#x255d;', 'allowHTML': true} );
+            } else if( bottom == y && left == x ) {
+                this.command95( 'putc-at', {'curX': x, 'curY': y, 'text': '&#x255a;', 'allowHTML': true} );
+            } else if( top == y || bottom == y ) {
+                this.command95( 'putc-at', {'curX': x, 'curY': y, 'text': '&#x2550;', 'allowHTML': true} );
+            } else if( left == x || right == x ) {
+                this.command95( 'putc-at', {'curX': x, 'curY': y, 'text': '&#x2551;', 'allowHTML': true} );
+            }
+        }
+    }
+
+    return this;
 
 case 'reset':
     var cmdTable = this.find( 'tbody' );
@@ -36,8 +67,8 @@ case 'reset':
     var rows = this.env95( 'get-int', 'rows' );
     console.assert( NaN != rows );
     for( var y = 0 ; rows > y ; y++ ) {
-        settings.curY = y;
-        this.command95( 'add-row', settings );
+        //settings.curY = y;
+        this.command95( 'add-row' );
     }
     /* this.children( '.window-form' ).attr( 'data-cursor-pos-x', 0 );
     this.children( '.window-form' ).attr( 'data-cursor-pos-y', 0 ); */
@@ -50,7 +81,8 @@ case 'add-row':
     var curY = this.find( '.prompt-row' ).length;
     var row = $('<tr class="prompt-row" data-text=""></tr>');
     row.attr( 'data-coord-y', curY.toString() );
-    for( var x = 0 ; this.env95( 'get-int', 'columns' ) > x ; x++ ) {
+    var columns = this.env95( 'get-int', 'columns' );
+    for( var x = 0 ; columns > x ; x++ ) {
         var td = $('<td class="prompt-char prompt-char-empty">&nbsp;</td>');
         td.attr( 'data-coord-x', x.toString() );
         row.append( td );
@@ -65,7 +97,11 @@ case 'cell-at':
 case 'putc-at':
     // Note that we do NOT add the char to the line's text attribute.
     var curCell = this.command95( 'cell-at', settings );
-    curCell.text( settings.text );
+    if( settings.allowHTML ) {
+        curCell.html( settings.text );
+    } else {
+        curCell.text( settings.text );
+    }
     curCell.removeClass( 'prompt-char-empty' );
     return this;
 
@@ -91,7 +127,7 @@ case 'putc':
     } else {
         var curX = this.command95( 'cursor-x' );
         var curY = this.command95( 'cursor-y' );
-        this.command95( 'putc-at', {'curX': curX, 'curY': curY, 'text': settings.text} );
+        this.command95( 'putc-at', {'curX': curX, 'curY': curY, 'text': settings.text, 'allowHTML': settings.allowHTML} );
         if( settings.addToLine ) {
             curCell.parent().attr( 'data-text',
                 curCell.parent().attr( 'data-text' ) + settings.text );
@@ -163,6 +199,17 @@ case 'newline':
 
     return this;
 
+case 'resize':
+    var newCols = Math.floor( this.outerWidth() / CHAR_WIDTH ) - 2;
+    var newRows = Math.floor( this.outerHeight() / CHAR_HEIGHT ) - 2;
+
+    this.env95( 'set', 'columns', newCols.toString() );
+    this.env95( 'set', 'rows', newRows.toString() );
+
+    this.command95( 'reset', settings );
+
+    return this;
+
 case 'cursor-x':
     if( null === settings.curX ) {
         return parseInt( this.children( '.window-form' ).attr( 'data-cursor-pos-x' ) );
@@ -196,10 +243,16 @@ case 'open':
     settings.resizable = false;
     settings.w = null;
     settings.h = null;
+
+    if( 0 >= $('#desktop').length ) {
+        settings.fullScreen = true;
+    }
+
     var winHandle = null;
-    if( 0 < $('#desktop').length || true == this.env95( 'get-bool', 'full-screen' ) ) {
+    if(!settings.fullScreen ) {
         winHandle = this.window95( 'open', settings );
     } else {
+        settings.scrollbackEnabled = false;
         winHandle = $('body');
         winHandle.append( '<form class="window-form"></form>' );
     }
@@ -210,6 +263,13 @@ case 'open':
 
     winHandle.children( '.window-form' ).append( cmdWrapper );
     winHandle.children( '.window-form' ).append( cmdInput );
+
+    if( settings.fullScreen ) {
+        winHandle.command95( 'resize' );
+    } else {
+        winHandle.env95( 'set', 'columns', settings.columns );
+        winHandle.env95( 'set', 'rows', settings.rows );
+    }
 
     winHandle.command95( 'reset', settings );
 

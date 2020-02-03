@@ -67,10 +67,7 @@
                             "env": {
                                 "working-path": "c:\\windows",
                                 "prompt-text": "C:\\WINDOWS>",
-                                "columns": 80,
-                                "rows": 20,
                                 "tab-width": 8,
-                                "full-screen": false,
                                 "line-handler": "handlePromptLine"
                             }
                         },
