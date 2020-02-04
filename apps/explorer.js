@@ -13,7 +13,7 @@ var settings = $.extend( {
     'h': 260,
     'callback': null,
     'cbData': null,
-    'menuContainer': '#desktop'
+    'menuContainer': '#desktop',
 }, options );
 
 var env = $.extend( {
@@ -111,7 +111,7 @@ case 'browse-save':
 
     winHandle.addClass( 'window-browse' );
 
-    var wrapper = $('<div class="container-wrapper"></div>');
+    var wrapper = $('<div class="container-wrapper browse-container-wrapper"></div>');
 
     var container = $('<div class="window-folder-container browse-container container"></div>');
     wrapper.append( container );
