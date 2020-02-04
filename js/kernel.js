@@ -238,7 +238,7 @@ function resolveContentsO( fileObject, callback ) {
     return deferred.promise();
 }
 
-function resolveItem( itemPath, iconElement ) {
+function resolveItem( itemPath ) {
     'use strict';
 
     var itemData = resolvePath( itemPath );
@@ -252,14 +252,6 @@ function resolveItem( itemPath, iconElement ) {
 
     if( !('args' in itemData) ) {
         itemData.args = {};
-    }
-
-    console.assert( null != iconElement );
-    console.trace();
-    
-    if( null != iconElement && 0 < iconElement.parent( '.container' ).length ) {
-        var iconEnv = iconElement.parent( '.container' ).env95( 'get' );
-        itemData.env = $.extend( itemData.env, iconEnv );
     }
 
     // Package the filename inside of the data.
@@ -444,6 +436,8 @@ function genericBoot() {
 }
 
 $(document).ready( function() {
+    'use strict';
+
     console.log( 'Loading associations...' );
     $.get( 'json/' + platform_name + '-assoc.json', function( data ) {
 
@@ -456,17 +450,21 @@ $(document).ready( function() {
             fs = JSON.parse( localStorage.getItem( 'fs-' + platform_name ) );
         }
         //fs = null;
-        if( null == fs ) {
+        if( null == fs && null != platform_name ) {
             $.get( 'json/' + platform_name + '-fs.json', ( data ) => {
                 fs = data;
                 console.log( 'Filesystem retrieved, booting...' );
                 genericBoot();
-                boot();
+                if( 'boot' in window ) {
+                    boot();
+                }
             } );
         } else {
             console.log( 'Booting...' );
             genericBoot();
-            boot();
+            if( 'boot' in window ) {
+                boot();
+            }
         }
     } );
 } );
