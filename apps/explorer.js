@@ -100,6 +100,46 @@ case 'show-menu':
     menu.show();
     break;
 
+case 'browse-save':
+    settings.w = 420;
+    settings.h = 260;
+    settings.show = false;
+    settings.resizable = false;
+    settings.icon = 'folder';
+
+    var winHandle = $('#desktop').window95( 'open', settings );
+
+    winHandle.addClass( 'window-browse' );
+
+    var wrapper = $('<div class="container-wrapper"></div>');
+
+    var container = $('<div class="window-folder-container browse-container container"></div>');
+    wrapper.append( container );
+    winHandle.find( '.window-form' ).append( wrapper );
+
+    for( var key in env ) {
+        container.attr( 'data-' + key, env[key] );
+    }
+
+    container.desktop95( 'enable' );
+
+    winHandle.addClass( 'window-scroll-contents' );
+
+    console.assert( 1 == winHandle.length );
+    console.assert( winHandle.hasClass( 'window-hidden' ) );
+
+    /* if( null != settings.target ) {
+        winHandle.addClass( 'explore-' + _htmlStrToClass( settings.target ) );
+    } */
+
+    winHandle.removeClass( 'window-hidden' );
+
+    container.trigger( 'desktop-populate' );
+
+    console.assert( 1 == winHandle.length );
+
+    return winHandle;
+
 case 'open-taskbar':
 
     var desktop = null;
@@ -153,8 +193,11 @@ case 'open-folder':
 
     winHandle.control95( 'statusbar' );
 
+    var wrapper = $('<div class="container-wrapper"></div>');
+
     var container = $('<div class="window-folder-container container"></div>');
-    winHandle.find( '.window-form' ).append( container );
+    wrapper.append( container );
+    winHandle.find( '.window-form' ).append( wrapper );
 
     for( var key in env ) {
         container.attr( 'data-' + key, env[key] );

@@ -12,7 +12,8 @@ var settings = $.extend( {
     'w': 480,
     'h': 260,
     'url': null,
-    'contents': null
+    'contents': null,
+    'path': null,
 }, options );
 
 switch( action.toLowerCase() ) {
@@ -28,6 +29,14 @@ case 'readcontents':
         $(winHandle).find( '.input-textarea' ).text( settings.contents );
     } );
 
+case 'save-as':
+
+    return this;
+
+case 'save-contents':
+    this.trigger( 'save-document', settings.path, this.find( '.input-textarea' ).text() );
+    return this;
+
 case 'open':
 
     settings.menu = null;
@@ -42,9 +51,15 @@ case 'open':
         'container': winHandle,
         'items': [
             {'caption': 'File', 'type': menu95Type.SUBMENU, 'items': [
-                {'caption': 'New Window', 'callback': function( m ) {
-                    settings.id = settings.id + 'n';
-                    this.notepad95( 'open', settings );
+                {'caption': 'New', 'callback': function( m ) {
+                }},
+                {'caption': 'Open...', 'callback': function( m ) {
+                }},
+                {'caption': 'Save', 'callback': function( m ) {
+                    winHandle.notepad95( 'save-document', {'path': winHandle.attr( 'document-path')} );
+                }},
+                {'caption': 'Save As...', 'callback': function( m ) {
+                    winHandle.explorer95( 'browse-save' );
                 }},
                 {'type': menu95Type.DIVIDER},
                 {'group': true, 'id': 'browser-recent'},

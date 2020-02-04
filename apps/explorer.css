@@ -41,3 +41,34 @@
     height: 25px;
     transform: rotate( 270deg );
 }
+
+.window-folder-container .statusbar .tray-objects {
+    flex-grow: 2;
+}
+
+.window-folder-container .statusbar .tray-bytes {
+    flex-grow: 1;
+}
+
+.container-wrapper {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    bottom: 2px;
+    left: 2px;
+}
+
+.window-folder-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: scroll;
+}
+
+.browse-container {
+    margin: 5px auto;
+    width: 400px;
+    height: 140px;
+}
