@@ -67,9 +67,59 @@
     overflow: scroll;
 }
 
+.browse-folder-select {
+}
+
 .browse-container-wrapper {
-    position: relative;
-    margin: 5px auto;
+    top: 30px;
+    left: 10px;
+    right: 10px;
     width: 400px;
     height: 140px;
+}
+
+.browse-path-row,
+.browse-type-row,
+.browse-filename-row {
+    position: absolute;
+    font-size: 12px;
+}
+
+.browse-path-row label,
+.browse-type-row label,
+.browse-filename-row label{
+    display: inline-block;
+    margin-left: 15px;
+    width: 80px;
+}
+
+.browse-folder-select-wrapper ,
+.browse-select-type-wrapper ,
+.browse-filename-row input{
+    display: inline-block;
+    width: 215px;
+}
+
+.browse-path-row button,
+.browse-type-row button,
+.browse-filename-row button{
+    display: inline-block;
+    margin-left: 10px;
+    width: 75px;
+}
+
+.browse-path-row {
+    top: 5px;
+}
+
+.browse-filename-row {
+    top: 180px;
+}
+
+.browse-filename-row input {
+    width: 210px;
+}
+
+.browse-type-row {
+    top: 205px;
 }

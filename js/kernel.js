@@ -51,11 +51,12 @@ var associations = null;
     case 'get':
         if( null != key ) {
             return this.attr( 'data-' + key );
-        } else {
+        } else if( 0 < this.length ) {
             var out = {};
             $.each( this[0].attributes, function() {
                 if( this.name.startsWith( 'data-' ) ) {
-                    out[this.name] = this.value;
+                    // Start from after the data- portion.
+                    out[this.name.substr( 5 )] = this.value;
                 }
             } );
             return out;
@@ -237,7 +238,7 @@ function resolveContentsO( fileObject, callback ) {
     return deferred.promise();
 }
 
-function resolveItem( itemPath ) {
+function resolveItem( itemPath, iconElement ) {
     'use strict';
 
     var itemData = resolvePath( itemPath );
@@ -252,7 +253,15 @@ function resolveItem( itemPath ) {
     if( !('args' in itemData) ) {
         itemData.args = {};
     }
+
+    console.assert( null != iconElement );
+    console.trace();
     
+    if( null != iconElement && 0 < iconElement.parent( '.container' ).length ) {
+        var iconEnv = iconElement.parent( '.container' ).env95( 'get' );
+        itemData.env = $.extend( itemData.env, iconEnv );
+    }
+
     // Package the filename inside of the data.
     itemData.caption = baseName( itemPath );
 
@@ -290,8 +299,8 @@ function resolveItem( itemPath ) {
     return itemData;
 }
 
-function resolveExec( itemPath ) {
-    var itemObject = resolveItem( itemPath );
+function resolveExec( itemPath, iconElement ) {
+    var itemObject = resolveItem( itemPath, iconElement );
     execVE( itemObject.exec, itemObject.args, itemObject.env );
 }
 
@@ -305,6 +314,10 @@ function execV( execPath, args ) {
 
 function execVE( execPath, args, env ) {
     'use strict';
+
+    console.log( 'Exec env:' );
+    console.log( env );
+    console.trace();
 
     var deferred = new $.Deferred();
 
@@ -391,25 +404,34 @@ function genericBoot() {
     'use strict';
 
     // Handle populating icon containers.
-    $('body').on( 'desktop-populate', '.container', function( e ) {
+    $('body').on( 'desktop-populate', '.container', function( e, options ) {
         let listing = listFolder( $(this).attr( 'data-working-path' ) );
         let nextPos = getNextIconPosition( $(this), true );
+        var settings = $.extend( {
+            'iconSize': 32,
+            'iconTextPosition': 'bottom',
+            'targetWindow': 'new'
+        }, options );
 
         // Get rid of existing icons.
         $(this).children( '.desktop-icon' ).remove();
 
-        console.log( listing );
+        $(this).env95( 'set', 'icon-target-window', settings.targetWindow );
 
         for( var idx in listing ) {
+            // Pass the settings as part of the icon constructor object to make
+            // sure it's the right size/layout on populate.
+            var itemIter = $.extend( {}, listing[idx], settings );
+
             // Setup the icon position if none is set.
-            if( !('x' in listing[idx] ) && !('y' in listing[idx]) ) {
-                listing[idx].x = nextPos[0];
-                listing[idx].y = nextPos[1];
+            if( !('x' in itemIter ) && !('y' in itemIter) ) {
+                itemIter.x = nextPos[0];
+                itemIter.y = nextPos[1];
                 nextPos = getNextIconPosition( $(this), false );
             }
 
-            // Creat the icon and append it.
-            var iconElement = $(this).desktop95( 'icon', listing[idx] );
+            // Create the icon and append it.
+            var iconElement = $(this).desktop95( 'icon', itemIter );
             $(this).append( iconElement );
         }
         e.stopPropagation();
@@ -417,8 +439,10 @@ function genericBoot() {
 
     // Handle icon double-clicks/openings.
     $('body').on( 'desktop-run-icon', '.desktop-icon', function( e ) {
-        var iconTarget = $(e.target).closest( '.desktop-icon' ).attr( 'data-item-path' );
-        resolveExec( iconTarget );
+        var icon = $(e.target).closest( '.desktop-icon' );
+        var iconTargetPath = icon.attr( 'data-item-path' );
+        console.assert( 1 == icon.length );
+        resolveExec( iconTargetPath, icon );
     } );
 
 }

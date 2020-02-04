@@ -14,6 +14,7 @@ var settings = $.extend( {
     'callback': null,
     'cbData': null,
     'menuContainer': '#desktop',
+    'targetWindow': 'new',
 }, options );
 
 var env = $.extend( {
@@ -105,17 +106,50 @@ case 'browse-save':
     settings.h = 260;
     settings.show = false;
     settings.resizable = false;
-    settings.icon = 'folder';
+    settings.icon = null;
 
     var winHandle = $('#desktop').window95( 'open', settings );
 
     winHandle.addClass( 'window-browse' );
 
-    var wrapper = $('<div class="container-wrapper browse-container-wrapper"></div>');
+    var pathRow = $('<div class="browse-path-row"><label>Save in:</label></div>');
+    var folderSelect = $('<select class="browse-folder-select input-select"></select>');
+    var folderWrapper = $('<div class="select-wrapper browse-folder-select-wrapper"></div>');
+    folderWrapper.append( folderSelect );
+    pathRow.append( folderWrapper );
 
+    winHandle.find( '.window-form' ).append( pathRow );
+
+    var wrapper = $('<div class="container-wrapper browse-container-wrapper"></div>');
     var container = $('<div class="window-folder-container browse-container container"></div>');
     wrapper.append( container );
     winHandle.find( '.window-form' ).append( wrapper );
+
+    var inputPath = $('<input type="text" class="browse-path input-text" name="browse-path" />');
+    var saveButton = $('<button class="browse-button-save">Save</button>');
+
+    saveButton.on( 'click', function( e ) {
+        e.preventDefault();
+    } );
+    
+    var filenameRow = $('<div class="browse-filename-row"><label>File name:</label></div>');
+    filenameRow.append( inputPath );
+    filenameRow.append( saveButton );
+    winHandle.find( '.window-form' ).append( filenameRow );
+
+    var typeSelect = $('<select class="browse-select-type input-select" name="browse-select-type"></select>');
+    var cancelButton = $('<button class="browse-button-cancel">Cancel</button>');
+
+    cancelButton.on( 'click', function( e ) {
+        e.preventDefault();
+    } );
+    
+    var typeRow = $('<div class="browse-type-row"><label>Save as type:</label></div>');
+    var typeWrapper = $('<div class="select-wrapper browse-select-type-wrapper"></div>');
+    typeWrapper.append( typeSelect );
+    typeRow.append( typeWrapper );
+    typeRow.append( cancelButton );
+    winHandle.find( '.window-form' ).append( typeRow );
 
     for( var key in env ) {
         container.attr( 'data-' + key, env[key] );
@@ -134,7 +168,7 @@ case 'browse-save':
 
     winHandle.removeClass( 'window-hidden' );
 
-    container.trigger( 'desktop-populate' );
+    container.trigger( 'desktop-populate', {'iconSize': 16, 'iconTextPosition': 'right', 'targetWindow': 'same'} );
 
     console.assert( 1 == winHandle.length );
 
