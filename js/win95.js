@@ -298,7 +298,8 @@ function boot() {
                     'icon': iter.icon,
                     'callback': function() {
                         let itemPath = menuPath + '\\' + iter.caption;
-                        resolveExec( itemPath );
+                        var itemObject = resolveItem( itemPath );
+                        execVE( itemObject.exec, itemObject.args, itemObject.env );
                     }
                 } );
             }

@@ -299,11 +299,6 @@ function resolveItem( itemPath, iconElement ) {
     return itemData;
 }
 
-function resolveExec( itemPath, iconElement ) {
-    var itemObject = resolveItem( itemPath, iconElement );
-    execVE( itemObject.exec, itemObject.args, itemObject.env );
-}
-
 function exec( execPath ) {
     return execV( execPath, {} );
 }
@@ -442,7 +437,8 @@ function genericBoot() {
         var icon = $(e.target).closest( '.desktop-icon' );
         var iconTargetPath = icon.attr( 'data-item-path' );
         console.assert( 1 == icon.length );
-        resolveExec( iconTargetPath, icon );
+        var itemObject = resolveItem( iconTargetPath );
+        execVE( itemObject.exec, itemObject.args, itemObject.env );
     } );
 
 }
