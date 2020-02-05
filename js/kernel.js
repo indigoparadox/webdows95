@@ -39,6 +39,8 @@ var fs = null;
 var associations = null;
 
 (function( $ ) {
+$('head').append( '<script type="text/javascript" src="js/filesystem.js"></script>' );
+
 $.fn.env95 = function( action, key, value ) {
 'use strict';
 
@@ -446,13 +448,14 @@ $(document).ready( function() {
         
         //localStorage.setItem( 'fs', JSON.stringify( skel ) );
         //localStorage.setItem( 'fs-' + platform_name, null );
-        if( null != localStorage.getItem( 'fs-' + platform_name ) ) {
+        /* if( null != localStorage.getItem( 'fs-' + platform_name ) ) {
             fs = JSON.parse( localStorage.getItem( 'fs-' + platform_name ) );
-        }
+        } */
         //fs = null;
         if( null == fs && null != platform_name ) {
             $.get( 'json/' + platform_name + '-fs.json', ( data ) => {
-                fs = data;
+                fs = new Filesystem95( data );
+                console.log( fs );
                 console.log( 'Filesystem retrieved, booting...' );
                 genericBoot();
                 if( 'boot' in window ) {
