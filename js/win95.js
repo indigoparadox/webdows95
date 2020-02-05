@@ -46,7 +46,7 @@ function handlePromptLine( text, winPrompt ) {
                 continue;
             }
 
-            if( desktop95Types.FOLDER == filedata.type ) {
+            if( File95Types.FOLDER == filedata.type ) {
                 winPrompt.command95( 'puts', {'text': filename.toUpperCase() + '\t' + '<DIR>\t01-01-95\t04:20a\n'} );
             } else {
                 winPrompt.command95( 'puts', {'text': filename.toUpperCase() + '\n'} );
@@ -57,7 +57,7 @@ function handlePromptLine( text, winPrompt ) {
         winPrompt.command95( 'puts', {'text': '0 bytes free\n\n'} );
     } else if(
         text in resolvePath( workingPath ).children &&
-        resolvePath( workingPath + '\\' + text ).type == desktop95Types.EXECUTABLE
+        resolvePath( workingPath + '\\' + text ).type == File95Types.EXECUTABLE
     ) {
         // TODO: Handle args.
         // TODO: Use ID for winPrompt.
@@ -285,20 +285,33 @@ function boot() {
         settings.items = [];
         let listing = listFolder( menuPath );
         listing.forEach( function( iter ) {
-            if( desktop95Types.FOLDER == iter.type ) {
+            if( File95Types.FOLDER == iter.type ) {
                 settings.items.push( {
                     'caption': iter.name,
                     'type': menu95Type.EVENTMENU,
                     'icon': 'programs'
                 } );
-            } else {
+            } else if( File95Types.SHORTCUT == iter.type ) {
+                var target = iter.resolve();
+                console.log( iter );
                 settings.items.push( {
-                    'caption': iter.caption,
+                    'caption': iter.name,
                     'type': menu95Type.ITEM,
                     'icon': iter.icon,
                     'callback': function() {
                         let itemPath = menuPath + '\\' + iter.caption;
-                        var itemObject = resolveItem( itemPath );
+                        var itemObject = resolvePath( itemPath ).resolve();
+                        execVE( itemObject.exec, itemObject.args, itemObject.env );
+                    }
+                } );
+            } else {
+                settings.items.push( {
+                    'caption': iter.name,
+                    'type': menu95Type.ITEM,
+                    'icon': iter.icon,
+                    'callback': function() {
+                        let itemPath = menuPath + '\\' + iter.caption;
+                        var itemObject = resolvePath( itemPath ).resolve();
                         execVE( itemObject.exec, itemObject.args, itemObject.env );
                     }
                 } );

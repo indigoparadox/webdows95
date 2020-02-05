@@ -15,11 +15,40 @@ var settings = $.extend( {
     'cbData': null,
     'menuContainer': '#desktop',
     'targetWindow': 'new',
+    /* 'iconSize': 32,
+    'iconTextPosition': 'bottom', */
 }, options );
 
 var env = $.extend( {
     'working-path': ''
 }, enviro );
+
+var explorerWindowSetup = function( winHandle, settings, env ) {
+
+    var wrapper = $('<div class="container-wrapper"></div>');
+    var container = $('<div class="window-folder-container container"></div>');
+    wrapper.append( container );
+    winHandle.find( '.window-form' ).append( wrapper );
+
+    for( var key in env ) {
+        container.attr( 'data-' + key, env[key] );
+    }
+
+    if( 'item-path' in settings ) {
+        container.attr( 'data-working-path', settings['item-path'] );
+    }
+
+    /*
+    container.attr( 'data-icon-size', settings.iconSize );
+    container.attr( 'data-icon-text-position', settings.iconTextPosition );
+    */
+
+    container.desktop95( 'enable' );
+
+    winHandle.addClass( 'window-scroll-contents' );
+
+    return container;
+};
 
 switch( action.toLowerCase() ) {
 
@@ -101,6 +130,10 @@ case 'show-menu':
     menu.show();
     break;
 
+case 'new-path':
+
+    break;
+
 case 'browse-save':
     settings.w = 420;
     settings.h = 260;
@@ -120,17 +153,16 @@ case 'browse-save':
 
     winHandle.find( '.window-form' ).append( pathRow );
 
-    var wrapper = $('<div class="container-wrapper browse-container-wrapper"></div>');
-    var container = $('<div class="window-folder-container browse-container container"></div>');
-    wrapper.append( container );
-    winHandle.find( '.window-form' ).append( wrapper );
-
     var inputPath = $('<input type="text" class="browse-path input-text" name="browse-path" />');
     var saveButton = $('<button class="browse-button-save">Save</button>');
 
     saveButton.on( 'click', function( e ) {
         e.preventDefault();
     } );
+
+    var container = explorerWindowSetup( winHandle, settings, env );
+    container.addClass( 'browse-container' );
+    container.parent( '.container-wrapper' ).addClass( 'browse-container-wrapper' );
     
     var filenameRow = $('<div class="browse-filename-row"><label>File name:</label></div>');
     filenameRow.append( inputPath );
@@ -150,21 +182,6 @@ case 'browse-save':
     typeRow.append( typeWrapper );
     typeRow.append( cancelButton );
     winHandle.find( '.window-form' ).append( typeRow );
-
-    for( var key in env ) {
-        container.attr( 'data-' + key, env[key] );
-    }
-
-    container.desktop95( 'enable' );
-
-    winHandle.addClass( 'window-scroll-contents' );
-
-    console.assert( 1 == winHandle.length );
-    console.assert( winHandle.hasClass( 'window-hidden' ) );
-
-    /* if( null != settings.target ) {
-        winHandle.addClass( 'explore-' + _htmlStrToClass( settings.target ) );
-    } */
 
     winHandle.removeClass( 'window-hidden' );
 
@@ -227,32 +244,13 @@ case 'open-folder':
 
     winHandle.control95( 'statusbar' );
 
-    var wrapper = $('<div class="container-wrapper"></div>');
-
-    var container = $('<div class="window-folder-container container"></div>');
-    wrapper.append( container );
-    winHandle.find( '.window-form' ).append( wrapper );
-
-    for( var key in env ) {
-        container.attr( 'data-' + key, env[key] );
-    }
-
-    container.desktop95( 'enable' );
-
     var trayObjects = $('<div class="tray tray-objects"></div>');
     winHandle.children( '.statusbar' ).append( trayObjects );
 
     var trayBytes = $('<div class="tray tray-bytes"></div>');
     winHandle.children( '.statusbar' ).append( trayBytes );
 
-    winHandle.addClass( 'window-scroll-contents' );
-
-    console.assert( 1 == winHandle.length );
-    console.assert( winHandle.hasClass( 'window-hidden' ) );
-
-    if( null != settings.target ) {
-        winHandle.addClass( 'explore-' + _htmlStrToClass( settings.target ) );
-    }
+    var container = explorerWindowSetup( winHandle, settings, env );
 
     winHandle.removeClass( 'window-hidden' );
 

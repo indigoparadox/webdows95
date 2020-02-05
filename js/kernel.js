@@ -1,12 +1,4 @@
 
-const desktop95Types = {
-    'DRIVE': 'drive',
-    'FOLDER': 'folder',
-    'COMPUTER': 'computer',
-    'EXECUTABLE': 'executable',
-    'SHORTCUT': 'shortcut',
-};
-
 const kernel95FolderTypes = [
     'folder', 'computer', 'drive'
 ];
@@ -105,7 +97,7 @@ function newFolder( parent, name ) {
     }
 
     parent.children[name] = {
-        'type': desktop95Types.FOLDER,
+        'type': File95Types.FOLDER,
         'children': {},
     }
 
@@ -135,12 +127,6 @@ function resolvePath( pathString ) {
 
     if( !('env' in file) ) {
         file.env = {};
-    }
-
-    if( !('working-path' in file.env) && kernel95FolderTypes.includes( file.type ) ) {
-        file.env['working-path'] = pathString;
-    } else if( !('working-path' in file.env) && !kernel95FolderTypes.includes( file.type ) ) {
-        file.env['working-path'] = dirName( pathString );
     }
 
     return file;
@@ -208,91 +194,6 @@ function dirName( path ) {
     return path;
 }
 
-function resolveContentsP( filePath, callback ) {
-    'use strict';
-
-    var fileObject = resolvePath( filePath );
-
-    return resolveContentsO( fileObject, callback );
-}
-
-function resolveContentsO( fileObject, callback ) {
-    'use strict';
-
-    var deferred = new $.Deferred();
-
-    // Handle old "URL" contents.
-    if( 'url' in fileObject ) {
-        fileObject.src = fileObject.url;
-    }
-
-    if( 'contents' in fileObject ) {
-        callback( fileObject.contents );
-        deferred.resolve();
-        return deferred.promise();
-    }
-    
-    $.get( fileObject.src, function( data ) {
-        callback( data );
-        deferred.resolve();
-    } );
-
-    return deferred.promise();
-}
-
-function resolveItem( itemPath ) {
-    'use strict';
-
-    var itemData = resolvePath( itemPath );
-    var origType = itemData.type;
-
-    if( 'shortcut' == origType ) {
-        var targetData = resolvePath( itemData.target );
-        itemData = $.extend( {}, itemData, targetData );
-        itemData.exec = itemData.target;
-    }
-
-    if( !('args' in itemData) ) {
-        itemData.args = {};
-    }
-
-    // Package the filename inside of the data.
-    itemData.caption = baseName( itemPath );
-
-    if( !('data' in itemData) ) {
-        itemData.data = {};
-    }
-
-    // Package the path to the file inside of the data for resolving the icon
-    // later.
-    itemData.data['item-path'] = itemPath;
-    itemData.data['item-type'] = origType;
-
-    if( !('type' in itemData) || !(itemData.type in associations) ) {
-        itemData.type = 'generic';
-    }
-
-    // Package the working path for running the process the icon points to.
-    switch( itemData.type ) {
-    case 'folder':
-    case 'drive':
-        itemData.env = {};
-        itemData.env['working-path'] = itemPath;
-        break;
-    case 'computer':
-        itemData.env = {};
-        itemData.env['working-path'] = '';
-        break;
-    }
-
-    if( itemData.type in associations ) {
-        // Fill in missing data with associations.
-        itemData = $.extend( {}, associations[itemData.type], itemData );
-    }
-
-    return itemData;
-}
-
 function exec( execPath ) {
     return execV( execPath, {} );
 }
@@ -306,11 +207,14 @@ function execVE( execPath, args, env ) {
 
     console.log( 'Exec env:' );
     console.log( env );
-    console.trace();
+    console.log( args );
 
     var deferred = new $.Deferred();
 
-    var execObject = resolvePath( execPath );
+    var execObject = execPath;
+    if( 'string' == typeof( execPath ) ) {
+        execObject = resolvePath( execPath );
+    }
 
     // Add specified args to exec args.
     execObject.args = $.extend( {}, execObject.args, args );
@@ -344,7 +248,7 @@ function execVE( execPath, args, env ) {
 
     // Load the executable code.
     $('#desktop').css( 'cursor', 'progress' );
-    resolveContentsO( execObject, function( data ) {
+    execObject.contents( function( data ) {
         var scriptElement = $('<script id="exe-' + _htmlStrToClass( execObject.src ) + '" type="text/javascript">' + data + '</script>');
         $('head').append( scriptElement );
     } ).then( function() {
@@ -356,8 +260,8 @@ function execVE( execPath, args, env ) {
         }
 
         // Create a fake file object, resolve its contents, and insert it as a stylesheet.
-        var styleObject = {'src': execObject.styleSrc};
-        return resolveContentsO( styleObject, function( data ) {
+        var styleObject = new File95( {'src': execObject.styleSrc} );
+        return styleObject.contents( function( data ) {
             var cssElement = $('<style id="exe-' + _htmlStrToClass( execObject.styleSrc ) + '" type="text/css">' + data + '</style>');
             $('head').append( cssElement );
         } );
@@ -376,7 +280,7 @@ function listFolder( path ) {
         for( var itemName in items ) {
             // We really only need enough info to make the icon. We'll get
             // all the runtime stuff again on execute.
-            var itemData = resolveItem( path + '\\' + itemName );
+            var itemData = resolvePath( path + '\\' + itemName );
 
             // No association available.
             itemsList.push( itemData );
@@ -402,6 +306,9 @@ function genericBoot() {
             'targetWindow': 'new'
         }, options );
 
+        $(this).attr( 'data-icon-size', settings.iconSize );
+        $(this).attr( 'data-icon-text-position', settings.iconTextPosition );
+
         // Get rid of existing icons.
         $(this).children( '.desktop-icon' ).remove();
 
@@ -412,6 +319,8 @@ function genericBoot() {
             // sure it's the right size/layout on populate.
             var itemIter = $.extend( {}, listing[idx], settings );
 
+            //console.log( listing[idx] );
+
             // Setup the icon position if none is set.
             if( !('x' in itemIter ) && !('y' in itemIter) ) {
                 itemIter.x = nextPos[0];
@@ -419,8 +328,22 @@ function genericBoot() {
                 nextPos = getNextIconPosition( $(this), false );
             }
 
+            //console.log( itemIter );
+
             // Create the icon and append it.
-            var iconElement = $(this).desktop95( 'icon', itemIter );
+            var iconElement = $(this).desktop95( 'icon', {
+                'caption': listing[idx].name,
+                'icon': listing[idx].icon,
+                'iconSize': settings.iconSize,
+                'iconTextPosition': settings.iconTextPosition,
+                'classes': settings.classes,
+                'data': {
+                    'item-type': itemIter.type,
+                    'item-path': $(this).attr( 'data-working-path' ) + '\\' + listing[idx].name,
+                },
+                'x': itemIter.x,
+                'y': itemIter.y,
+            } );
             $(this).append( iconElement );
         }
         e.stopPropagation();
@@ -429,10 +352,24 @@ function genericBoot() {
     // Handle icon double-clicks/openings.
     $('body').on( 'desktop-run-icon', '.desktop-icon', function( e ) {
         var icon = $(e.target).closest( '.desktop-icon' );
-        var iconTargetPath = icon.attr( 'data-item-path' );
+        var container = $(e.target).closest( '.container' );
+
         console.assert( 1 == icon.length );
-        var itemObject = resolveItem( iconTargetPath );
-        execVE( itemObject.exec, itemObject.args, itemObject.env );
+        var itemObject = resolvePath( icon.attr( 'data-item-path' ) );
+        if( File95Types.SHORTCUT == itemObject.type ) {
+            itemObject = itemObject.resolve();
+        }
+
+        if( 'same' == container.attr( 'data-icon-target-window' ) && kernel95FolderTypes.includes( itemObject.type ) ) {
+            container.attr( 'data-working-path', itemObject.args['item-path'] );
+            container.trigger( 'desktop-populate', {
+                'iconSize': container.attr( 'data-icon-size' ),
+                'iconTextPosition': container.attr( 'data-icon-text-position' ),
+                'targetWindow': container.attr( 'data-icon-target-window' )
+            } );
+        } else {
+            execVE( itemObject.opener(), itemObject.args, itemObject.env );
+        }
     } );
 
 }

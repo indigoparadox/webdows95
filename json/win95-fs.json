@@ -1,5 +1,75 @@
 {
     "type": "computer",
+    "associations": {
+        "executable": {
+            "description": "Executable",
+            "icon": "exe"
+        },
+        "shortcut": {
+            "description": "Shortcut",
+            "icon": "lnk"
+        },
+        "computer": {
+            "description": "Computer",
+            "icon": "computer",
+            "exec": "c:\\windows\\explorer.js"
+        },
+        "drive": {
+            "description": "Drive",
+            "icon": "drive",
+            "exec": "c:\\windows\\explorer.js",
+            "contextMenu": {
+                "items": [
+                    {
+                        "caption": "Format",
+                        "callback": "formatFS"
+                    },
+                    {
+                        "type": "divider"
+                    },
+                    {
+                        "caption": "Properties",
+                        "callback": ""
+                    }
+                ]
+            }
+        },
+        "folder": {
+            "description": "Folder",
+            "icon": "folder",
+            "exec": "c:\\windows\\explorer.js"
+        },
+        "notepad": {
+            "description": "Text Document",
+            "icon": "txt",
+            "exec": "c:\\windows\\notepad.js"
+        },
+        "wordpad": {
+            "description": "Rich Text Document",
+            "icon": "rtf",
+            "exec": "c:\\windows\\wordpad.js"
+        },
+        "prompt": {
+            "description": "Prompt",
+            "icon": "prompt",
+            "exec": "c:\\windows\\command.js"
+        },
+        "browser": {
+            "description": "Internet Shortcut",
+            "icon": "url",
+            "exec": "c:\\windows\\browser.js"
+        },
+        "cdplayer": {
+            "description": "Music CD",
+            "icon": "cda",
+            "exec": "c:\\windows\\cdplayer.js"
+        },
+        "video": {
+            "description": "Video File",
+            "icon": "avi",
+            "exec": "c:\\windows\\mpvideo.js"
+        }
+    },    
     "children":{
         "c:": {
             "type": "drive",
