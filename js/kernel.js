@@ -39,37 +39,37 @@ var fs = null;
 var associations = null;
 
 (function( $ ) {
-    $.fn.env95 = function( action, key, value ) {
-    'use strict';
-    
-    switch( action.toLowerCase() ) {
+$.fn.env95 = function( action, key, value ) {
+'use strict';
 
-    case 'set':
-        this.attr( 'data-' + key, value );
-        return this;
-        
-    case 'get':
-        if( null != key ) {
-            return this.attr( 'data-' + key );
-        } else if( 0 < this.length ) {
-            var out = {};
-            $.each( this[0].attributes, function() {
-                if( this.name.startsWith( 'data-' ) ) {
-                    // Start from after the data- portion.
-                    out[this.name.substr( 5 )] = this.value;
-                }
-            } );
-            return out;
-        }
+switch( action.toLowerCase() ) {
 
-    case 'get-int':
-        if( null != key ) {
-            return parseInt( this.attr( 'data-' + key ) );
-        } else {
-            return {}; // XXX
-        }
+case 'set':
+    this.attr( 'data-' + key, value );
+    return this;
     
-    }; }; }( jQuery ) );
+case 'get':
+    if( null != key ) {
+        return this.attr( 'data-' + key );
+    } else if( 0 < this.length ) {
+        var out = {};
+        $.each( this[0].attributes, function() {
+            if( this.name.startsWith( 'data-' ) ) {
+                // Start from after the data- portion.
+                out[this.name.substr( 5 )] = this.value;
+            }
+        } );
+        return out;
+    }
+
+case 'get-int':
+    if( null != key ) {
+        return parseInt( this.attr( 'data-' + key ) );
+    } else {
+        return {}; // XXX
+    }
+
+}; }; }( jQuery ) );
 
 function _handleContainerDrop( e, d ) {
     'use strict';
