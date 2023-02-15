@@ -5,7 +5,7 @@ itsdangerous==1.1.0
 Jinja2==2.11.3
 MarkupSafe==1.1.1
 PyYAML==5.4
-Werkzeug==0.16.0
+Werkzeug==2.2.3
 WTForms==2.2.1
 Flask-Login==0.4.1
 is-safe-url==1.0
