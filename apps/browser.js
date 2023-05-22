@@ -29,7 +29,7 @@ switch( action.toLowerCase() ) {
 
 case 'go':
     return this.each( function( idx, winHandle ) {
-        var newLoc = 'http://web.archive.org/web/' + settings.waybackDate + '/' + settings.url;
+        var newLoc = 'https://web.archive.org/web/' + settings.waybackDate + '/' + settings.url;
         $(winHandle).find( '.input-url' ).val( settings.url );
         $(winHandle).find( '.tray-status-text' ).text( 'Opening ' + settings.url + '...' );
         //$(winHandle).css( 'cursor', 'progress' );
